@@ -37,7 +37,8 @@ export async function generateStaticParams() {
 
 // Generate metadata for SEO
 export async function generateMetadata({ params }) {
-  const post = getBlogPost(params.slug);
+  const resolvedParams = await params; // AWAIT PARAMS IN NEXT.JS 15+
+  const post = getBlogPost(resolvedParams.slug);
   
   if (!post) {
     return {
@@ -45,7 +46,7 @@ export async function generateMetadata({ params }) {
     };
   }
 
-  const baseUrl = 'https://jobcalculators.com'; // Change to your actual domain
+  const baseUrl = 'https://jobcalculators.com';
   const url = `${baseUrl}/blog/${post.slug}`;
 
   return {
@@ -54,12 +55,10 @@ export async function generateMetadata({ params }) {
     keywords: post.keywords,
     authors: [{ name: post.author }],
     
-    // Canonical URL
     alternates: {
       canonical: url,
     },
     
-    // Open Graph tags for Facebook, LinkedIn
     openGraph: {
       title: post.title,
       description: post.description,
@@ -70,7 +69,7 @@ export async function generateMetadata({ params }) {
       authors: [post.author],
       images: [
         {
-          url: `${baseUrl}/og-image-blog.jpg`, // Create a default blog OG image
+          url: `${baseUrl}/og-image-blog.jpg`,
           width: 1200,
           height: 630,
           alt: post.title,
@@ -78,7 +77,6 @@ export async function generateMetadata({ params }) {
       ],
     },
     
-    // Twitter Card tags
     twitter: {
       card: 'summary_large_image',
       title: post.title,
@@ -88,20 +86,21 @@ export async function generateMetadata({ params }) {
   };
 }
 
-export default function BlogPost({ params }) {
-  const post = getBlogPost(params.slug);
+export default async function BlogPost({ params }) {
+  const resolvedParams = await params; // AWAIT PARAMS IN NEXT.JS 15+
+  const post = getBlogPost(resolvedParams.slug);
   
   if (!post) {
     notFound();
   }
 
-  const PostComponent = postComponents[params.slug];
+  const PostComponent = postComponents[resolvedParams.slug];
   
   if (!PostComponent) {
     notFound();
   }
 
-  const baseUrl = 'https://jobcalculators.com'; // Change to your actual domain
+  const baseUrl = 'https://jobcalculators.com';
   const url = `${baseUrl}/blog/${post.slug}`;
 
   // Article Schema (JSON-LD) for rich results
@@ -124,7 +123,7 @@ export default function BlogPost({ params }) {
       url: baseUrl,
       logo: {
         '@type': 'ImageObject',
-        url: `${baseUrl}/logo.png`, // Add your logo
+        url: `${baseUrl}/logo.png`,
       },
     },
     mainEntityOfPage: {
