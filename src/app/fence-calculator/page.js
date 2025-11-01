@@ -1,5 +1,6 @@
 import { getCalculatorData } from '@/data/calculatorData';
 import FenceCalculator from '@/components/calculators/FenceCalculator';
+import CalculatorBlogLink from '@/components/blog/CalculatorBlogLink';
 
 export async function generateMetadata() {
   const data = getCalculatorData('fence-calculator');

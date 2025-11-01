@@ -1,5 +1,6 @@
 import { getCalculatorData } from '@/data/calculatorData';
 import DeckStainCalculator from '@/components/calculators/DeckStainCalculator';
+import CalculatorBlogLink from '@/components/blog/CalculatorBlogLink';
 
 export async function generateMetadata() {
   const data = getCalculatorData('deck-stain-calculator');

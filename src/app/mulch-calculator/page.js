@@ -1,5 +1,6 @@
 import { getCalculatorData } from '@/data/calculatorData';
 import MulchCalculator from '@/components/calculators/MulchCalculator';
+import CalculatorBlogLink from '@/components/blog/CalculatorBlogLink';
 
 export async function generateMetadata() {
   const data = getCalculatorData('mulch-calculator');

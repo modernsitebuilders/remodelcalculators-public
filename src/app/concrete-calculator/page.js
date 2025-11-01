@@ -1,5 +1,6 @@
 import { getCalculatorData } from '@/data/calculatorData';
 import ConcreteCalculator from '@/components/calculators/ConcreteCalculator';
+import CalculatorBlogLink from '@/components/blog/CalculatorBlogLink';
 
 export async function generateMetadata() {
   const data = getCalculatorData('concrete-calculator');

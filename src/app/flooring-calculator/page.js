@@ -1,5 +1,6 @@
 import { getCalculatorData } from '@/data/calculatorData';
 import FlooringCalculator from '@/components/calculators/FlooringCalculator';
+import CalculatorBlogLink from '@/components/blog/CalculatorBlogLink';
 
 export async function generateMetadata() {
   const data = getCalculatorData('flooring-calculator');

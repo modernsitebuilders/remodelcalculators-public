@@ -1,5 +1,6 @@
 import { getCalculatorData } from '@/data/calculatorData';
 import InteriorPaintCalculator from '@/components/calculators/InteriorPaintCalculator';
+import CalculatorBlogLink from '@/components/blog/CalculatorBlogLink';
 
 export async function generateMetadata() {
   const data = getCalculatorData('interior-paint-calculator');

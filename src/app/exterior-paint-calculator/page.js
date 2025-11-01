@@ -1,5 +1,6 @@
 import { getCalculatorData } from '@/data/calculatorData';
 import ExteriorPaintCalculator from '@/components/calculators/ExteriorPaintCalculator';
+import CalculatorBlogLink from '@/components/blog/CalculatorBlogLink';
 
 export async function generateMetadata() {
   const data = getCalculatorData('exterior-paint-calculator');
