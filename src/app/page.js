@@ -1,6 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import DumpsterCalculatorPromo from '@/components/DumpsterCalculatorPromo';
+
 import { 
   Calculator, 
   Hammer, 
@@ -121,7 +123,11 @@ export default function HomePage() {
             </div>
           </div>
         </div>
+      {/* ADD THIS - After popular calculators, before footer */}
+      <div className="max-w-4xl mx-auto mt-16 mb-8">
+        <DumpsterCalculatorPromo />
       </div>
+    </div>
 
       {/* Calculator Grid */}
       <div className="container mx-auto max-w-7xl px-4 py-16">
