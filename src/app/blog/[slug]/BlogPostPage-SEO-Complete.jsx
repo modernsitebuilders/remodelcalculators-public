@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getBlogPost, blogPosts } from '@/app/data/blogPosts';
+import { getBlogPost, blogPosts } from '@/data/blogPosts';
 import Link from 'next/link';
 
 // Import all blog post components

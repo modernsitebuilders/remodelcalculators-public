@@ -22,7 +22,7 @@ export default function BlogPage() {
             className="group"
           >
             <div className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow p-6 h-full">
-              <div className="text-4xl mb-4">{post.icon}</div>
+              <div className="text-4xl mb-4">{post.image}</div>
               <h2 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors">
                 {post.title}
               </h2>
