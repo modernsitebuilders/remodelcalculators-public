@@ -32,9 +32,13 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6">
-            <Link href="/" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
-              Home
-            </Link>
+  <Link href="/" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
+    Home
+  </Link>
+  
+  <Link href="/blog" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
+    Guides
+  </Link>
             
             {/* Calculators Dropdown */}
             <div className="relative group">
