@@ -1,0 +1,124 @@
+export const blogPosts = [
+  {
+    slug: 'concrete-calculation-guide',
+    title: 'How Much Concrete Do I Need? Complete Calculation Guide',
+    description: 'Industry-standard concrete calculations for slabs, driveways, footings, and posts. Includes ACI specifications, bag yields, and ready-mix comparisons.',
+    category: 'Concrete',
+    date: '2025-10-31',
+    readTime: '8 min read',
+    image: '🏗️',
+    keywords: ['concrete calculator', 'cubic yards', 'concrete bags', 'slab thickness', 'ACI 318'],
+    author: 'Construction Calculators',
+  },
+  {
+    slug: 'drywall-material-guide',
+    title: 'Drywall Material List: What You Need Per 1000 Sq Ft',
+    description: 'Complete drywall material calculations including sheets, joint compound, tape, and screws. Based on USG and manufacturer specifications.',
+    category: 'Drywall',
+    date: '2025-10-31',
+    readTime: '7 min read',
+    image: '🧱',
+    keywords: ['drywall calculator', 'joint compound', 'drywall tape', 'sheet coverage'],
+    author: 'Construction Calculators',
+  },
+  {
+    slug: 'roofing-square-calculator',
+    title: 'Roofing Square Calculator: Shingle Coverage Standards',
+    description: 'Roofing materials using NRCA standards. Includes pitch factors, bundle coverage rates, underlayment requirements, and waste factor calculations.', 
+    category: 'Roofing',
+    date: '2025-10-31',
+    readTime: '7 min read',
+    image: '🏠',
+    keywords: ['roofing square', 'shingle calculator', 'roofing materials', 'pitch factor'],
+    author: 'Construction Calculators',
+  },
+  {
+    slug: 'interior-paint-coverage-guide',
+    title: 'Interior Paint Coverage: How Much Per Room',
+    description: 'Interior paint coverage rates for smooth, textured, and bare drywall. Manufacturer specs, room calculations, and primer requirements from major brands.',
+    category: 'Paint',
+    date: '2025-10-31',
+    readTime: '7 min read',
+    image: '🎨',
+    keywords: ['interior paint calculator', 'paint per room', 'wall coverage', 'primer coverage'],
+    author: 'Construction Calculators',
+  },
+  {
+    slug: 'exterior-paint-coverage-guide',
+    title: 'Exterior Paint Coverage: Siding & Surface Types',
+    description: 'Exterior paint coverage by siding type: vinyl, wood, stucco, brick. ASTM standards for primers, weather factors, and professional application methods.',
+    category: 'Paint',
+    date: '2025-10-31',
+    readTime: '8 min read',
+    image: '🏡',
+    keywords: ['exterior paint calculator', 'house paint', 'siding coverage', 'exterior primer'],
+    author: 'Construction Calculators',
+  },
+  {
+    slug: 'deck-stain-coverage-guide',
+    title: 'Deck Stain Coverage: How Much Per Square Foot',
+    description: 'Deck stain coverage by wood condition and stain type. Manufacturer specs, application methods, and coverage for railings and vertical surfaces.',
+    category: 'Deck & Outdoor',
+    date: '2025-10-31',
+    readTime: '7 min read',
+    image: '🪵',
+    keywords: ['deck stain calculator', 'stain coverage', 'wood deck', 'deck sealer'],
+    author: 'Construction Calculators',
+  },
+  {
+    slug: 'flooring-material-calculator',
+    title: 'Calculate Flooring Materials: Square Footage + Waste',
+    description: 'Flooring calculations for tile, hardwood, laminate, vinyl. Waste factors, layout patterns, and cutting allowances for professional results.',
+    category: 'Flooring',
+    date: '2025-10-31',
+    readTime: '7 min read',
+    image: '📐',
+    keywords: ['flooring calculator', 'tile calculator', 'hardwood flooring', 'waste factor'],
+    author: 'Construction Calculators',
+  },
+  {
+    slug: 'fence-post-spacing-guide',
+    title: 'Fence Post Spacing: Building Code Requirements by State',
+    description: 'IRC/IBC fence post spacing standards, load calculations, and concrete footing requirements. State-specific building codes included.',
+    category: 'Fencing',
+    date: '2025-10-31',
+    readTime: '8 min read',
+    image: '🚧',
+    keywords: ['fence calculator', 'post spacing', 'building codes', 'fence footings'],
+    author: 'Construction Calculators',
+  },
+  {
+    slug: 'siding-material-calculator',
+    title: 'Siding Calculator: Materials by House Size & Type',
+    description: 'Siding material calculations for vinyl, fiber cement, wood, and metal. Coverage rates, waste factors, and trim accessory requirements per IRC standards.',
+    category: 'Siding',
+    date: '2025-10-31',
+    readTime: '7 min read',
+    image: '🏘️',
+    keywords: ['siding calculator', 'vinyl siding', 'fiber cement', 'house siding'],
+    author: 'Construction Calculators',
+  },
+  {
+    slug: 'mulch-calculator-guide',
+    title: 'Mulch Calculator: Cubic Yards & Coverage by Depth',
+    description: 'Mulch coverage calculations with depth recommendations by application. Bulk vs bagged comparison, material types, and landscaping installation standards.',
+    category: 'Landscaping',
+    date: '2025-10-31',
+    readTime: '7 min read',
+    image: '🌱',
+    keywords: ['mulch calculator', 'cubic yards mulch', 'landscaping', 'mulch depth'],
+    author: 'Construction Calculators',
+  },
+];
+
+export function getBlogPost(slug) {
+  return blogPosts.find(post => post.slug === slug);
+}
+
+export function getRecentPosts(limit = 3) {
+  return blogPosts.slice(0, limit);
+}
+
+export function getPostsByCategory(category) {
+  return blogPosts.filter(post => post.category === category);
+}
