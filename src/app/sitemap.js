@@ -1,3 +1,5 @@
+import { blogPosts } from '@/data/blogPosts';
+
 export default function sitemap() {
   const baseUrl = 'https://jobcalculators.com';
   
@@ -8,6 +10,12 @@ export default function sitemap() {
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 1,
+    },
+    {
+      url: `${baseUrl}/blog`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.9,
     },
     {
       url: `${baseUrl}/about`,
@@ -50,5 +58,13 @@ export default function sitemap() {
     priority: 0.9,
   }));
 
-  return [...staticPages, ...calculatorPages];
+  // Blog posts
+  const blogPages = blogPosts.map((post) => ({
+    url: `${baseUrl}/blog/${post.slug}`,
+    lastModified: new Date(post.date),
+    changeFrequency: 'monthly',
+    priority: 0.8,
+  }));
+
+  return [...staticPages, ...calculatorPages, ...blogPages];
 }
