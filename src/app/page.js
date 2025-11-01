@@ -1,65 +1,172 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import Link from 'next/link';
+import { 
+  Calculator, 
+  Hammer, 
+  Home, 
+  Paintbrush, 
+  Fence, 
+  Mountain, 
+  Trees, 
+  Layers,
+  Square,
+  LayoutGrid
+} from 'lucide-react';
+
+const calculators = [
+  {
+    name: 'Concrete Calculator',
+    description: 'Calculate concrete volume and material requirements for slabs, footings, and foundations.',
+    href: '/concrete-calculator',
+    icon: Layers,
+    category: 'Foundation'
+  },
+  {
+    name: 'Deck Stain Calculator',
+    description: 'Estimate deck stain requirements based on deck size and wood type.',
+    href: '/deck-stain-calculator',
+    icon: Home,
+    category: 'Exterior'
+  },
+  {
+    name: 'Drywall Calculator',
+    description: 'Calculate drywall sheets needed, disposal weight, and material estimates.',
+    href: '/drywall-calculator',
+    icon: Square,
+    category: 'Interior'
+  },
+  {
+    name: 'Exterior Paint Calculator',
+    description: 'Estimate paint requirements for exterior walls, siding, and trim.',
+    href: '/exterior-paint-calculator',
+    icon: Paintbrush,
+    category: 'Exterior'
+  },
+  {
+    name: 'Fence Calculator',
+    description: 'Calculate fencing materials including posts, rails, and pickets.',
+    href: '/fence-calculator',
+    icon: Fence,
+    category: 'Exterior'
+  },
+  {
+    name: 'Flooring Calculator',
+    description: 'Estimate flooring materials for tile, hardwood, laminate, vinyl, and carpet.',
+    href: '/flooring-calculator',
+    icon: LayoutGrid,
+    category: 'Interior'
+  },
+  {
+    name: 'Interior Paint Calculator',
+    description: 'Calculate interior paint requirements for walls, ceilings, and trim.',
+    href: '/interior-paint-calculator',
+    icon: Paintbrush,
+    category: 'Interior'
+  },
+  {
+    name: 'Mulch Calculator',
+    description: 'Estimate mulch volume and bags needed for landscaping projects.',
+    href: '/mulch-calculator',
+    icon: Trees,
+    category: 'Landscaping'
+  },
+  {
+    name: 'Roofing Calculator',
+    description: 'Calculate roofing materials including shingles, underlayment, and ridge caps.',
+    href: '/roofing-calculator',
+    icon: Mountain,
+    category: 'Exterior'
+  },
+  {
+    name: 'Siding Calculator',
+    description: 'Estimate siding materials for exterior wall coverage.',
+    href: '/siding-calculator',
+    icon: Hammer,
+    category: 'Exterior'
+  }
+];
+
+export default function HomePage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.js file.
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      {/* Hero Section */}
+      <div className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white py-20 px-4">
+        <div className="container mx-auto max-w-6xl text-center">
+          <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
+            <Calculator className="w-5 h-5" />
+            <span className="text-sm font-medium">Professional Construction Calculators</span>
+          </div>
+          
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+            Calculate Materials.<br />Build with Confidence.
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          
+          <p className="text-xl md:text-2xl mb-8 text-blue-50 max-w-3xl mx-auto">
+            Industry-standard calculators for accurate material estimation. Free, no login required.
+          </p>
+          
+          <div className="flex flex-wrap gap-4 justify-center text-sm">
+            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg">
+              <span className="text-green-300">✓</span> Free Forever
+            </div>
+            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg">
+              <span className="text-green-300">✓</span> No Sign Up
+            </div>
+            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg">
+              <span className="text-green-300">✓</span> Mobile Friendly
+            </div>
+            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg">
+              <span className="text-green-300">✓</span> Industry Standards
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Calculator Grid */}
+      <div className="container mx-auto max-w-7xl px-4 py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            All Calculators
+          </h2>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Select a calculator below to get started. Each calculator uses industry-standard formulas and includes waste factors.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {calculators.map((calc) => {
+            const IconComponent = calc.icon;
+            return (
+              <Link 
+                key={calc.href}
+                href={calc.href}
+                className="group block bg-white rounded-xl border-2 border-gray-200 hover:border-blue-500 hover:shadow-lg transition-all duration-200 p-6"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="bg-blue-50 group-hover:bg-blue-100 p-3 rounded-lg transition-colors">
+                    <IconComponent className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                        {calc.name}
+                      </h3>
+                      <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                        {calc.category}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                      {calc.description}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
         </div>
-      </main>
+      </div>
+
     </div>
   );
 }
