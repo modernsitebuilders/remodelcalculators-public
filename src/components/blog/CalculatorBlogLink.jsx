@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-export default function CalculatorBlogLink({ calculatorSlug, guideSlug, guideTitle }) {
+export default function CalculatorBlogLink({ blogSlug, blogTitle, description }) {
   return (
     <div className="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-r-lg my-8">
       <div className="flex items-start gap-3">
@@ -10,13 +10,13 @@ export default function CalculatorBlogLink({ calculatorSlug, guideSlug, guideTit
             Want to Learn More?
           </h3>
           <p className="text-gray-700 mb-3">
-            Check out our comprehensive guide with industry standards, specifications, and best practices.
+            {description || 'Check out our comprehensive guide with industry standards, specifications, and best practices.'}
           </p>
           <Link 
-            href={`/blog/${guideSlug}`}
+            href={`/blog/${blogSlug}`}
             className="inline-flex items-center gap-2 text-blue-600 font-semibold hover:text-blue-700 hover:underline"
           >
-            Read the {guideTitle} Guide
+            Read the {blogTitle} Guide
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
