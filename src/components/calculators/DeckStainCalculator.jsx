@@ -8,22 +8,22 @@ const DeckStainCalculator = () => {
   const [showResults, setShowResults] = useState(false);
   
   const [inputs, setInputs] = useState({
-    deckLength: 20,
-    deckWidth: 15,
-    railingLinearFeet: 50,
+    deckLength: '',
+    deckWidth: '',
+    railingLinearFeet: '',
     railingStyle: 'traditional_spindles',
     railingPanelHeight: 36,
-    numberOfSteps: 4,
+    numberOfSteps: '',
     stepWidth: 36,
     treadDepth: 11,
     riserHeight: 7,
-    stairRailingLinearFeet: 0,
+    stairRailingLinearFeet: '',
     includeLandings: false,
-    numberOfLandings: 1,
-    landingLength: 4,
-    landingWidth: 4,
-    numberOfBeams: 4,
-    beamLength: 20,
+    numberOfLandings: '',
+    landingLength: '',
+    landingWidth: '',
+    numberOfBeams: '',
+    beamLength: '',
     beamSize: '4x6',
     woodType: 'pressure_treated',
     woodCondition: 'new',
@@ -31,7 +31,7 @@ const DeckStainCalculator = () => {
     stainType: 'solid',
     applicationMethod: 'roller',
     coats: 2,
-    includeRailing: true,
+    includeRailing: false,
     includeStairs: false,
     includeBeams: false,
     includeUnderside: false
@@ -39,22 +39,22 @@ const DeckStainCalculator = () => {
 
   const handleReset = () => {
     setInputs({
-      deckLength: 20,
-      deckWidth: 15,
-      railingLinearFeet: 50,
+      deckLength: '',
+      deckWidth: '',
+      railingLinearFeet: '',
       railingStyle: 'traditional_spindles',
       railingPanelHeight: 36,
-      numberOfSteps: 4,
+      numberOfSteps: '',
       stepWidth: 36,
       treadDepth: 11,
       riserHeight: 7,
-      stairRailingLinearFeet: 0,
+      stairRailingLinearFeet: '',
       includeLandings: false,
-      numberOfLandings: 1,
-      landingLength: 4,
-      landingWidth: 4,
-      numberOfBeams: 4,
-      beamLength: 20,
+      numberOfLandings: '',
+      landingLength: '',
+      landingWidth: '',
+      numberOfBeams: '',
+      beamLength: '',
       beamSize: '4x6',
       woodType: 'pressure_treated',
       woodCondition: 'new',
@@ -62,7 +62,7 @@ const DeckStainCalculator = () => {
       stainType: 'solid',
       applicationMethod: 'roller',
       coats: 2,
-      includeRailing: true,
+      includeRailing: false,
       includeStairs: false,
       includeBeams: false,
       includeUnderside: false
@@ -231,44 +231,47 @@ const DeckStainCalculator = () => {
   };
 
   const results = useMemo(() => {
-    const deckArea = inputs.deckLength * inputs.deckWidth;
+    const deckArea = (parseFloat(inputs.deckLength) || 0) * (parseFloat(inputs.deckWidth) || 0);
 
     let deckRailingArea = 0;
-    if (inputs.includeRailing && inputs.railingLinearFeet > 0) {
+    if (inputs.includeRailing && (parseFloat(inputs.railingLinearFeet) || 0) > 0) {
+      const railingFeet = parseFloat(inputs.railingLinearFeet) || 0;
       if (railingStyles[inputs.railingStyle].multiplier === 'custom') {
-        deckRailingArea = inputs.railingLinearFeet * (inputs.railingPanelHeight / 12);
+        deckRailingArea = railingFeet * (inputs.railingPanelHeight / 12);
       } else {
-        deckRailingArea = inputs.railingLinearFeet * (inputs.railingPanelHeight / 12) * railingStyles[inputs.railingStyle].multiplier;
+        deckRailingArea = railingFeet * (inputs.railingPanelHeight / 12) * railingStyles[inputs.railingStyle].multiplier;
       }
     }
 
     let stairsArea = 0;
     let stairRailingArea = 0;
-    if (inputs.includeStairs && inputs.numberOfSteps > 0) {
-      const treadArea = (inputs.stepWidth / 12) * (inputs.treadDepth / 12) * inputs.numberOfSteps;
-      const riserArea = (inputs.stepWidth / 12) * (inputs.riserHeight / 12) * inputs.numberOfSteps;
+    if (inputs.includeStairs && (parseFloat(inputs.numberOfSteps) || 0) > 0) {
+      const steps = parseFloat(inputs.numberOfSteps) || 0;
+      const treadArea = (inputs.stepWidth / 12) * (inputs.treadDepth / 12) * steps;
+      const riserArea = (inputs.stepWidth / 12) * (inputs.riserHeight / 12) * steps;
       stairsArea = treadArea + riserArea;
 
-      if (inputs.stairRailingLinearFeet > 0) {
+      if ((parseFloat(inputs.stairRailingLinearFeet) || 0) > 0) {
+        const stairRailing = parseFloat(inputs.stairRailingLinearFeet) || 0;
         if (railingStyles[inputs.railingStyle].multiplier === 'custom') {
-          stairRailingArea = inputs.stairRailingLinearFeet * (inputs.railingPanelHeight / 12);
+          stairRailingArea = stairRailing * (inputs.railingPanelHeight / 12);
         } else {
-          stairRailingArea = inputs.stairRailingLinearFeet * (inputs.railingPanelHeight / 12) * railingStyles[inputs.railingStyle].multiplier;
+          stairRailingArea = stairRailing * (inputs.railingPanelHeight / 12) * railingStyles[inputs.railingStyle].multiplier;
         }
       }
     }
 
     let landingsArea = 0;
-    if (inputs.includeLandings && inputs.numberOfLandings > 0) {
-      landingsArea = inputs.landingLength * inputs.landingWidth * inputs.numberOfLandings;
+    if (inputs.includeLandings && (parseFloat(inputs.numberOfLandings) || 0) > 0) {
+      landingsArea = (parseFloat(inputs.landingLength) || 0) * (parseFloat(inputs.landingWidth) || 0) * (parseFloat(inputs.numberOfLandings) || 0);
     }
 
     let beamsArea = 0;
-    if (inputs.includeBeams && inputs.numberOfBeams > 0) {
+    if (inputs.includeBeams && (parseFloat(inputs.numberOfBeams) || 0) > 0) {
       const beamDimensions = beamSizes[inputs.beamSize];
       const perimeterInches = beamDimensions.width + (2 * beamDimensions.height);
       const perimeterFeet = perimeterInches / 12;
-      beamsArea = perimeterFeet * inputs.beamLength * inputs.numberOfBeams;
+      beamsArea = perimeterFeet * (parseFloat(inputs.beamLength) || 0) * (parseFloat(inputs.numberOfBeams) || 0);
     }
 
     let undersideArea = 0;
@@ -293,12 +296,12 @@ const DeckStainCalculator = () => {
     // Calculate gallons per coat - second coats cover approximately 2x the area
     let totalGallonsRaw = 0;
     
-    if (inputs.coats >= 1) {
+    if (inputs.coats >= 1 && totalArea > 0) {
       // First coat uses standard effective coverage
       totalGallonsRaw += totalArea / effectiveCoverage;
     }
     
-    if (inputs.coats >= 2) {
+    if (inputs.coats >= 2 && totalArea > 0) {
       // Second coat covers approximately 2x the area (wood is already saturated)
       // Exception: oil-based penetrating with wet-on-wet doesn't get this benefit
       const secondCoatCoverage = inputs.stainType === 'oil_based_penetrating' 
@@ -307,7 +310,7 @@ const DeckStainCalculator = () => {
       totalGallonsRaw += totalArea / secondCoatCoverage;
     }
     
-    if (inputs.coats >= 3) {
+    if (inputs.coats >= 3 && totalArea > 0) {
       // Third coat also gets 2x benefit
       const thirdCoatCoverage = inputs.stainType === 'oil_based_penetrating'
         ? effectiveCoverage
@@ -334,7 +337,7 @@ const DeckStainCalculator = () => {
       baseCoverage,
       effectiveCoverage,
       totalGallonsRaw: totalGallonsRaw.toFixed(2),
-      totalWithWaste: roundedGallons,
+      totalWithWaste: roundedGallons || 0,
       wastePercentage: Math.round((wasteFactor - 1) * 100)
     };
   }, [inputs]);
@@ -369,6 +372,7 @@ const DeckStainCalculator = () => {
                     value={inputs.deckLength}
                     onChange={(e) => handleInputChange('deckLength', e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Enter length"
                     min="1"
                   />
                 </div>
@@ -382,6 +386,7 @@ const DeckStainCalculator = () => {
                     value={inputs.deckWidth}
                     onChange={(e) => handleInputChange('deckWidth', e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Enter width"
                     min="1"
                   />
                 </div>
@@ -853,6 +858,12 @@ const DeckStainCalculator = () => {
           <div className="flex gap-4">
             <button
               onClick={() => {
+                // Validate required inputs
+                if (!inputs.deckLength || !inputs.deckWidth) {
+                  alert('Please enter deck dimensions (length and width) before calculating.');
+                  return;
+                }
+                
                 setShowResults(true);
                 // Track the calculation
                 trackCalculation('deck-stain', inputs, {
