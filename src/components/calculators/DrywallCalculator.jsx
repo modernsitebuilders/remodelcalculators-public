@@ -5,35 +5,33 @@ import { Calculator, Info, Square, Ruler, Package } from 'lucide-react';
 
 // Industry standards based on USG specifications and ASTM C840
 const SHEET_SIZES = {
-  '4x8': { name: '4×8 (32 sq ft)', area: 32, tapePerSheet: 10 },
-  '4x10': { name: '4×10 (40 sq ft)', area: 40, tapePerSheet: 12 },
-  '4x12': { name: '4×12 (48 sq ft)', area: 48, tapePerSheet: 14 }
+  '4x8': { name: '4×8 (32 sq ft)', area: 32, perimeter: 24 },
+  '4x10': { name: '4×10 (40 sq ft)', area: 40, perimeter: 28 },
+  '4x12': { name: '4×12 (48 sq ft)', area: 48, perimeter: 32 },
+  '4x14': { name: '4×14 (56 sq ft)', area: 56, perimeter: 36 },
+  '4x16': { name: '4×16 (64 sq ft)', area: 64, perimeter: 40 }
 };
 
 const THICKNESS_SPECS = {
   'quarter': { 
     name: '1/4"', 
     weight: 38, 
-    application: 'Curved surfaces, overlay',
-    screwsPerSheet: 28 
+    application: 'Curved surfaces, overlay'
   },
   'threeEighth': { 
     name: '3/8"', 
     weight: 44, 
-    application: 'Overlay existing walls',
-    screwsPerSheet: 32 
+    application: 'Overlay existing walls'
   },
   'half': { 
     name: '1/2"', 
     weight: 54, 
-    application: 'Standard walls (most common)',
-    screwsPerSheet: 35 
+    application: 'Standard walls (most common)'
   },
   'fiveEighth': { 
     name: '5/8"', 
     weight: 70, 
-    application: 'Fire-rated, ceilings, commercial',
-    screwsPerSheet: 38 
+    application: 'Fire-rated, ceilings, commercial'
   }
 };
 
@@ -98,44 +96,60 @@ export default function DrywallCalculator() {
       return;
     }
     
-    // Total area minus deductions
+    // Apply waste factors per industry standards
+    // Walls: 10% waste factor
+    const wallAreaWithWaste = totalWallArea * 1.10;
+    // Ceilings: 10% + additional 4% = 14% total waste factor (per research)
+    const ceilingAreaWithWaste = totalCeilingArea * 1.14;
+    
+    // Total area after waste factors, minus deductions
+    const totalAreaWithWaste = wallAreaWithWaste + ceilingAreaWithWaste - totalDeductions;
     totalArea = totalWallArea + totalCeilingArea - totalDeductions;
     
     // Get sheet specifications
     const sheetArea = SHEET_SIZES[sheetSize].area;
-    const tapePerSheet = SHEET_SIZES[sheetSize].tapePerSheet;
+    const sheetPerimeter = SHEET_SIZES[sheetSize].perimeter;
     const thicknessSpec = THICKNESS_SPECS[thickness];
     
-    // Calculate sheets needed (with 10% waste factor per industry standard)
-    const sheetsBase = totalArea / sheetArea;
-    const sheetsWithWaste = Math.ceil(sheetsBase * 1.10);
+    // Calculate sheets needed (waste already applied above)
+    const sheetsNeeded = Math.ceil(totalAreaWithWaste / sheetArea);
     
-    // Joint compound calculation (280 sq ft per gallon per USG specs)
-    // Level 4 finish requires 3 coats
-    const mudPerCoatGallons = totalArea / 280;
-    const totalMudGallons = Math.ceil(mudPerCoatGallons * 3);
+    // Joint compound calculation per USG specs
+    // Level 4 finish: 3 coats at 280 sq ft per gallon per coat
+    const gallonsPerCoat = totalArea / 280;
+    const totalMudGallons = Math.ceil(gallonsPerCoat * 3);
     
-    // Drywall tape (feet) - approximate based on sheets
-    const totalTapeFeet = Math.ceil(sheetsWithWaste * tapePerSheet);
-    const tapeRolls = Math.ceil(totalTapeFeet / 250); // 250 ft rolls standard
+    // Drywall tape calculation - Industry standard: 1 roll (500 ft) per 100 sq ft
+    // Alternative method: sheet perimeter × number of sheets
+    const tapeFeetByArea = (totalArea / 100) * 500;
+    const tapeFeetByPerimeter = sheetsNeeded * sheetPerimeter;
+    // Use the higher estimate for safety
+    const totalTapeFeet = Math.ceil(Math.max(tapeFeetByArea, tapeFeetByPerimeter));
+    const tapeRolls = Math.ceil(totalTapeFeet / 500); // 500 ft rolls standard
     
-    // Screws calculation (ASTM C840 standard spacing)
-    const totalScrews = sheetsWithWaste * thicknessSpec.screwsPerSheet;
+    // Screws calculation per ASTM C840
+    // Walls: 1 screw per sq ft (16" o.c. spacing)
+    // Ceilings: 1.25 screws per sq ft (12" o.c. spacing)
+    const wallScrews = Math.ceil(wallAreaWithWaste * 1.0);
+    const ceilingScrews = Math.ceil(ceilingAreaWithWaste * 1.25);
+    const totalScrews = wallScrews + ceilingScrews;
     const screwPounds = Math.ceil(totalScrews / 300); // ~300 screws per pound
     
     // Weight calculation for disposal
-    const totalWeight = sheetsWithWaste * thicknessSpec.weight;
+    const totalWeight = sheetsNeeded * thicknessSpec.weight;
 
     setResults({
       totalArea: totalArea.toFixed(0),
       wallArea: totalWallArea.toFixed(0),
       ceilingArea: totalCeilingArea.toFixed(0),
       deductSqFt: totalDeductions.toFixed(0),
-      sheets: sheetsWithWaste,
+      sheets: sheetsNeeded,
       mudGallons: totalMudGallons,
       tapeFeet: totalTapeFeet,
       tapeRolls: tapeRolls,
       screws: totalScrews,
+      wallScrews: wallScrews,
+      ceilingScrews: ceilingScrews,
       screwPounds: screwPounds,
       totalWeight: totalWeight,
       thicknessDisplay: thicknessSpec.name,
@@ -284,7 +298,7 @@ export default function DrywallCalculator() {
         {/* Sheet Size Selection */}
         <div>
           <label className="block font-semibold mb-2 text-gray-700">Sheet Size</label>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
             {Object.entries(SHEET_SIZES).map(([key, size]) => (
               <button
                 key={key}
@@ -295,10 +309,13 @@ export default function DrywallCalculator() {
                     : 'border-gray-300 hover:border-gray-400'
                 }`}
               >
-                <div className="font-semibold">{size.name}</div>
+                <div className="font-semibold text-sm">{size.name}</div>
               </button>
             ))}
           </div>
+          <p className="text-sm text-gray-600 mt-2">
+            <Info className="w-4 h-4 inline" /> Longer sheets reduce butt seams and finishing labor
+          </p>
         </div>
 
         {/* Thickness Selection */}
@@ -397,7 +414,7 @@ export default function DrywallCalculator() {
                   <div>
                     <div className="font-bold text-gray-900">Paper Drywall Tape</div>
                     <div className="text-sm text-gray-600">{results.tapeFeet} linear feet</div>
-                    <div className="text-xs text-gray-500 mt-1">Standard 250 ft rolls</div>
+                    <div className="text-xs text-gray-500 mt-1">Industry standard: 500 ft per 100 sq ft drywall</div>
                   </div>
                   <div className="text-3xl font-bold text-green-600">{results.tapeRolls} rolls</div>
                 </div>
@@ -407,7 +424,12 @@ export default function DrywallCalculator() {
                   <div>
                     <div className="font-bold text-gray-900">Drywall Screws (1¼" coarse thread)</div>
                     <div className="text-sm text-gray-600">{results.screws.toLocaleString()} screws total</div>
-                    <div className="text-xs text-gray-500 mt-1">ASTM C840: 12" o.c. on walls, 12" o.c. on ceilings</div>
+                    {parseInt(results.ceilingArea) > 0 && (
+                      <div className="text-xs text-gray-500 mt-1">
+                        Walls: {results.wallScrews.toLocaleString()} (1.0/sq ft) | Ceilings: {results.ceilingScrews.toLocaleString()} (1.25/sq ft)
+                      </div>
+                    )}
+                    <div className="text-xs text-gray-500 mt-1">ASTM C840: 16" o.c. walls, 12" o.c. ceilings</div>
                   </div>
                   <div className="text-3xl font-bold text-purple-600">{results.screwPounds} lbs</div>
                 </div>
@@ -427,13 +449,31 @@ export default function DrywallCalculator() {
             <div className="bg-blue-50 rounded-lg p-5 border-l-4 border-blue-500">
               <h5 className="font-bold text-gray-900 mb-2">Industry Standards Applied:</h5>
               <ul className="space-y-1 text-sm text-gray-700">
-                <li>• <strong>ASTM C840</strong> - Fastener spacing and installation methods</li>
-                <li>• <strong>GA-216</strong> - Gypsum Association finishing levels (Level 4 standard)</li>
-                <li>• <strong>USG Specifications</strong> - Material coverage rates and application guidelines</li>
-                <li>• <strong>10% Waste Factor</strong> - Standard allowance for cuts, breakage, and odd angles</li>
-                <li>• <strong>IRC Chapter 7</strong> - Wall covering thickness and fire rating requirements</li>
+                <li>• <strong>ASTM C840</strong> - Fastener spacing: 16" o.c. walls, 12" o.c. ceilings</li>
+                <li>• <strong>GA-216</strong> - Level 4 finish standard (3 coats joint compound)</li>
+                <li>• <strong>USG Specifications</strong> - 280 sq ft per gallon per coat coverage</li>
+                <li>• <strong>Waste Factors</strong> - 10% walls, 14% ceilings (10% + 4% overhead difficulty)</li>
+                <li>• <strong>Tape Requirements</strong> - 500 linear feet per 100 sq ft of drywall</li>
+                <li>• <strong>Screw Density</strong> - 1.0 per sq ft walls, 1.25 per sq ft ceilings</li>
+                <li>• <strong>IRC Chapter 7</strong> - 5/8" minimum for ceilings with 24" o.c. joists</li>
               </ul>
             </div>
+
+            {/* Ceiling thickness warning */}
+            {parseInt(results.ceilingArea) > 0 && thickness !== 'fiveEighth' && (
+              <div className="bg-orange-50 rounded-lg p-5 border-l-4 border-orange-500">
+                <div className="flex items-start gap-3">
+                  <Info className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h5 className="font-bold text-gray-900 mb-1">Ceiling Thickness Recommendation</h5>
+                    <p className="text-sm text-gray-700">
+                      Industry standard (GA-216) requires <strong>5/8" minimum thickness</strong> for ceilings with joists spaced 24" on center. 
+                      Consider using 5/8" drywall for your ceiling installation to meet code requirements and prevent sagging.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Reset Button */}
             <button
