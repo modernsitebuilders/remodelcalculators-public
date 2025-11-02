@@ -24,7 +24,7 @@ export default function InteriorPaintGuide() {
             <div className="space-y-3 text-gray-700">
               <div className="flex justify-between py-2 border-b border-gray-100">
                 <span className="font-medium">Primer coverage:</span>
-                <span className="font-semibold">350-400 sq ft/gal</span>
+                <span className="font-semibold">200-300 sq ft/gal</span>
               </div>
               <div className="flex justify-between py-2 border-b border-gray-100">
                 <span className="font-medium">Paint coverage:</span>
@@ -60,7 +60,7 @@ export default function InteriorPaintGuide() {
             <div className="space-y-3 text-gray-700">
               <div className="flex justify-between py-2 border-b border-gray-100">
                 <span className="font-medium">First coat:</span>
-                <span className="font-semibold">250-300 sq ft/gal</span>
+                <span className="font-semibold">200-300 sq ft/gal</span>
               </div>
               <div className="flex justify-between py-2 border-b border-gray-100">
                 <span className="font-medium">Additional coats:</span>
@@ -318,7 +318,7 @@ export default function InteriorPaintGuide() {
         
         <div className="grid md:grid-cols-2 gap-6">
           <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-lg p-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">PDCA Recommendations</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-4">PCA (formerly PDCA)</h3>
             <div className="space-y-3 text-sm text-gray-700">
               <div className="flex items-start gap-2">
                 <div className="bg-blue-500 rounded-full w-2 h-2 mt-1.5 flex-shrink-0"></div>
@@ -334,7 +334,7 @@ export default function InteriorPaintGuide() {
               </div>
               <div className="flex items-start gap-2">
                 <div className="bg-blue-500 rounded-full w-2 h-2 mt-1.5 flex-shrink-0"></div>
-                <p><strong>Deduct 21 sq ft per door</strong> and 15 sq ft per window when calculating wall area</p>
+                <p><strong>Deduct 20 sq ft per door</strong> and 15 sq ft per window when calculating wall area</p>
               </div>
             </div>
           </div>
@@ -381,7 +381,7 @@ export default function InteriorPaintGuide() {
 
                 <div className="bg-white rounded-lg p-4">
                   <p className="font-semibold text-gray-900 mb-2">Step 2: Deduct openings</p>
-                  <p className="text-gray-700 font-mono">Door: 21 sq ft</p>
+                  <p className="text-gray-700 font-mono">Door: 20 sq ft</p>
                   <p className="text-gray-700 font-mono">Windows (2): 30 sq ft</p>
                   <p className="text-gray-700 font-mono">Net area = 432 - 51 = 381 sq ft</p>
                 </div>

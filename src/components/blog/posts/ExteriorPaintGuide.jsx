@@ -8,7 +8,7 @@ export default function ExteriorPaintGuide() {
           <div className="text-3xl">💡</div>
           <div>
             <div className="font-semibold text-lg mb-2 text-gray-900">Quick Answer</div>
-            <p className="text-gray-700">Exterior paint coverage varies by surface: <strong>350-400 sq ft/gallon</strong> on smooth vinyl siding, <strong>250-300 sq ft/gallon</strong> on wood, and <strong>150-200 sq ft/gallon</strong> on rough stucco or brick.</p>
+            <p className="text-gray-700">Exterior paint coverage varies by surface: <strong>200-300 sq ft/gallon</strong> on smooth vinyl siding, <strong>250-300 sq ft/gallon</strong> on wood, and <strong>150-200 sq ft/gallon</strong> on rough stucco or brick.</p>
           </div>
         </div>
       </div>
@@ -24,7 +24,7 @@ export default function ExteriorPaintGuide() {
             <div className="space-y-3 text-gray-700">
               <div className="flex justify-between py-2 border-b border-gray-100">
                 <span className="font-medium">Primer coverage:</span>
-                <span className="font-semibold">350-400 sq ft/gal</span>
+                <span className="font-semibold">200-300 sq ft/gal</span>
               </div>
               <div className="flex justify-between py-2 border-b border-gray-100">
                 <span className="font-medium">Paint coverage:</span>
@@ -42,11 +42,11 @@ export default function ExteriorPaintGuide() {
             <div className="space-y-3 text-gray-700">
               <div className="flex justify-between py-2 border-b border-gray-100">
                 <span className="font-medium">New wood:</span>
-                <span className="font-semibold">250-300 sq ft/gal</span>
+                <span className="font-semibold">300-350 sq ft/gal</span>
               </div>
               <div className="flex justify-between py-2 border-b border-gray-100">
                 <span className="font-medium">Weathered wood:</span>
-                <span className="font-semibold">200-250 sq ft/gal</span>
+                <span className="font-semibold">250-300 sq ft/gal</span>
               </div>
               <div className="bg-orange-50 rounded-lg p-3 text-sm">
                 <strong>High absorption:</strong> Wood grain and weathering increase paint consumption by 25-50%.
@@ -64,7 +64,7 @@ export default function ExteriorPaintGuide() {
               </div>
               <div className="flex justify-between py-2 border-b border-gray-100">
                 <span className="font-medium">Rough stucco:</span>
-                <span className="font-semibold">150-200 sq ft/gal</span>
+                <span className="font-semibold">200-300 sq ft/gal</span>
               </div>
               <div className="bg-purple-50 rounded-lg p-3 text-sm">
                 <strong>Highly textured:</strong> Deep texture consumes 2-3× more paint than smooth surfaces.
@@ -82,7 +82,7 @@ export default function ExteriorPaintGuide() {
               </div>
               <div className="flex justify-between py-2 border-b border-gray-100">
                 <span className="font-medium">Unsealed brick:</span>
-                <span className="font-semibold">150-175 sq ft/gal</span>
+                <span className="font-semibold">200-300 sq ft/gal</span>
               </div>
               <div className="bg-red-50 rounded-lg p-3 text-sm">
                 <strong>Extreme porosity:</strong> Requires acrylic masonry primer before paint.
@@ -372,7 +372,7 @@ export default function ExteriorPaintGuide() {
             <div className="space-y-3 text-sm text-gray-700">
               <div className="flex justify-between py-2 border-b border-gray-100">
                 <span className="font-medium">Waste factor:</span>
-                <span className="font-semibold">35%</span>
+                <span className="font-semibold">20%</span>
               </div>
               <p className="pt-2">Fastest application. High overspray. Requires extensive masking. Best for large, open surfaces.</p>
             </div>
@@ -432,7 +432,7 @@ export default function ExteriorPaintGuide() {
         
         <div className="grid md:grid-cols-2 gap-6">
           <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-lg p-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">PDCA Standards</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-4">PCA (formerly PDCA)</h3>
             <div className="space-y-3 text-sm text-gray-700">
               <div className="flex items-start gap-2">
                 <div className="bg-blue-500 rounded-full w-2 h-2 mt-1.5 flex-shrink-0"></div>

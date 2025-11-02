@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { Info, AlertCircle, Droplets, Layers, Calculator } from 'lucide-react';
-import { trackCalculation } from '@/utils/tracking';
+
 
 const DeckStainCalculator = () => {
   const [showResults, setShowResults] = useState(false);
@@ -27,7 +27,9 @@ const DeckStainCalculator = () => {
     beamSize: '4x6',
     woodType: 'pressure_treated',
     woodCondition: 'new',
+    surfaceTexture: 'smooth',
     stainType: 'solid',
+    applicationMethod: 'roller',
     coats: 2,
     includeRailing: true,
     includeStairs: false,
@@ -56,7 +58,9 @@ const DeckStainCalculator = () => {
       beamSize: '4x6',
       woodType: 'pressure_treated',
       woodCondition: 'new',
+      surfaceTexture: 'smooth',
       stainType: 'solid',
+      applicationMethod: 'roller',
       coats: 2,
       includeRailing: true,
       includeStairs: false,
@@ -69,89 +73,120 @@ const DeckStainCalculator = () => {
   const woodTypes = {
     pressure_treated: {
       name: 'Pressure Treated Pine',
-      coverage: 150,
-      absorption: 1.3,
-      description: 'High absorption, requires more stain'
+      coverage: 175,
+      description: 'High absorption softwood - most common deck material'
     },
     cedar: {
       name: 'Cedar',
-      coverage: 175,
-      absorption: 1.2,
-      description: 'Moderate absorption, good stain retention'
+      coverage: 200,
+      description: 'Moderate absorption, naturally rot-resistant'
     },
     redwood: {
       name: 'Redwood',
-      coverage: 175,
-      absorption: 1.2,
-      description: 'Moderate absorption, premium wood'
+      coverage: 200,
+      description: 'Moderate absorption, premium softwood'
     },
     composite: {
       name: 'Composite/PVC',
-      coverage: 300,
-      absorption: 0.5,
-      description: 'Low absorption, may not need staining'
+      coverage: 400,
+      description: 'Very low absorption - check manufacturer recommendations'
     },
     hardwood: {
-      name: 'Hardwood (Ipe, Mahogany)',
-      coverage: 200,
-      absorption: 1.0,
-      description: 'Dense wood, lower absorption'
+      name: 'Hardwood (Ipe, Mahogany, Cumaru)',
+      coverage: 375,
+      description: 'Dense tropical hardwood - requires 2-3x less stain than softwoods'
     }
   };
 
   const woodConditions = {
     new: {
-      name: 'New/Unstained Wood',
-      multiplier: 1.4,
-      description: 'Bare wood absorbs more stain on first application'
+      name: 'New/Bare Wood (Never Stained)',
+      multiplier: 1.25,
+      description: 'First-time application - wood is thirsty and absorbs more'
     },
     weathered: {
-      name: 'Weathered (Gray/Faded)',
-      multiplier: 1.6,
-      description: 'Very absorbent, may need extra coats or wood brightener first'
+      name: 'Weathered/Gray (UV Damaged)',
+      multiplier: 1.5,
+      description: 'Most absorbent - UV damage opens grain, may need 40% more stain'
     },
     previously_stained: {
-      name: 'Previously Stained (Good Condition)',
-      multiplier: 1.0,
-      description: 'Standard coverage, surface is sealed'
+      name: 'Previously Stained (Maintenance Coat)',
+      multiplier: 0.6,
+      description: 'Refresher coat - covers 50-100% MORE area than first coat'
     },
     peeling: {
-      name: 'Peeling/Failing Stain',
-      multiplier: 1.3,
-      description: 'Requires stripping, then behaves like new wood'
+      name: 'Peeling/Failing (Requires Stripping)',
+      multiplier: 1.25,
+      description: 'Must strip completely first - then behaves like new wood'
+    }
+  };
+
+  const surfaceTextures = {
+    smooth: {
+      name: 'Smooth/Planed',
+      multiplier: 1.0,
+      description: 'Standard planed lumber - best coverage'
+    },
+    rough: {
+      name: 'Rough Sawn/Textured',
+      multiplier: 1.7,
+      description: 'Requires 50-100% more stain due to increased surface area'
     }
   };
 
   const stainTypes = {
     solid: {
       name: 'Solid Color Stain',
-      coverage: 150,
+      coverage: 250,
       coatsRecommended: 2,
-      description: 'Highest opacity, best coverage, hides wood grain'
+      description: 'Opaque finish, hides wood grain completely'
     },
     semi_solid: {
       name: 'Semi-Solid Stain',
-      coverage: 175,
+      coverage: 250,
       coatsRecommended: 2,
-      description: 'Moderate opacity, some grain visible'
+      description: 'Heavy pigment with some grain showing through'
     },
     semi_transparent: {
       name: 'Semi-Transparent Stain',
-      coverage: 200,
+      coverage: 225,
       coatsRecommended: 2,
       description: 'Light color, grain clearly visible'
     },
     transparent: {
       name: 'Transparent/Clear Sealer',
-      coverage: 250,
+      coverage: 275,
       coatsRecommended: 2,
-      description: 'No color, protects wood only'
+      description: 'No pigment, protects wood only'
     },
-    oil_based: {
-      name: 'Oil-Based Penetrating',
+    oil_based_penetrating: {
+      name: 'Oil-Based Penetrating (TWP, Ready Seal)',
       coverage: 125,
       coatsRecommended: 1,
-      description: 'Deep penetration, single coat typically sufficient'
+      description: 'Deep penetration formulas - lowest coverage, often single coat wet-on-wet'
+    }
+  };
+
+  const applicationMethods = {
+    brush: {
+      name: 'Brush',
+      wasteFactor: 1.075,
+      description: 'Most control, 5-10% waste - best for detailed work'
+    },
+    roller: {
+      name: 'Roller (with back-brushing)',
+      wasteFactor: 1.175,
+      description: 'Fast for large areas, 15-20% waste - must back-brush'
+    },
+    pad: {
+      name: 'Pad Applicator',
+      wasteFactor: 1.125,
+      description: 'Good for smooth decks, 10-15% waste'
+    },
+    spray: {
+      name: 'Spray (with back-brushing)',
+      wasteFactor: 1.30,
+      description: 'Fastest but 25-40% waste from overspray - always back-brush'
     }
   };
 
@@ -197,147 +232,182 @@ const DeckStainCalculator = () => {
 
   const results = useMemo(() => {
     const deckArea = inputs.deckLength * inputs.deckWidth;
-    
-    // Deck railing calculation
+
     let deckRailingArea = 0;
-    if (inputs.includeRailing) {
-      const railingStyle = railingStyles[inputs.railingStyle];
-      
-      if (railingStyle.multiplier === 'custom') {
-        deckRailingArea = (inputs.railingLinearFeet * inputs.railingPanelHeight / 12) + inputs.railingLinearFeet;
+    if (inputs.includeRailing && inputs.railingLinearFeet > 0) {
+      if (railingStyles[inputs.railingStyle].multiplier === 'custom') {
+        deckRailingArea = inputs.railingLinearFeet * (inputs.railingPanelHeight / 12);
       } else {
-        deckRailingArea = inputs.railingLinearFeet * railingStyle.multiplier;
+        deckRailingArea = inputs.railingLinearFeet * (inputs.railingPanelHeight / 12) * railingStyles[inputs.railingStyle].multiplier;
       }
     }
 
-    // Stair railing calculation (uses same railing style)
+    let stairsArea = 0;
     let stairRailingArea = 0;
-    if (inputs.includeStairs && inputs.stairRailingLinearFeet > 0) {
-      const railingStyle = railingStyles[inputs.railingStyle];
-      
-      if (railingStyle.multiplier === 'custom') {
-        stairRailingArea = (inputs.stairRailingLinearFeet * inputs.railingPanelHeight / 12) + inputs.stairRailingLinearFeet;
-      } else {
-        stairRailingArea = inputs.stairRailingLinearFeet * railingStyle.multiplier;
+    if (inputs.includeStairs && inputs.numberOfSteps > 0) {
+      const treadArea = (inputs.stepWidth / 12) * (inputs.treadDepth / 12) * inputs.numberOfSteps;
+      const riserArea = (inputs.stepWidth / 12) * (inputs.riserHeight / 12) * inputs.numberOfSteps;
+      stairsArea = treadArea + riserArea;
+
+      if (inputs.stairRailingLinearFeet > 0) {
+        if (railingStyles[inputs.railingStyle].multiplier === 'custom') {
+          stairRailingArea = inputs.stairRailingLinearFeet * (inputs.railingPanelHeight / 12);
+        } else {
+          stairRailingArea = inputs.stairRailingLinearFeet * (inputs.railingPanelHeight / 12) * railingStyles[inputs.railingStyle].multiplier;
+        }
       }
     }
 
-    const totalRailingArea = deckRailingArea + stairRailingArea;
-    
-    const stairsArea = inputs.includeStairs 
-      ? ((inputs.treadDepth + inputs.riserHeight) * inputs.stepWidth * inputs.numberOfSteps) / 144
-      : 0;
-
-    // Landing calculation
-    const landingsArea = (inputs.includeStairs && inputs.includeLandings)
-      ? inputs.numberOfLandings * inputs.landingLength * inputs.landingWidth
-      : 0;
-    
-    // Support beams calculation
-    // Typically 3 sides are visible (top and two sides, not bottom)
-    let beamsArea = 0;
-    if (inputs.includeBeams) {
-      const beam = beamSizes[inputs.beamSize];
-      const perimeterPerBeam = (beam.width + beam.height + beam.height) / 12; // Convert inches to feet
-      beamsArea = inputs.numberOfBeams * inputs.beamLength * perimeterPerBeam;
+    let landingsArea = 0;
+    if (inputs.includeLandings && inputs.numberOfLandings > 0) {
+      landingsArea = inputs.landingLength * inputs.landingWidth * inputs.numberOfLandings;
     }
 
-    // Underside of deck - includes rough boards AND structural members (joists, rim, blocking)
-    // Typically 2× the deck surface area
-    const undersideArea = inputs.includeUnderside ? deckArea * 2.0 : 0;
+    let beamsArea = 0;
+    if (inputs.includeBeams && inputs.numberOfBeams > 0) {
+      const beamDimensions = beamSizes[inputs.beamSize];
+      const perimeterInches = beamDimensions.width + (2 * beamDimensions.height);
+      const perimeterFeet = perimeterInches / 12;
+      beamsArea = perimeterFeet * inputs.beamLength * inputs.numberOfBeams;
+    }
+
+    let undersideArea = 0;
+    if (inputs.includeUnderside) {
+      undersideArea = deckArea * 2;
+    }
+
+    const totalArea = Math.round(deckArea + deckRailingArea + stairsArea + stairRailingArea + landingsArea + beamsArea + undersideArea);
+
+    // Calculate effective coverage with all modifiers
+    const baseCoverage = Math.min(
+      woodTypes[inputs.woodType].coverage,
+      stainTypes[inputs.stainType].coverage
+    );
+
+    // Apply surface texture, then wood condition
+    const effectiveCoverage = Math.round(
+      baseCoverage / 
+      (surfaceTextures[inputs.surfaceTexture].multiplier * woodConditions[inputs.woodCondition].multiplier)
+    );
+
+    // Calculate gallons per coat - second coats cover approximately 2x the area
+    let totalGallonsRaw = 0;
     
-    const totalArea = deckArea + totalRailingArea + stairsArea + landingsArea + beamsArea + undersideArea;
+    if (inputs.coats >= 1) {
+      // First coat uses standard effective coverage
+      totalGallonsRaw += totalArea / effectiveCoverage;
+    }
+    
+    if (inputs.coats >= 2) {
+      // Second coat covers approximately 2x the area (wood is already saturated)
+      // Exception: oil-based penetrating with wet-on-wet doesn't get this benefit
+      const secondCoatCoverage = inputs.stainType === 'oil_based_penetrating' 
+        ? effectiveCoverage 
+        : effectiveCoverage * 2;
+      totalGallonsRaw += totalArea / secondCoatCoverage;
+    }
+    
+    if (inputs.coats >= 3) {
+      // Third coat also gets 2x benefit
+      const thirdCoatCoverage = inputs.stainType === 'oil_based_penetrating'
+        ? effectiveCoverage
+        : effectiveCoverage * 2;
+      totalGallonsRaw += totalArea / thirdCoatCoverage;
+    }
 
-    const woodType = woodTypes[inputs.woodType];
-    const woodCondition = woodConditions[inputs.woodCondition];
-    const stainType = stainTypes[inputs.stainType];
+    // Apply waste factor based on application method
+    const wasteFactor = applicationMethods[inputs.applicationMethod].wasteFactor;
+    const totalGallonsWithWaste = totalGallonsRaw * wasteFactor;
 
-    let baseCoverage = Math.min(woodType.coverage, stainType.coverage);
-    const effectiveCoverage = baseCoverage / woodCondition.multiplier;
-
-    const gallonsPerCoatRaw = totalArea / effectiveCoverage;
-    const gallonsPerCoat = Math.ceil(gallonsPerCoatRaw);
-    const totalGallons = gallonsPerCoat * inputs.coats;
-    const wasteMultiplier = 1.15;
-    const totalWithWaste = Math.ceil(totalGallons * wasteMultiplier);
+    // Round up to nearest 0.5 gallon for purchasing
+    const roundedGallons = Math.ceil(totalGallonsWithWaste * 2) / 2;
 
     return {
       deckArea: Math.round(deckArea),
       deckRailingArea: Math.round(deckRailingArea),
-      stairRailingArea: Math.round(stairRailingArea),
-      totalRailingArea: Math.round(totalRailingArea),
       stairsArea: Math.round(stairsArea),
+      stairRailingArea: Math.round(stairRailingArea),
       landingsArea: Math.round(landingsArea),
       beamsArea: Math.round(beamsArea),
       undersideArea: Math.round(undersideArea),
-      totalArea: Math.round(totalArea),
-      effectiveCoverage: Math.round(effectiveCoverage),
-      gallonsPerCoatRaw: gallonsPerCoatRaw.toFixed(1),
-      gallonsPerCoat,
-      totalGallons,
-      totalWithWaste
+      totalArea,
+      baseCoverage,
+      effectiveCoverage,
+      totalGallonsRaw: totalGallonsRaw.toFixed(2),
+      totalWithWaste: roundedGallons,
+      wastePercentage: Math.round((wasteFactor - 1) * 100)
     };
   }, [inputs]);
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <div className="bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-lg shadow-lg p-8 mb-8">
-        <div className="flex items-center gap-3 mb-4">
-          <Droplets className="w-10 h-10" />
-          <h1 className="text-4xl font-bold">Deck Stain Calculator</h1>
+      <div className="bg-white rounded-lg shadow-xl p-8 mb-8">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-800 mb-3">
+            Deck Stain Calculator
+          </h1>
+          <p className="text-gray-600 text-lg">
+            Calculate exact stain quantities based on industry research
+          </p>
         </div>
-        <p className="text-amber-100 text-lg">
-          Calculate how much stain you need for your deck, railings, and stairs with industry-accurate coverage rates.
-        </p>
-      </div>
 
-      <div className="grid lg:grid-cols-2 gap-8">
-        <div className="space-y-6">
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <Layers className="w-6 h-6 text-amber-600" />
-              Deck Dimensions
-            </h2>
+        <div className="grid lg:grid-cols-2 gap-8">
+          <div className="space-y-6">
+            <div className="bg-blue-50 rounded-lg p-6 border-l-4 border-blue-500">
+              <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <Layers className="w-6 h-6 text-blue-600" />
+                Deck Dimensions
+              </h2>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Deck Length (feet)
-                </label>
-                <input
-                  type="number"
-                  value={inputs.deckLength}
-                  onChange={(e) => handleInputChange('deckLength', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                  min="1"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Deck Length (feet)
+                  </label>
+                  <input
+                    type="number"
+                    value={inputs.deckLength}
+                    onChange={(e) => handleInputChange('deckLength', e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    min="1"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Deck Width (feet)
+                  </label>
+                  <input
+                    type="number"
+                    value={inputs.deckWidth}
+                    onChange={(e) => handleInputChange('deckWidth', e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    min="1"
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Deck Width (feet)
-                </label>
-                <input
-                  type="number"
-                  value={inputs.deckWidth}
-                  onChange={(e) => handleInputChange('deckWidth', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                  min="1"
-                />
+              <div className="mt-4 p-3 bg-white rounded-lg">
+                <div className="text-sm text-gray-600">Deck Surface Area</div>
+                <div className="text-2xl font-bold text-blue-600">
+                  {results.deckArea} sq ft
+                </div>
               </div>
             </div>
 
-            <div className="mt-6 pt-6 border-t border-gray-200">
-              <div className="flex items-center gap-3 mb-4">
-                <input
-                  type="checkbox"
-                  id="includeRailing"
-                  checked={inputs.includeRailing}
-                  onChange={(e) => handleInputChange('includeRailing', e.target.checked)}
-                  className="w-5 h-5 text-amber-600 rounded focus:ring-amber-500"
-                />
-                <label htmlFor="includeRailing" className="text-sm font-medium text-gray-700">
-                  Include Railing
+            <div className="bg-purple-50 rounded-lg p-6 border-l-4 border-purple-500">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-gray-800">
+                  Deck Railing
+                </h2>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={inputs.includeRailing}
+                    onChange={(e) => handleInputChange('includeRailing', e.target.checked)}
+                    className="w-5 h-5 text-purple-600 rounded focus:ring-2 focus:ring-purple-500"
+                  />
+                  <span className="text-sm font-medium text-gray-700">Include</span>
                 </label>
               </div>
 
@@ -345,18 +415,18 @@ const DeckStainCalculator = () => {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Deck Railing Linear Feet (deck only, not stairs)
-                      <span className="text-xs text-gray-500 ml-2">
-                        (measure all sides with railing)
-                      </span>
+                      Railing Linear Feet
                     </label>
                     <input
                       type="number"
                       value={inputs.railingLinearFeet}
                       onChange={(e) => handleInputChange('railingLinearFeet', e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       min="0"
                     />
+                    <div className="mt-1 text-xs text-gray-500">
+                      Measure total perimeter of railing
+                    </div>
                   </div>
 
                   <div>
@@ -366,7 +436,7 @@ const DeckStainCalculator = () => {
                     <select
                       value={inputs.railingStyle}
                       onChange={(e) => handleInputChange('railingStyle', e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     >
                       {Object.entries(railingStyles).map(([key, style]) => (
                         <option key={key} value={key}>
@@ -374,74 +444,78 @@ const DeckStainCalculator = () => {
                         </option>
                       ))}
                     </select>
-                    <p className="mt-1 text-xs text-gray-500">
+                    <div className="mt-1 text-xs text-gray-500">
                       {railingStyles[inputs.railingStyle].description}
-                    </p>
+                    </div>
                   </div>
 
-                  {inputs.railingStyle === 'solid_panels' && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Panel Height (inches)
-                      </label>
-                      <input
-                        type="number"
-                        value={inputs.railingPanelHeight}
-                        onChange={(e) => handleInputChange('railingPanelHeight', e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                        min="1"
-                      />
-                      <div className="mt-1 text-xs text-gray-500">Typical: 36-42 inches</div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Railing Height (inches)
+                    </label>
+                    <input
+                      type="number"
+                      value={inputs.railingPanelHeight}
+                      onChange={(e) => handleInputChange('railingPanelHeight', e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      min="24"
+                      max="48"
+                    />
+                    <div className="mt-1 text-xs text-gray-500">
+                      Typically 36-42 inches
                     </div>
-                  )}
+                  </div>
                 </div>
               )}
             </div>
 
-            <div className="mt-6 pt-6 border-t border-gray-200">
-              <div className="flex items-center gap-3 mb-4">
-                <input
-                  type="checkbox"
-                  id="includeStairs"
-                  checked={inputs.includeStairs}
-                  onChange={(e) => handleInputChange('includeStairs', e.target.checked)}
-                  className="w-5 h-5 text-amber-600 rounded focus:ring-amber-500"
-                />
-                <label htmlFor="includeStairs" className="text-sm font-medium text-gray-700">
-                  Include Stairs
+            <div className="bg-green-50 rounded-lg p-6 border-l-4 border-green-500">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-gray-800">
+                  Stairs
+                </h2>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={inputs.includeStairs}
+                    onChange={(e) => handleInputChange('includeStairs', e.target.checked)}
+                    className="w-5 h-5 text-green-600 rounded focus:ring-2 focus:ring-green-500"
+                  />
+                  <span className="text-sm font-medium text-gray-700">Include</span>
                 </label>
               </div>
 
               {inputs.includeStairs && (
                 <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Number of Steps
-                    </label>
-                    <input
-                      type="number"
-                      value={inputs.numberOfSteps}
-                      onChange={(e) => handleInputChange('numberOfSteps', e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                      min="1"
-                    />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Number of Steps
+                      </label>
+                      <input
+                        type="number"
+                        value={inputs.numberOfSteps}
+                        onChange={(e) => handleInputChange('numberOfSteps', e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        min="0"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Step Width (inches)
+                      </label>
+                      <input
+                        type="number"
+                        value={inputs.stepWidth}
+                        onChange={(e) => handleInputChange('stepWidth', e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        min="24"
+                      />
+                    </div>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Step Width (inches)
-                    </label>
-                    <input
-                      type="number"
-                      value={inputs.stepWidth}
-                      onChange={(e) => handleInputChange('stepWidth', e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                      min="1"
-                    />
-                    <div className="mt-1 text-xs text-gray-500">Typical: 36-48 inches</div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Tread Depth (inches)
@@ -450,10 +524,9 @@ const DeckStainCalculator = () => {
                         type="number"
                         value={inputs.treadDepth}
                         onChange={(e) => handleInputChange('treadDepth', e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                        min="1"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        min="9"
                       />
-                      <div className="mt-1 text-xs text-gray-500">Typical: 10-11"</div>
                     </div>
 
                     <div>
@@ -464,14 +537,14 @@ const DeckStainCalculator = () => {
                         type="number"
                         value={inputs.riserHeight}
                         onChange={(e) => handleInputChange('riserHeight', e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                        min="1"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        min="4"
+                        max="8"
                       />
-                      <div className="mt-1 text-xs text-gray-500">Typical: 7-8"</div>
                     </div>
                   </div>
 
-                  <div className="mt-4 pt-4 border-t border-gray-200">
+                  <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Stair Railing Linear Feet (optional)
                     </label>
@@ -479,127 +552,120 @@ const DeckStainCalculator = () => {
                       type="number"
                       value={inputs.stairRailingLinearFeet}
                       onChange={(e) => handleInputChange('stairRailingLinearFeet', e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       min="0"
                     />
-                    <div className="mt-1 text-xs text-gray-500">
-                      Measure both sides if stairs have railings. Uses same style as deck railing.
-                    </div>
-                  </div>
-
-                  <div className="mt-4 pt-4 border-t border-gray-200">
-                    <div className="flex items-center gap-3 mb-4">
-                      <input
-                        type="checkbox"
-                        id="includeLandings"
-                        checked={inputs.includeLandings}
-                        onChange={(e) => handleInputChange('includeLandings', e.target.checked)}
-                        className="w-4 h-4 text-amber-600 rounded focus:ring-amber-500"
-                      />
-                      <label htmlFor="includeLandings" className="text-sm font-medium text-gray-700">
-                        Include Landing(s)
-                      </label>
-                    </div>
-
-                    {inputs.includeLandings && (
-                      <div className="space-y-3 ml-7">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Number of Landings
-                          </label>
-                          <input
-                            type="number"
-                            value={inputs.numberOfLandings}
-                            onChange={(e) => handleInputChange('numberOfLandings', e.target.value)}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                            min="1"
-                          />
-                          <div className="mt-1 text-xs text-gray-500">
-                            L-shaped stairs = 1 landing, U-shaped = 1-2 landings
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Landing Length (ft)
-                            </label>
-                            <input
-                              type="number"
-                              value={inputs.landingLength}
-                              onChange={(e) => handleInputChange('landingLength', e.target.value)}
-                              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                              min="1"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Landing Width (ft)
-                            </label>
-                            <input
-                              type="number"
-                              value={inputs.landingWidth}
-                              onChange={(e) => handleInputChange('landingWidth', e.target.value)}
-                              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                              min="1"
-                            />
-                          </div>
-                        </div>
-
-                        <div className="bg-blue-50 p-2 rounded">
-                          <div className="text-xs text-blue-800">
-                            <Info className="w-3 h-3 inline mr-1" />
-                            {inputs.numberOfLandings} landing(s) × {inputs.landingLength}' × {inputs.landingWidth}' = {results.landingsArea} sq ft
-                          </div>
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </div>
               )}
             </div>
 
-            <div className="mt-6 pt-6 border-t border-gray-200">
-              <div className="flex items-center gap-3 mb-4">
-                <input
-                  type="checkbox"
-                  id="includeBeams"
-                  checked={inputs.includeBeams}
-                  onChange={(e) => handleInputChange('includeBeams', e.target.checked)}
-                  className="w-5 h-5 text-amber-600 rounded focus:ring-amber-500"
-                />
-                <label htmlFor="includeBeams" className="text-sm font-medium text-gray-700">
-                  Include Visible Support Beams
+            <div className="bg-yellow-50 rounded-lg p-6 border-l-4 border-yellow-500">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-gray-800">
+                  Landings
+                </h2>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={inputs.includeLandings}
+                    onChange={(e) => handleInputChange('includeLandings', e.target.checked)}
+                    className="w-5 h-5 text-yellow-600 rounded focus:ring-2 focus:ring-yellow-500"
+                  />
+                  <span className="text-sm font-medium text-gray-700">Include</span>
+                </label>
+              </div>
+
+              {inputs.includeLandings && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Number of Landings
+                    </label>
+                    <input
+                      type="number"
+                      value={inputs.numberOfLandings}
+                      onChange={(e) => handleInputChange('numberOfLandings', e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                      min="0"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Landing Length (feet)
+                      </label>
+                      <input
+                        type="number"
+                        value={inputs.landingLength}
+                        onChange={(e) => handleInputChange('landingLength', e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                        min="1"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Landing Width (feet)
+                      </label>
+                      <input
+                        type="number"
+                        value={inputs.landingWidth}
+                        onChange={(e) => handleInputChange('landingWidth', e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                        min="1"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="bg-orange-50 rounded-lg p-6 border-l-4 border-orange-500">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-gray-800">
+                  Support Beams
+                </h2>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={inputs.includeBeams}
+                    onChange={(e) => handleInputChange('includeBeams', e.target.checked)}
+                    className="w-5 h-5 text-orange-600 rounded focus:ring-2 focus:ring-orange-500"
+                  />
+                  <span className="text-sm font-medium text-gray-700">Include</span>
                 </label>
               </div>
 
               {inputs.includeBeams && (
                 <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Number of Beams
-                    </label>
-                    <input
-                      type="number"
-                      value={inputs.numberOfBeams}
-                      onChange={(e) => handleInputChange('numberOfBeams', e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                      min="1"
-                    />
-                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Number of Beams
+                      </label>
+                      <input
+                        type="number"
+                        value={inputs.numberOfBeams}
+                        onChange={(e) => handleInputChange('numberOfBeams', e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        min="0"
+                      />
+                    </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Average Beam Length (feet)
-                    </label>
-                    <input
-                      type="number"
-                      value={inputs.beamLength}
-                      onChange={(e) => handleInputChange('beamLength', e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                      min="1"
-                    />
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Beam Length (feet)
+                      </label>
+                      <input
+                        type="number"
+                        value={inputs.beamLength}
+                        onChange={(e) => handleInputChange('beamLength', e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        min="1"
+                      />
+                    </div>
                   </div>
 
                   <div>
@@ -609,56 +675,59 @@ const DeckStainCalculator = () => {
                     <select
                       value={inputs.beamSize}
                       onChange={(e) => handleInputChange('beamSize', e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     >
-                      {Object.entries(beamSizes).map(([key, beam]) => (
+                      {Object.entries(beamSizes).map(([key, size]) => (
                         <option key={key} value={key}>
-                          {beam.name}
+                          {size.name}
                         </option>
                       ))}
                     </select>
                     <div className="mt-1 text-xs text-gray-500">
-                      Calculates 3 visible sides (top and both sides)
+                      Only 3 sides are stained (top and both sides)
                     </div>
                   </div>
                 </div>
               )}
             </div>
 
-            <div className="mt-6 pt-6 border-t border-gray-200">
-              <div className="flex items-center gap-3 mb-4">
-                <input
-                  type="checkbox"
-                  id="includeUnderside"
-                  checked={inputs.includeUnderside}
-                  onChange={(e) => handleInputChange('includeUnderside', e.target.checked)}
-                  className="w-5 h-5 text-amber-600 rounded focus:ring-amber-500"
-                />
-                <label htmlFor="includeUnderside" className="text-sm font-medium text-gray-700">
-                  Include Underside of Deck Boards
+            <div className="bg-red-50 rounded-lg p-6 border-l-4 border-red-500">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-gray-800">
+                  Deck Underside + Structure
+                </h2>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={inputs.includeUnderside}
+                    onChange={(e) => handleInputChange('includeUnderside', e.target.checked)}
+                    className="w-5 h-5 text-red-600 rounded focus:ring-2 focus:ring-red-500"
+                  />
+                  <span className="text-sm font-medium text-gray-700">Include</span>
                 </label>
               </div>
 
               {inputs.includeUnderside && (
-                <div className="bg-blue-50 p-3 rounded-lg">
-                  <div className="flex items-start gap-2">
-                    <Info className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                    <div className="text-xs text-blue-800">
-                      <strong>Note:</strong> Underside calculation includes deck boards (rough surface) PLUS all structural members 
-                      (joists, rim joists, blocking). Uses deck area × 2.0 to account for this significant additional surface area.
-                    </div>
+                <div className="p-3 bg-white rounded-lg">
+                  <div className="text-xs text-gray-600 mb-2">
+                    Includes rough lumber underside + all joists and structure.
+                    Calculated as 2× deck surface area due to rough texture.
+                  </div>
+                  <div className="text-lg font-semibold text-red-600">
+                    {results.undersideArea} sq ft
                   </div>
                 </div>
               )}
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">
-              Wood & Stain Type
-            </h2>
+          <div className="space-y-6">
+            <div className="bg-amber-50 rounded-lg p-6 border-l-4 border-amber-500">
+              <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <Droplets className="w-6 h-6 text-amber-600" />
+                Wood & Stain Details
+              </h2>
 
-            <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Wood Type
@@ -668,18 +737,18 @@ const DeckStainCalculator = () => {
                   onChange={(e) => handleInputChange('woodType', e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                 >
-                  {Object.entries(woodTypes).map(([key, wood]) => (
+                  {Object.entries(woodTypes).map(([key, type]) => (
                     <option key={key} value={key}>
-                      {wood.name}
+                      {type.name}
                     </option>
                   ))}
                 </select>
-                <p className="mt-1 text-xs text-gray-500">
+                <div className="mt-1 text-xs text-gray-500">
                   {woodTypes[inputs.woodType].description}
-                </p>
+                </div>
               </div>
 
-              <div>
+              <div className="mt-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Wood Condition
                 </label>
@@ -694,12 +763,32 @@ const DeckStainCalculator = () => {
                     </option>
                   ))}
                 </select>
-                <p className="mt-1 text-xs text-gray-500">
+                <div className="mt-1 text-xs text-gray-500">
                   {woodConditions[inputs.woodCondition].description}
-                </p>
+                </div>
               </div>
 
-              <div>
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Surface Texture
+                </label>
+                <select
+                  value={inputs.surfaceTexture}
+                  onChange={(e) => handleInputChange('surfaceTexture', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                >
+                  {Object.entries(surfaceTextures).map(([key, texture]) => (
+                    <option key={key} value={key}>
+                      {texture.name}
+                    </option>
+                  ))}
+                </select>
+                <div className="mt-1 text-xs text-gray-500">
+                  {surfaceTextures[inputs.surfaceTexture].description}
+                </div>
+              </div>
+
+              <div className="mt-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Stain Type
                 </label>
@@ -708,18 +797,38 @@ const DeckStainCalculator = () => {
                   onChange={(e) => handleInputChange('stainType', e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                 >
-                  {Object.entries(stainTypes).map(([key, stain]) => (
+                  {Object.entries(stainTypes).map(([key, type]) => (
                     <option key={key} value={key}>
-                      {stain.name}
+                      {type.name}
                     </option>
                   ))}
                 </select>
-                <p className="mt-1 text-xs text-gray-500">
+                <div className="mt-1 text-xs text-gray-500">
                   {stainTypes[inputs.stainType].description}
-                </p>
+                </div>
               </div>
 
-              <div>
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Application Method
+                </label>
+                <select
+                  value={inputs.applicationMethod}
+                  onChange={(e) => handleInputChange('applicationMethod', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                >
+                  {Object.entries(applicationMethods).map(([key, method]) => (
+                    <option key={key} value={key}>
+                      {method.name}
+                    </option>
+                  ))}
+                </select>
+                <div className="mt-1 text-xs text-gray-500">
+                  {applicationMethods[inputs.applicationMethod].description}
+                </div>
+              </div>
+
+              <div className="mt-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Number of Coats
                 </label>
@@ -740,21 +849,21 @@ const DeckStainCalculator = () => {
           </div>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-6 mt-6">
           <div className="flex gap-4">
             <button
               onClick={() => setShowResults(true)}
               className="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-bold py-4 px-6 rounded-lg shadow-lg transition-colors duration-200 flex items-center justify-center gap-2"
             >
               <Calculator className="w-5 h-5" />
-              Calculate
+              Calculate Stain Needed
             </button>
             
             <button
               onClick={handleReset}
               className="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold py-4 px-6 rounded-lg shadow-lg transition-colors duration-200"
             >
-              Start Over
+              Reset Calculator
             </button>
           </div>
 
@@ -811,37 +920,37 @@ const DeckStainCalculator = () => {
                 </div>
 
                 <div className="bg-white rounded-lg p-4 mb-6">
-                  <div className="text-sm text-gray-600 mb-2">Coverage Rate (with conditions)</div>
+                  <div className="text-sm text-gray-600 mb-2">Effective Coverage Rate</div>
                   <div className="text-lg font-semibold text-gray-800">
                     {results.effectiveCoverage} sq ft per gallon
                   </div>
                   <div className="text-xs text-gray-500 mt-1">
-                    Base: {Math.min(woodTypes[inputs.woodType].coverage, stainTypes[inputs.stainType].coverage)} sq ft/gal 
-                    × {woodConditions[inputs.woodCondition].name.toLowerCase()} factor
+                    Base: {results.baseCoverage} sq ft/gal adjusted for wood condition & surface texture
                   </div>
                 </div>
 
                 <div className="space-y-3 mb-6">
                   <div className="flex justify-between items-center text-sm text-gray-600">
-                    <span>Calculated per coat:</span>
-                    <span>{results.gallonsPerCoatRaw} gal</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-700">Rounded per coat:</span>
-                    <span className="font-semibold">{results.gallonsPerCoat} gallons</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-700">× {inputs.coats} Coats:</span>
-                    <span className="font-semibold">{results.totalGallons} gallons</span>
+                    <span>Raw calculation ({inputs.coats} coat{inputs.coats > 1 ? 's' : ''}):</span>
+                    <span>{results.totalGallonsRaw} gal</span>
                   </div>
                   <div className="flex justify-between items-center pb-3 border-b-2 border-amber-300">
-                    <span className="text-gray-700">+ 15% Waste:</span>
-                    <span className="font-semibold">{results.totalWithWaste} gallons</span>
+                    <span className="text-gray-700">+ {results.wastePercentage}% waste ({inputs.applicationMethod}):</span>
+                    <span className="font-semibold">+{(results.totalWithWaste - results.totalGallonsRaw).toFixed(2)} gal</span>
                   </div>
                   <div className="flex justify-between items-center pt-3">
-                    <span className="font-bold text-gray-800 text-lg">Total Needed:</span>
+                    <span className="font-bold text-gray-800 text-lg">Total Stain Needed:</span>
                     <span className="text-4xl font-bold text-amber-700">{results.totalWithWaste}</span>
                     <span className="text-xl font-bold text-amber-700">gallons</span>
+                  </div>
+                </div>
+
+                <div className="bg-blue-100 border border-blue-300 rounded-lg p-4 text-sm">
+                  <div className="font-semibold text-blue-900 mb-1">About Second Coats:</div>
+                  <div className="text-blue-800">
+                    {inputs.stainType === 'oil_based_penetrating' 
+                      ? 'Oil-based penetrating stains use the same coverage for all coats when applied wet-on-wet (15-30 min between coats).'
+                      : 'Second coats cover approximately 2× the area of first coats because wood is already saturated. This calculator accounts for this.'}
                   </div>
                 </div>
               </div>
@@ -850,16 +959,14 @@ const DeckStainCalculator = () => {
                 <div className="flex items-start gap-3">
                   <Info className="w-5 h-5 text-blue-600 mt-1 flex-shrink-0" />
                   <div>
-                    <h3 className="font-bold text-blue-900 mb-2">Pro Tips</h3>
+                    <h3 className="font-bold text-blue-900 mb-2">Surface Preparation Tips</h3>
                     <ul className="space-y-2 text-sm text-blue-800">
-                      <li>• Clean and prepare deck thoroughly - power wash and let dry 48+ hours</li>
-                      <li>• New pressure-treated lumber: wait 3-6 months before staining</li>
-                      <li>• Apply when temps are 50-90°F with no rain in forecast for 24-48 hours</li>
-                      <li>• Underside includes rough boards + all joists/structure - uses 2× deck surface area</li>
-                      <li>• Support beams: typically only 3 sides are visible (top and both sides)</li>
-                      <li>• Horizontal surfaces (deck floor) need 2 coats; vertical may need only 1</li>
-                      <li>• Railing style dramatically affects stain usage - spindles use 4× more than cables</li>
-                      <li>• Test stain on inconspicuous area first to check color and absorption</li>
+                      <li>• Clean thoroughly - power wash and let dry 48+ hours to 12-15% moisture content</li>
+                      <li>• New pressure-treated: wait 3-6 months for chemicals to dry before staining</li>
+                      <li>• Use water bead test: if water beads, wood isn't ready. If absorbed in 10 min, proceed</li>
+                      <li>• For weathered/gray wood: use deck brightener after cleaning to open grain</li>
+                      <li>• Sand with 60-grit max - finer grits close pores and reduce absorption</li>
+                      <li>• Test stain on inconspicuous area first to verify color and absorption rate</li>
                     </ul>
                   </div>
                 </div>
@@ -869,12 +976,15 @@ const DeckStainCalculator = () => {
                 <div className="flex items-start gap-3">
                   <AlertCircle className="w-5 h-5 text-amber-600 mt-1 flex-shrink-0" />
                   <div>
-                    <h3 className="font-bold text-amber-900 mb-2">Application Method</h3>
+                    <h3 className="font-bold text-amber-900 mb-2">Application Best Practices</h3>
                     <ul className="space-y-2 text-sm text-amber-800">
-                      <li><strong>Brush:</strong> Best for railings, corners, and edges. Most control.</li>
-                      <li><strong>Roller:</strong> Fast for large flat surfaces. Use 3/4" nap roller.</li>
-                      <li><strong>Pump Sprayer:</strong> Fastest but requires back-brushing for even penetration. More waste.</li>
-                      <li><strong>Pad Applicator:</strong> Good compromise between speed and control for deck floor.</li>
+                      <li>• <strong>Temperature:</strong> Apply when 50-90°F, no rain forecast for 24-48 hours</li>
+                      <li>• <strong>Timing:</strong> Work in shade, avoid 10am-3pm direct sun to prevent flash drying</li>
+                      <li>• <strong>Spray method:</strong> ALWAYS back-brush immediately - magic is in the back-brushing</li>
+                      <li>• <strong>Roller method:</strong> Must back-brush to work stain into grain - never leave roller texture</li>
+                      <li>• <strong>Brush method:</strong> Most material-efficient (lowest waste), best for detailed work</li>
+                      <li>• <strong>Coverage:</strong> Don't stretch material thin - adequate saturation prevents premature failure</li>
+                      <li>• <strong>Maintenance:</strong> Recoat every 2-3 years (semi-transparent) or 4-5 years (solid)</li>
                     </ul>
                   </div>
                 </div>
@@ -888,23 +998,31 @@ const DeckStainCalculator = () => {
         <h3 className="text-xl font-bold text-gray-800 mb-4">Understanding Coverage Rates</h3>
         <div className="grid md:grid-cols-2 gap-6 text-sm text-gray-700">
           <div>
-            <h4 className="font-semibold text-gray-800 mb-2">Why Coverage Varies:</h4>
+            <h4 className="font-semibold text-gray-800 mb-2">Key Factors That Affect Coverage:</h4>
             <ul className="space-y-1">
-              <li>• <strong>Wood Type:</strong> Softwoods absorb more than hardwoods</li>
-              <li>• <strong>Wood Condition:</strong> Weathered wood can use 60% more stain</li>
-              <li>• <strong>Stain Type:</strong> Solid stains cover better than transparent</li>
-              <li>• <strong>Temperature:</strong> Hot weather causes faster drying = less penetration</li>
+              <li>• <strong>Surface Texture:</strong> Rough wood uses 50-100% more stain than smooth</li>
+              <li>• <strong>Wood Species:</strong> Softwoods need 2-3× more than dense hardwoods</li>
+              <li>• <strong>Wood Condition:</strong> Weathered wood absorbs 40% more than new wood</li>
+              <li>• <strong>Previous Coating:</strong> Maintenance coats cover 50-100% more area</li>
+              <li>• <strong>Application Method:</strong> Spray wastes 25-40%, brush only 5-10%</li>
             </ul>
           </div>
           <div>
-            <h4 className="font-semibold text-gray-800 mb-2">Industry Standards:</h4>
+            <h4 className="font-semibold text-gray-800 mb-2">Research-Based Coverage Ranges:</h4>
             <ul className="space-y-1">
-              <li>• Solid stain: 150-200 sq ft/gallon</li>
-              <li>• Semi-transparent: 200-300 sq ft/gallon</li>
-              <li>• Clear sealer: 250-350 sq ft/gallon</li>
-              <li>• Always add 15-20% for waste and touchups</li>
+              <li>• <strong>Solid stain:</strong> 200-400 sq ft/gal (first coat)</li>
+              <li>• <strong>Semi-transparent:</strong> 100-650 sq ft/gal (varies widely)</li>
+              <li>• <strong>Transparent/clear:</strong> 150-600 sq ft/gal</li>
+              <li>• <strong>Oil-based penetrating:</strong> 75-400 sq ft/gal</li>
+              <li>• <strong>Dense hardwoods:</strong> 350-450 sq ft/gal (ipe, cumaru)</li>
+              <li>• <strong>Second coats:</strong> Cover approximately 2× first coat area</li>
             </ul>
           </div>
+        </div>
+        <div className="mt-4 p-4 bg-yellow-100 border border-yellow-300 rounded-lg">
+          <p className="text-sm text-yellow-900">
+            <strong>Important:</strong> This calculator uses conservative estimates based on industry research showing field coverage is typically 20-40% lower than manufacturer specifications. Coverage rates account for wood absorption, surface texture, condition, and application method waste.
+          </p>
         </div>
       </div>
     </div>

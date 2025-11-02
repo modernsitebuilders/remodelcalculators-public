@@ -46,7 +46,7 @@ export default function ConcreteGuide() {
               </div>
               <div className="flex justify-between py-2 border-b border-gray-100">
                 <span className="font-medium">IRC minimum:</span>
-                <span className="font-semibold">4" (6" recommended)</span>
+                <span className="font-semibold">4-5 inches (6" for RV/heavy trucks)</span>
               </div>
               <div className="bg-green-50 rounded-lg p-3 text-sm">
                 <strong>Formula:</strong> (L × W × 0.5) ÷ 27 = cubic yards
@@ -140,11 +140,11 @@ export default function ConcreteGuide() {
               <ul className="space-y-2 text-gray-700">
                 <li className="flex items-start gap-2">
                   <span className="text-blue-600 font-bold">•</span>
-                  <span>Patios/Walkways: <strong>4 inches minimum</strong></span>
+                  <span>Patios/Walkways: <strong>3.5 inches minimum (4" standard)</strong></span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-blue-600 font-bold">•</span>
-                  <span>Garage floors: <strong>4 inches</strong> (6" for heavy vehicles)</span>
+                  <span>Garage floors: <strong>4-5 inches (6-8" for heavy vehicles)</strong></span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-blue-600 font-bold">•</span>
@@ -531,12 +531,12 @@ export default function ConcreteGuide() {
               </div>
               <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
                 <span className="font-semibold text-gray-900">Maximum pour temp</span>
-                <span className="font-bold text-red-700">90°F</span>
+                <span className="font-bold text-red-700">95°F</span>
               </div>
               <div className="text-sm text-gray-700 space-y-2">
                 <div className="flex items-start gap-2">
                   <span className="text-blue-600">❄️</span>
-                  <span><strong>Cold weather (&lt;40°F):</strong> Use heated mix and insulating blankets</span>
+                  <span><strong>Cold weather - Concrete must be minimum 65°F during mixing (ACI 306):</strong> Use heated mix and insulating blankets</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="text-red-600">☀️</span>
