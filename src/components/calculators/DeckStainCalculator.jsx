@@ -101,7 +101,7 @@ const DeckStainCalculator = () => {
   const woodConditions = {
     new: {
       name: 'New/Bare Wood (Never Stained)',
-      multiplier: 1.25,
+      multiplier: 1.0,
       description: 'First-time application - wood is thirsty and absorbs more'
     },
     weathered: {
@@ -116,7 +116,7 @@ const DeckStainCalculator = () => {
     },
     peeling: {
       name: 'Peeling/Failing (Requires Stripping)',
-      multiplier: 1.25,
+      multiplier: 1.0,
       description: 'Must strip completely first - then behaves like new wood'
     }
   };
