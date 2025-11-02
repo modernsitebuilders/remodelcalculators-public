@@ -192,17 +192,49 @@ const SidingCalculator = () => {
 
     setStep(5);
 
-    trackCalculation('deck-stain', {
-  deckLength: inputs.deckLength,
-  deckWidth: inputs.deckWidth,
-  woodType: inputs.woodType,
-  stainType: inputs.stainType,
-  coats: inputs.coats,
-  includeUnderside: inputs.includeUnderside
-}, {
-  totalGallons: results.totalWithWaste,
-  totalArea: results.totalArea
-});
+    // Track the calculation
+    trackCalculation('siding', {
+      complexity: projectData.complexity,
+      wallsCount: projectData.walls.length,
+      gablesCount: projectData.gables.length,
+      includeGables: projectData.includeGables,
+      windows: projectData.windows,
+      doors: projectData.doors,
+      garageDoors: projectData.garageDoors,
+      garageDoorSize: projectData.garageDoorSize,
+      sidingType: projectData.sidingType,
+      vinylProfile: projectData.sidingType === 'vinyl' ? projectData.vinylProfile : null,
+      fiberCementWidth: projectData.sidingType === 'fiberCement' ? projectData.fiberCementWidth : null,
+      woodType: projectData.sidingType === 'wood' ? projectData.woodType : null,
+      includeSoffit: projectData.includeSoffit,
+      includeFascia: projectData.includeFascia,
+      includeCorners: projectData.includeCorners,
+      includeUnderlayment: projectData.includeUnderlayment,
+      underlaymentType: projectData.underlaymentType,
+      climate: projectData.climate
+    }, {
+      totalWallArea: totalWallArea,
+      totalGableArea: totalGableArea,
+      totalBeforeDeductions: totalAreaBeforeDeductions,
+      deductions: deductions,
+      netArea: netArea,
+      totalWithWaste: totalAreaWithWaste,
+      wasteFactor: wasteFactor * 100,
+      sidingSquares: sidingResults.squares,
+      sidingBoxes: sidingResults.boxes,
+      sidingPieces: sidingResults.pieces,
+      sidingPlanks: sidingResults.planks,
+      sidingBoardFeet: sidingResults.boardFeet,
+      sidingBundles: sidingResults.bundles,
+      sidingWeight: sidingResults.weight,
+      starterStrip: accessories?.starterStrip?.pieces,
+      jChannel: accessories?.jChannel?.pieces,
+      cornerPosts: accessories?.corners,
+      soffitPanels: accessories?.soffit?.panels,
+      fasciaPieces: accessories?.fascia?.pieces,
+      nails: fasteners?.nails?.total,
+      underlaymentRolls: underlayment?.rolls
+    });
   };
 
   const calculateAccessories = () => {

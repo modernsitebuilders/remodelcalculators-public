@@ -103,6 +103,29 @@ const MulchCalculator = () => {
   const handleCalculate = () => {
     if (hasResults) {
       setShowResults(true);
+      
+      // Track the calculation
+      trackCalculation('mulch', {
+        shape: shape,
+        length: shape === 'rectangle' ? length : null,
+        width: shape === 'rectangle' ? width : null,
+        diameter: shape === 'circle' ? diameter : null,
+        depth: depth === 'custom' ? customDepth : depth,
+        materialType: materialType,
+        purchaseFormat: purchaseFormat,
+        bagSize: purchaseFormat === 'bagged' ? bagSize : null,
+        includeWaste: includeWaste
+      }, {
+        squareFootage: squareFootage,
+        actualDepth: actualDepth,
+        cubicFeet: cubicFeet,
+        cubicYards: cubicYards,
+        bagsNeeded: purchaseFormat === 'bagged' ? bagsNeeded : null,
+        estimatedWeight: estimatedWeight,
+        coverageAtOneInch: coverageAtOneInch,
+        truckLoads: truckLoads,
+        wasteFactor: includeWaste ? 5 : 0
+      });
     }
   };
 

@@ -23,6 +23,42 @@ const RoofingMaterialsCalculator = () => {
   // Handler functions
   const handleCalculate = () => {
     setShowResults(true);
+    
+    // Track the calculation
+    trackCalculation('roofing', {
+      roofLength: roofLength,
+      roofWidth: roofWidth,
+      roofPitch: roofPitch,
+      roofComplexity: roofComplexity,
+      shingleType: shingleType,
+      underlaymentType: underlaymentType,
+      windZone: windZone,
+      coldClimate: coldClimate,
+      atticArea: atticArea,
+      ridgeLength: ridgeLength,
+      hipLength: hipLength,
+      valleyLength: valleyLength,
+      includeRakeStarter: includeRakeStarter
+    }, {
+      footprint: footprint,
+      actualRoofArea: actualRoofArea,
+      totalWithWaste: totalWithWaste,
+      squares: squares,
+      wasteFactor: wasteFactor * 100,
+      pitchMultiplier: pitchMultiplier,
+      totalBundles: totalBundles,
+      bundlesPerSquare: bundlesPerSquare,
+      underlaymentRolls: underlaymentRolls,
+      starterBundles: starterBundles,
+      ridgeCapBundles: ridgeCapBundles,
+      iceWaterRolls: iceWaterRolls,
+      dripEdgePieces: dripEdgePieces,
+      nailBoxes: nailBoxes,
+      totalShingleNails: totalShingleNails,
+      totalCapNails: totalCapNails,
+      ridgeVentNeeded: adjustedRidgeVent,
+      requiredNFA: requiredNFA
+    });
   };
 
   const handleStartOver = () => {
