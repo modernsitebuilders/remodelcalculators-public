@@ -16,22 +16,6 @@ const ExteriorPaintCalculator = () => {
 
   const [showResults, setShowResults] = useState(false);
 
-  const handleCalculate = () => {
-    setShowResults(true);
-  };
-
-  const handleReset = () => {
-    setInputs({
-      squareFeet: 2000,
-      surfaceType: 'vinyl',
-      surfaceCondition: 'good',
-      applicationMethod: 'roll',
-      coats: 2,
-      needsPrimer: true
-    });
-    setShowResults(false);
-  };
-
   // Helper function to round UP to nearest 0.1 gallon (never round down)
   const roundUpToTenth = (value) => {
     return Math.ceil(value * 10) / 10;
@@ -158,6 +142,35 @@ const ExteriorPaintCalculator = () => {
                        inputs.applicationMethod === 'spray_hvlp' ? 25 : 10
     };
   }, [inputs]);
+
+  const handleCalculate = () => {
+    setShowResults(true);
+    
+    // Track the calculation
+    trackCalculation('exterior-paint', inputs, {
+      totalPaintGallons: calculations.totalPaint,
+      primerGallons: calculations.primerGallons,
+      effectiveCoverage: calculations.effectiveCoverage,
+      firstCoatGallons: calculations.firstCoatGallons,
+      subsequentCoatsGallons: calculations.subsequentCoatsGallons,
+      wastePercentage: calculations.wastePercentage,
+      surfaceType: surfaceTypes[inputs.surfaceType].name,
+      coats: inputs.coats,
+      needsPrimer: inputs.needsPrimer
+    });
+  };
+
+  const handleReset = () => {
+    setInputs({
+      squareFeet: 2000,
+      surfaceType: 'vinyl',
+      surfaceCondition: 'good',
+      applicationMethod: 'roll',
+      coats: 2,
+      needsPrimer: true
+    });
+    setShowResults(false);
+  };
 
   return (
     <div className="w-full max-w-6xl mx-auto p-6 bg-gradient-to-br from-blue-50 to-green-50">

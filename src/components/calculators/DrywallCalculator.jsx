@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { Calculator, Info, Square, Ruler, Package } from 'lucide-react';
+import { trackCalculation } from '@/utils/tracking';
 
 // Industry standards based on USG specifications and ASTM C840
 const SHEET_SIZES = {
@@ -155,6 +156,28 @@ export default function DrywallCalculator() {
       thicknessDisplay: thicknessSpec.name,
       sheetSizeDisplay: SHEET_SIZES[sheetSize].name,
       application: thicknessSpec.application,
+      roomCount: rooms.length
+    });
+    
+    // Track the calculation
+    trackCalculation('drywall', {
+      rooms: rooms,
+      sheetSize: sheetSize,
+      thickness: thickness
+    }, {
+      totalArea: totalArea.toFixed(0),
+      wallArea: totalWallArea.toFixed(0),
+      ceilingArea: totalCeilingArea.toFixed(0),
+      deductSqFt: totalDeductions.toFixed(0),
+      sheets: sheetsNeeded,
+      mudGallons: totalMudGallons,
+      tapeFeet: totalTapeFeet,
+      tapeRolls: tapeRolls,
+      screws: totalScrews,
+      screwPounds: screwPounds,
+      totalWeight: totalWeight,
+      sheetSize: SHEET_SIZES[sheetSize].name,
+      thickness: thicknessSpec.name,
       roomCount: rooms.length
     });
     

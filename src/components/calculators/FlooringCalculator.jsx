@@ -187,17 +187,29 @@ export default function FlooringCalculator() {
       document.getElementById('results-section')?.scrollIntoView({ behavior: 'smooth' });
     }, 100);
 
-    trackCalculation('deck-stain', {
-  deckLength: inputs.deckLength,
-  deckWidth: inputs.deckWidth,
-  woodType: inputs.woodType,
-  stainType: inputs.stainType,
-  coats: inputs.coats,
-  includeUnderside: inputs.includeUnderside
-}, {
-  totalGallons: results.totalWithWaste,
-  totalArea: results.totalArea
-});
+    // Track the calculation
+    trackCalculation('flooring', {
+      flooringType: selectedFlooringType,
+      roomLength: length,
+      roomWidth: width,
+      layoutPattern: layoutPattern,
+      roomComplexity: roomComplexity,
+      installerExp: installerExp,
+      plankWidth: selectedFlooringType === 'hardwood' ? (plankWidth === 'other' ? customPlankWidth : plankWidth) : null,
+      tileWidth: selectedFlooringType === 'tile' ? tileWidth : null,
+      tileLength: selectedFlooringType === 'tile' ? tileLength : null,
+      groutWidth: selectedFlooringType === 'tile' ? groutWidth : null,
+      carpetWidth: selectedFlooringType === 'carpet' ? carpetWidth : null,
+      patternMatch: selectedFlooringType === 'carpet' ? patternMatch : null
+    }, {
+      area: Math.round(areaSquareFeet),
+      wastePercentage: baseFactor.toFixed(1),
+      totalMaterial: Math.round(totalMaterialNeeded),
+      boxesNeeded: boxesNeeded,
+      boxCoverage: boxCoverage.toFixed(1),
+      additionalMaterials: additionalMaterials,
+      recommendations: recommendations
+    });
   };
 
   const handleReset = () => {

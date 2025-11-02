@@ -677,7 +677,46 @@ export default function PaintCalculator() {
 
           {/* Calculate Button */}
           <button
-            onClick={() => setShowResults(true)}
+            onClick={() => {
+              setShowResults(true);
+              
+              // Track the calculation
+              const results = calculatePaint();
+              trackCalculation('interior-paint', {
+                rooms: rooms.map(room => ({
+                  length: room.length,
+                  width: room.width,
+                  height: room.height,
+                  doorsCount: room.doors.length,
+                  windowsCount: room.windows.length,
+                  useCustomDoorSizes: room.useCustomDoorSizes,
+                  useCustomWindowSizes: room.useCustomWindowSizes
+                })),
+                paintWalls: paintWalls,
+                wallCoats: wallCoats,
+                wallSurfaceTexture: wallSurfaceTexture,
+                wallSurfaceCondition: wallSurfaceCondition,
+                wallApplicationMethod: wallApplicationMethod,
+                wallPaintType: wallPaintType,
+                paintCeiling: paintCeiling,
+                ceilingCoats: ceilingCoats,
+                ceilingSurfaceCondition: ceilingSurfaceCondition,
+                ceilingApplicationMethod: ceilingApplicationMethod,
+                ceilingPaintType: ceilingPaintType
+              }, {
+                totalWallArea: results.totalWallArea,
+                totalCeilingArea: results.totalCeilingArea,
+                wallGallons: results.walls ? results.walls.gallonsNeeded : 0,
+                wallPrimerGallons: results.walls ? results.walls.primerGallons : 0,
+                ceilingGallons: results.ceiling ? results.ceiling.gallonsNeeded : 0,
+                ceilingPrimerGallons: results.ceiling ? results.ceiling.primerGallons : 0,
+                totalGallons: (results.walls ? results.walls.gallonsNeeded : 0) + 
+                            (results.ceiling ? results.ceiling.gallonsNeeded : 0),
+                totalPrimerGallons: (results.walls ? results.walls.primerGallons : 0) + 
+                                  (results.ceiling ? results.ceiling.primerGallons : 0),
+                roomCount: rooms.length
+              });
+            }}
             disabled={!paintWalls && !paintCeiling}
             className={`w-full py-3 rounded-lg transition-colors font-semibold text-lg shadow-lg ${
               !paintWalls && !paintCeiling

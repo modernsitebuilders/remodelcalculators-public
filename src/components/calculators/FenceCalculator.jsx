@@ -198,6 +198,47 @@ export default function FenceInstallationCalculator() {
     };
     
     setMaterials(materialsData);
+    setHasCalculated(true);
+    
+    // Track the calculation
+    trackCalculation('fence', {
+      linearFeet: linearFt,
+      fenceType: fenceType,
+      height: height,
+      boardWidth: boardWidth,
+      boardSpacing: boardSpacing,
+      railLength: railLength,
+      terrain: terrain,
+      slopeMethod: slopeMethod,
+      frostDepth: frostDepth,
+      gates3ft: gates3ft,
+      gates4ft: gates4ft,
+      gates6ft: gates6ft,
+      gates10ft: gates10ft,
+      gates12ft: gates12ft,
+      corners: cornersCount,
+      fenceLayout: fenceLayout
+    }, {
+      totalPosts: totalPosts,
+      post4x4: post4x4Count,
+      post6x6: post6x6Count,
+      postLength: postLength,
+      postSpacing: postSpacing,
+      concreteBags: concreteBags,
+      gravelBags: gravelBags,
+      gravelCubicFeet: gravelCubicFeet,
+      pickets: pickets,
+      boardFeet: boardFeet,
+      rails: rails,
+      totalRailLength: totalRailLength,
+      totalFasteners: totalFasteners,
+      postCaps: postCaps,
+      gateHardware: gateHardware,
+      panels: panels,
+      chainLinkRolls: chainLinkRolls,
+      meshFabric: meshFabric,
+      fenceTypeName: fenceTypes[fenceType].name
+    });
   };
   
   return (
