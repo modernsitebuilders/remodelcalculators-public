@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { Info, AlertCircle, Droplets, Layers, Calculator } from 'lucide-react';
-
+import { trackCalculation } from '@/utils/tracking';
 
 const DeckStainCalculator = () => {
   const [showResults, setShowResults] = useState(false);
@@ -852,7 +852,22 @@ const DeckStainCalculator = () => {
         <div className="space-y-6 mt-6">
           <div className="flex gap-4">
             <button
-              onClick={() => setShowResults(true)}
+              onClick={() => {
+                setShowResults(true);
+                // Track the calculation
+                trackCalculation('deck-stain', inputs, {
+                  totalArea: results.totalArea,
+                  totalGallons: results.totalWithWaste,
+                  effectiveCoverage: results.effectiveCoverage,
+                  deckArea: results.deckArea,
+                  railingArea: results.deckRailingArea,
+                  stairsArea: results.stairsArea,
+                  woodType: woodTypes[inputs.woodType].name,
+                  stainType: stainTypes[inputs.stainType].name,
+                  coats: inputs.coats,
+                  applicationMethod: applicationMethods[inputs.applicationMethod].name
+                });
+              }}
               className="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-bold py-4 px-6 rounded-lg shadow-lg transition-colors duration-200 flex items-center justify-center gap-2"
             >
               <Calculator className="w-5 h-5" />
