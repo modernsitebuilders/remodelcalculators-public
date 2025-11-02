@@ -66,30 +66,63 @@ export default function FenceInstallationCalculator() {
     
     const sections = Math.ceil(linearFt / postSpacing);
     
-    // Post count depends on fence layout
+    // Calculate total posts needed
     let linePosts;
-    let endPosts = 0;
+    let terminalPosts = 0;
     
     if (fenceLayout === 'continuous') {
       // Continuous fence (closed loop): posts = sections
       linePosts = sections;
     } else {
-      // Fence with endpoints: posts = sections + 1, and 2 end posts need to be 6×6
+      // Fence with endpoints: posts = sections + 1, plus 2 terminal posts are 6×6
       linePosts = sections + 1;
-      endPosts = 2; // Start and end posts (will be 6×6)
+      terminalPosts = 2; // Start and end posts should be 6×6
     }
     
     const totalPosts = linePosts;
+    
+    // Calculate 6×6 post requirements
+    let post6x6Breakdown = {
+      terminal: 0,
+      corners: 0,
+      gates: 0,
+      tall: 0,
+      total: 0
+    };
     
     let post4x4Count = 0;
     let post6x6Count = 0;
     
     if (height > 6) {
+      // All posts should be 6×6 for fences over 6 feet
       post6x6Count = totalPosts;
+      post6x6Breakdown.tall = totalPosts;
+      post6x6Breakdown.total = totalPosts;
     } else {
-      // 6×6 posts needed for: corners + large gates + end posts (if applicable)
-      const needs6x6 = cornersCount + gates6ft + (gates10ft * 2) + (gates12ft * 2) + endPosts;
-      post6x6Count = Math.min(needs6x6, totalPosts);
+      // Calculate 6×6 posts needed
+      // Terminal posts (if open-ended)
+      if (fenceLayout !== 'continuous') {
+        post6x6Breakdown.terminal = 2;
+      }
+      
+      // Corner posts
+      post6x6Breakdown.corners = cornersCount;
+      
+      // Gate posts (2 posts per gate, 6×6 for gates 4ft and larger)
+      const gates4ftPlus = gates4ft + gates6ft + gates10ft + gates12ft;
+      const gates3ftCount = gates3ft;
+      
+      // All gates 4ft and larger need 6×6 posts (2 per gate)
+      post6x6Breakdown.gates = gates4ftPlus * 2;
+      
+      // Sum up all 6×6 posts needed
+      post6x6Count = post6x6Breakdown.terminal + post6x6Breakdown.corners + post6x6Breakdown.gates;
+      
+      // Can't have more 6×6 posts than total posts
+      post6x6Count = Math.min(post6x6Count, totalPosts);
+      post6x6Breakdown.total = post6x6Count;
+      
+      // Remaining posts are 4×4
       post4x4Count = totalPosts - post6x6Count;
     }
     
@@ -187,7 +220,14 @@ export default function FenceInstallationCalculator() {
     }
     
     const materialsData = {
-      posts: { post4x4: post4x4Count, post6x6: post6x6Count, total: totalPosts, length: postLength, spacing: postSpacing },
+      posts: { 
+        post4x4: post4x4Count, 
+        post6x6: post6x6Count, 
+        total: totalPosts, 
+        length: postLength, 
+        spacing: postSpacing,
+        post6x6Breakdown: post6x6Breakdown 
+      },
       concrete: { bags: concreteBags, depth: requiredDepth },
       gravel: { bags: gravelBags, cubicFeet: gravelCubicFeet },
       pickets: { count: pickets, boardFeet: boardFeet, width: boardWidth, spacing: boardSpacing },
@@ -199,9 +239,6 @@ export default function FenceInstallationCalculator() {
     
     setMaterials(materialsData);
     setHasCalculated(true);
-
-    // After setHasCalculated(true);
-window.scrollTo({ top: 0, behavior: 'smooth' });
     
     // Track the calculation
     trackCalculation('fence', {
@@ -290,6 +327,15 @@ window.scrollTo({ top: 0, behavior: 'smooth' });
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Number of Corners</label>
                   <input type="number" value={corners} onChange={(e) => setCorners(e.target.value)} onWheel={(e) => e.target.blur()} className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" min="0" placeholder="Enter number of corners (e.g., 4)" />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Fence Layout</label>
+                  <select value={fenceLayout} onChange={(e) => setFenceLayout(e.target.value)} className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                    <option value="continuous">Continuous Loop (returns to starting point)</option>
+                    <option value="open">Open-Ended (has terminal posts)</option>
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">Open-ended fences require stronger terminal posts</p>
                 </div>
               </div>
             </div>
@@ -461,6 +507,38 @@ window.scrollTo({ top: 0, behavior: 'smooth' });
                       )}
                       <div className="text-xs text-gray-500 mt-2">Total: {materials.posts?.total}</div>
                     </div>
+                    
+                    {materials.posts?.post6x6 > 0 && materials.posts?.post6x6Breakdown && (
+                      <div className="mt-3 bg-amber-50 p-3 rounded-lg border border-amber-200">
+                        <div className="text-xs font-semibold text-amber-900 mb-1">6×6 Post Requirements:</div>
+                        <div className="text-xs text-amber-800 space-y-1">
+                          {materials.posts.post6x6Breakdown.terminal > 0 && (
+                            <div className="flex justify-between">
+                              <span>• Terminal posts (fence ends)</span>
+                              <span className="font-semibold">{materials.posts.post6x6Breakdown.terminal}</span>
+                            </div>
+                          )}
+                          {materials.posts.post6x6Breakdown.corners > 0 && (
+                            <div className="flex justify-between">
+                              <span>• Corner posts</span>
+                              <span className="font-semibold">{materials.posts.post6x6Breakdown.corners}</span>
+                            </div>
+                          )}
+                          {materials.posts.post6x6Breakdown.gates > 0 && (
+                            <div className="flex justify-between">
+                              <span>• Gate posts (2 per gate ≥4ft)</span>
+                              <span className="font-semibold">{materials.posts.post6x6Breakdown.gates}</span>
+                            </div>
+                          )}
+                          {materials.posts.post6x6Breakdown.tall > 0 && (
+                            <div className="flex justify-between">
+                              <span>• All posts (fence over 6ft)</span>
+                              <span className="font-semibold">{materials.posts.post6x6Breakdown.tall}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                   
                   <div className="border-b pb-3">
