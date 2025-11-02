@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Calculator, Info } from 'lucide-react';
+import { trackCalculation } from '@/utils/tracking';
 
 export default function PaintCalculator() {
   const [rooms, setRooms] = useState([{ 

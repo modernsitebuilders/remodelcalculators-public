@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { Info, Home, Droplets } from 'lucide-react';
+import { trackCalculation } from '@/utils/tracking';
 
 const ExteriorPaintCalculator = () => {
   const [inputs, setInputs] = useState({

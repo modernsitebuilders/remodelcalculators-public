@@ -1,176 +1,149 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Calculator, AlertTriangle, Info } from 'lucide-react';
+import { Calculator, Info, Square, Ruler, Package } from 'lucide-react';
 
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxqmLeD7kIu4kIn58c7QY83KJE3rePIZLfS24LrLkEfFLt3ahm-vq3s-5M2uqgaaRiC/exec';
-
-function getSessionId() {
-  if (typeof window === 'undefined') return null;
-  let sessionId = sessionStorage.getItem('calculatorSessionId');
-  if (!sessionId) {
-    sessionId = Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-    sessionStorage.setItem('calculatorSessionId', sessionId);
-  }
-  return sessionId;
-}
-
-async function trackCalculatorUsage(calculatorData) {
-  try {
-    await fetch(SHEET_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        calculatorType: calculatorData.type,
-        zipCode: calculatorData.zipCode || '',
-        projectType: calculatorData.projectType || '',
-        squareFootage: calculatorData.squareFootage || '',
-        recommendedSize: calculatorData.recommendedSize || '',
-        totalVolume: calculatorData.totalVolume || '',
-        totalWeight: calculatorData.totalWeight || '',
-        materialsRemoved: calculatorData.materialsRemoved || '',
-        email: calculatorData.email || '',
-        pageUrl: window.location.href,
-        referrer: document.referrer,
-        userAgent: navigator.userAgent,
-        sessionId: getSessionId()
-      })
-    });
-  } catch (error) {
-    console.error('Sheet tracking error:', error);
-  }
-}
-
-const DRYWALL_TYPES = {
-  'regular': {
-    name: 'Regular Drywall',
-    weight_threeEighth: 1.6, // lbs per sq ft
-    weight_half: 2.0,
-    weight_fiveEighth: 2.2,
-    description: 'Standard gypsum board for interior walls'
-  },
-  'moisture': {
-    name: 'Moisture-Resistant (Green Board)',
-    weight_threeEighth: 1.7,
-    weight_half: 2.1,
-    weight_fiveEighth: 2.3,
-    description: 'For bathrooms and high-humidity areas'
-  },
-  'typeX': {
-    name: 'Type X Fire-Rated',
-    weight_threeEighth: 1.8,
-    weight_half: 2.3,
-    weight_fiveEighth: 2.5,
-    description: 'Fire-resistant drywall for garages/walls'
-  }
+// Industry standards based on USG specifications and ASTM C840
+const SHEET_SIZES = {
+  '4x8': { name: '4×8 (32 sq ft)', area: 32, tapePerSheet: 10 },
+  '4x10': { name: '4×10 (40 sq ft)', area: 40, tapePerSheet: 12 },
+  '4x12': { name: '4×12 (48 sq ft)', area: 48, tapePerSheet: 14 }
 };
 
-const SHEET_SIZES = {
-  '4x8': { area: 32, name: "4×8 (32 sq ft)" },
-  '4x10': { area: 40, name: "4×10 (40 sq ft)" },
-  '4x12': { area: 48, name: "4×12 (48 sq ft)" }
+const THICKNESS_SPECS = {
+  'quarter': { 
+    name: '1/4"', 
+    weight: 38, 
+    application: 'Curved surfaces, overlay',
+    screwsPerSheet: 28 
+  },
+  'threeEighth': { 
+    name: '3/8"', 
+    weight: 44, 
+    application: 'Overlay existing walls',
+    screwsPerSheet: 32 
+  },
+  'half': { 
+    name: '1/2"', 
+    weight: 54, 
+    application: 'Standard walls (most common)',
+    screwsPerSheet: 35 
+  },
+  'fiveEighth': { 
+    name: '5/8"', 
+    weight: 70, 
+    application: 'Fire-rated, ceilings, commercial',
+    screwsPerSheet: 38 
+  }
 };
 
 export default function DrywallCalculator() {
-  const [inputMode, setInputMode] = useState('sheets'); // 'sheets' or 'sqft'
-  const [numSheets, setNumSheets] = useState('');
-  const [sqft, setSqft] = useState('');
+  const [rooms, setRooms] = useState([
+    { length: '', width: '', height: '8', includeCeiling: false, deductions: '' }
+  ]);
   const [sheetSize, setSheetSize] = useState('4x8');
-  const [thickness, setThickness] = useState('half'); // 'threeEighth', 'half', or 'fiveEighth'
-  const [drywallType, setDrywallType] = useState('regular');
+  const [thickness, setThickness] = useState('half');
   const [results, setResults] = useState(null);
   
-  // Ref for auto-scrolling to results
   const resultsRef = useRef(null);
 
-  const calculateDebris = () => {
-    let totalSqFt = 0;
+  const updateRoom = (index, field, value) => {
+    const newRooms = [...rooms];
+    newRooms[index][field] = value;
+    setRooms(newRooms);
+  };
 
-    if (inputMode === 'sheets') {
-      const sheets = parseFloat(numSheets) || 0;
-      if (sheets === 0) {
-        alert('Please enter number of sheets');
-        return;
+  const addRoom = () => {
+    setRooms([...rooms, { length: '', width: '', height: '8', includeCeiling: false, deductions: '' }]);
+  };
+
+  const removeRoom = (index) => {
+    if (rooms.length > 1) {
+      setRooms(rooms.filter((_, i) => i !== index));
+    }
+  };
+
+  const calculateMaterials = () => {
+    let totalArea = 0;
+    let totalWallArea = 0;
+    let totalCeilingArea = 0;
+    let totalDeductions = 0;
+
+    // Calculate totals from all rooms
+    for (const room of rooms) {
+      const roomLength = parseFloat(room.length) || 0;
+      const roomWidth = parseFloat(room.width) || 0;
+      const roomHeight = parseFloat(room.height) || 0;
+      const deductSqFt = parseFloat(room.deductions) || 0;
+
+      if (roomLength === 0 || roomWidth === 0 || roomHeight === 0) {
+        continue;
       }
-      totalSqFt = sheets * SHEET_SIZES[sheetSize].area;
-    } else {
-      totalSqFt = parseFloat(sqft) || 0;
-      if (totalSqFt === 0) {
-        alert('Please enter square footage');
-        return;
+
+      // Calculate wall area (all four walls)
+      const wallArea = 2 * (roomLength + roomWidth) * roomHeight;
+      totalWallArea += wallArea;
+      
+      // Calculate ceiling area if included
+      if (room.includeCeiling) {
+        const ceilingArea = roomLength * roomWidth;
+        totalCeilingArea += ceilingArea;
       }
+      
+      totalDeductions += deductSqFt;
     }
 
-    // Calculate weight
-    const type = DRYWALL_TYPES[drywallType];
-    const weightPerSqFt = thickness === 'threeEighth' ? type.weight_threeEighth : 
-                          thickness === 'half' ? type.weight_half : 
-                          type.weight_fiveEighth;
-    const totalWeight = totalSqFt * weightPerSqFt;
-
-    // Calculate volume (drywall is about 0.012 cubic yards per square foot)
-    const volumePerSqFt = 0.012;
-    const totalVolume = totalSqFt * volumePerSqFt;
-
-    // Add waste factor (15%)
-    const totalVolumeWithWaste = totalVolume * 1.15;
-    const totalWeightWithWaste = totalWeight * 1.15;
-
-    // Determine dumpster size
-    const weightInTons = totalWeightWithWaste / 2000;
-    let recommendedSize = '';
-    let costRange = '';
-    let notes = '';
-
-    if (weightInTons <= 1.5 && totalVolumeWithWaste <= 10) {
-      recommendedSize = '10-Yard';
-      costRange = '$300-$400';
-      notes = 'Good for small renovation projects';
-    } else if (weightInTons <= 2.5 && totalVolumeWithWaste <= 20) {
-      recommendedSize = '20-Yard';
-      costRange = '$400-$500';
-      notes = 'Most common for residential drywall removal';
-    } else if (weightInTons <= 3.5 && totalVolumeWithWaste <= 30) {
-      recommendedSize = '30-Yard';
-      costRange = '$450-$600';
-      notes = 'For whole-house renovations';
-    } else {
-      recommendedSize = '40-Yard';
-      costRange = '$500-$700';
-      notes = 'Large commercial or multi-room projects';
+    if (totalWallArea === 0) {
+      alert('Please enter valid dimensions for at least one room');
+      return;
     }
-
-    // Calculate equivalent sheets if user entered sqft
-    const equivalentSheets = totalSqFt / SHEET_SIZES[sheetSize].area;
-
-    trackCalculatorUsage({
-      type: 'Drywall',
-      projectType: 'Drywall Removal',
-      squareFootage: totalSqFt,
-      recommendedSize: recommendedSize,
-      totalVolume: Math.ceil(totalVolumeWithWaste),
-      totalWeight: Math.round(totalWeightWithWaste),
-      materialsRemoved: `${drywallType} drywall, ${thickness === 'threeEighth' ? '3/8"' : thickness === 'half' ? '1/2"' : '5/8"'}`
-    });
+    
+    // Total area minus deductions
+    totalArea = totalWallArea + totalCeilingArea - totalDeductions;
+    
+    // Get sheet specifications
+    const sheetArea = SHEET_SIZES[sheetSize].area;
+    const tapePerSheet = SHEET_SIZES[sheetSize].tapePerSheet;
+    const thicknessSpec = THICKNESS_SPECS[thickness];
+    
+    // Calculate sheets needed (with 10% waste factor per industry standard)
+    const sheetsBase = totalArea / sheetArea;
+    const sheetsWithWaste = Math.ceil(sheetsBase * 1.10);
+    
+    // Joint compound calculation (280 sq ft per gallon per USG specs)
+    // Level 4 finish requires 3 coats
+    const mudPerCoatGallons = totalArea / 280;
+    const totalMudGallons = Math.ceil(mudPerCoatGallons * 3);
+    
+    // Drywall tape (feet) - approximate based on sheets
+    const totalTapeFeet = Math.ceil(sheetsWithWaste * tapePerSheet);
+    const tapeRolls = Math.ceil(totalTapeFeet / 250); // 250 ft rolls standard
+    
+    // Screws calculation (ASTM C840 standard spacing)
+    const totalScrews = sheetsWithWaste * thicknessSpec.screwsPerSheet;
+    const screwPounds = Math.ceil(totalScrews / 300); // ~300 screws per pound
+    
+    // Weight calculation for disposal
+    const totalWeight = sheetsWithWaste * thicknessSpec.weight;
 
     setResults({
-      sqft: totalSqFt.toFixed(0),
-      sheets: inputMode === 'sheets' ? numSheets : equivalentSheets.toFixed(1),
-      weight: Math.round(totalWeightWithWaste),
-      weightTons: weightInTons.toFixed(2),
-      volume: Math.ceil(totalVolumeWithWaste),
-      recommendedSize,
-      costRange,
-      notes,
-      drywallTypeName: type.name,
-      thicknessDisplay: thickness === 'threeEighth' ? '3/8"' : 
-                        thickness === 'half' ? '1/2"' : '5/8"'
+      totalArea: totalArea.toFixed(0),
+      wallArea: totalWallArea.toFixed(0),
+      ceilingArea: totalCeilingArea.toFixed(0),
+      deductSqFt: totalDeductions.toFixed(0),
+      sheets: sheetsWithWaste,
+      mudGallons: totalMudGallons,
+      tapeFeet: totalTapeFeet,
+      tapeRolls: tapeRolls,
+      screws: totalScrews,
+      screwPounds: screwPounds,
+      totalWeight: totalWeight,
+      thicknessDisplay: thicknessSpec.name,
+      sheetSizeDisplay: SHEET_SIZES[sheetSize].name,
+      application: thicknessSpec.application,
+      roomCount: rooms.length
     });
     
-    // Auto-scroll to results after a brief delay
     setTimeout(() => {
       resultsRef.current?.scrollIntoView({ 
         behavior: 'smooth',
@@ -180,11 +153,9 @@ export default function DrywallCalculator() {
   };
 
   const reset = () => {
-    setNumSheets('');
-    setSqft('');
+    setRooms([{ length: '', width: '', height: '8', includeCeiling: false, deductions: '' }]);
     setSheetSize('4x8');
     setThickness('half');
-    setDrywallType('regular');
     setResults(null);
   };
 
@@ -193,228 +164,283 @@ export default function DrywallCalculator() {
       <div className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white p-6">
         <div className="flex items-center justify-center gap-3">
           <Calculator className="w-8 h-8" />
-          <h3 className="text-2xl font-bold">Quick Drywall Disposal Calculator</h3>
+          <h3 className="text-2xl font-bold">Drywall Material Calculator</h3>
         </div>
-        <p className="text-center mt-2 text-cyan-100">Calculate weight and volume from drywall removal</p>
+        <p className="text-center mt-2 text-cyan-100">Industry-standard calculations per ASTM C840 & USG specifications</p>
       </div>
 
       <div className="p-6 space-y-6">
-        {/* Input Mode Selection */}
-        <div>
-          <label className="block font-semibold mb-3">How do you want to calculate?</label>
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={() => setInputMode('sheets')}
-              className={`p-4 rounded-lg border-2 transition ${
-                inputMode === 'sheets'
-                  ? 'border-cyan-500 bg-cyan-50 text-cyan-900'
-                  : 'border-gray-300 hover:border-gray-400'
-              }`}
-            >
-              <div className="font-semibold">Number of Sheets</div>
-              <div className="text-sm text-gray-600">I know sheet count</div>
-            </button>
-            <button
-              onClick={() => setInputMode('sqft')}
-              className={`p-4 rounded-lg border-2 transition ${
-                inputMode === 'sqft'
-                  ? 'border-cyan-500 bg-cyan-50 text-cyan-900'
-                  : 'border-gray-300 hover:border-gray-400'
-              }`}
-            >
-              <div className="font-semibold">Square Footage</div>
-              <div className="text-sm text-gray-600">I know total area</div>
-            </button>
-          </div>
-        </div>
+        {/* Rooms Section */}
+        <div className="space-y-4">
+          {rooms.map((room, index) => (
+            <div key={index} className="border-2 border-gray-200 rounded-lg p-5 space-y-4 bg-gray-50">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="font-bold text-gray-900 text-lg">
+                  Room {index + 1}
+                </h4>
+                {rooms.length > 1 && (
+                  <button
+                    onClick={() => removeRoom(index)}
+                    className="text-red-600 hover:text-red-800 font-semibold text-sm"
+                  >
+                    Remove Room
+                  </button>
+                )}
+              </div>
 
-        {/* Input Fields */}
-        {inputMode === 'sheets' ? (
-          <div>
-            <label className="block font-semibold mb-2">Number of Drywall Sheets</label>
-            <input
-              type="number"
-              value={numSheets}
-              onChange={(e) => setNumSheets(e.target.value)}
-              placeholder="e.g., 50"
-              className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-cyan-500 focus:outline-none text-lg"
-            />
-            <p className="text-sm text-gray-600 mt-1">
-              <Info className="w-4 h-4 inline" /> Count all sheets being removed or disposed of
-            </p>
-          </div>
-        ) : (
-          <div>
-            <label className="block font-semibold mb-2">Total Square Footage</label>
-            <input
-              type="number"
-              value={sqft}
-              onChange={(e) => setSqft(e.target.value)}
-              placeholder="e.g., 1600"
-              className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-cyan-500 focus:outline-none text-lg"
-            />
-            <p className="text-sm text-gray-600 mt-1">
-              <Info className="w-4 h-4 inline" /> Total drywall area (walls + ceiling if applicable)
-            </p>
-          </div>
-        )}
+              {/* Room Dimensions */}
+              <div className="grid md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block font-semibold mb-2 text-gray-700">
+                    <Ruler className="w-4 h-4 inline mr-1" />
+                    Length (feet)
+                  </label>
+                  <input
+                    type="number"
+                    value={room.length}
+                    onChange={(e) => updateRoom(index, 'length', e.target.value)}
+                    step="0.5"
+                    min="1"
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-cyan-500 focus:outline-none text-lg"
+                  />
+                </div>
 
-        {/* Sheet Size */}
-        <div>
-          <label className="block font-semibold mb-2">Sheet Size</label>
-          <select
-            value={sheetSize}
-            onChange={(e) => setSheetSize(e.target.value)}
-            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-cyan-500 focus:outline-none text-lg"
+                <div>
+                  <label className="block font-semibold mb-2 text-gray-700">
+                    <Ruler className="w-4 h-4 inline mr-1" />
+                    Width (feet)
+                  </label>
+                  <input
+                    type="number"
+                    value={room.width}
+                    onChange={(e) => updateRoom(index, 'width', e.target.value)}
+                    step="0.5"
+                    min="1"
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-cyan-500 focus:outline-none text-lg"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-semibold mb-2 text-gray-700">
+                    <Ruler className="w-4 h-4 inline mr-1" />
+                    Height (feet)
+                  </label>
+                  <input
+                    type="number"
+                    value={room.height}
+                    onChange={(e) => updateRoom(index, 'height', e.target.value)}
+                    step="0.5"
+                    min="7"
+                    max="20"
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-cyan-500 focus:outline-none text-lg"
+                  />
+                </div>
+              </div>
+
+              {/* Include Ceiling */}
+              <div className="flex items-center gap-3 p-3 bg-white rounded-lg">
+                <input
+                  type="checkbox"
+                  id={`includeCeiling-${index}`}
+                  checked={room.includeCeiling}
+                  onChange={(e) => updateRoom(index, 'includeCeiling', e.target.checked)}
+                  className="w-5 h-5 text-cyan-600 focus:ring-cyan-500 rounded"
+                />
+                <label htmlFor={`includeCeiling-${index}`} className="font-semibold text-gray-700 cursor-pointer">
+                  Include ceiling drywall
+                </label>
+              </div>
+
+              {/* Deductions */}
+              <div>
+                <label className="block font-semibold mb-2 text-gray-700">
+                  <Square className="w-4 h-4 inline mr-1" />
+                  Deductions (doors, windows) - sq ft
+                </label>
+                <input
+                  type="number"
+                  value={room.deductions}
+                  onChange={(e) => updateRoom(index, 'deductions', e.target.value)}
+                  step="1"
+                  min="0"
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-cyan-500 focus:outline-none text-lg"
+                />
+                <p className="text-sm text-gray-600 mt-1">
+                  <Info className="w-4 h-4 inline" /> Typical door: 20 sq ft | Standard window: 15 sq ft
+                </p>
+              </div>
+            </div>
+          ))}
+
+          {/* Add Room Button */}
+          <button
+            onClick={addRoom}
+            className="w-full border-2 border-dashed border-cyan-400 text-cyan-600 hover:border-cyan-600 hover:bg-cyan-50 py-4 rounded-lg font-semibold transition"
           >
-            {Object.entries(SHEET_SIZES).map(([key, size]) => (
-              <option key={key} value={key}>{size.name}</option>
-            ))}
-          </select>
+            + Add Another Room
+          </button>
         </div>
 
-        {/* Thickness */}
+        {/* Sheet Size Selection */}
         <div>
-          <label className="block font-semibold mb-2">Drywall Thickness</label>
+          <label className="block font-semibold mb-2 text-gray-700">Sheet Size</label>
           <div className="grid grid-cols-3 gap-3">
-            <button
-              onClick={() => setThickness('threeEighth')}
-              className={`p-4 rounded-lg border-2 transition ${
-                thickness === 'threeEighth'
-                  ? 'border-cyan-500 bg-cyan-50 text-cyan-900'
-                  : 'border-gray-300 hover:border-gray-400'
-              }`}
-            >
-              <div className="font-semibold">3/8 Inch</div>
-              <div className="text-sm text-gray-600">Overlay/curved</div>
-            </button>
-            <button
-              onClick={() => setThickness('half')}
-              className={`p-4 rounded-lg border-2 transition ${
-                thickness === 'half'
-                  ? 'border-cyan-500 bg-cyan-50 text-cyan-900'
-                  : 'border-gray-300 hover:border-gray-400'
-              }`}
-            >
-              <div className="font-semibold">1/2 Inch</div>
-              <div className="text-sm text-gray-600">Most common</div>
-            </button>
-            <button
-              onClick={() => setThickness('fiveEighth')}
-              className={`p-4 rounded-lg border-2 transition ${
-                thickness === 'fiveEighth'
-                  ? 'border-cyan-500 bg-cyan-50 text-cyan-900'
-                  : 'border-gray-300 hover:border-gray-400'
-              }`}
-            >
-              <div className="font-semibold">5/8 Inch</div>
-              <div className="text-sm text-gray-600">Fire-rated/ceilings</div>
-            </button>
+            {Object.entries(SHEET_SIZES).map(([key, size]) => (
+              <button
+                key={key}
+                onClick={() => setSheetSize(key)}
+                className={`p-4 rounded-lg border-2 transition ${
+                  sheetSize === key
+                    ? 'border-cyan-500 bg-cyan-50 text-cyan-900'
+                    : 'border-gray-300 hover:border-gray-400'
+                }`}
+              >
+                <div className="font-semibold">{size.name}</div>
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Drywall Type */}
+        {/* Thickness Selection */}
         <div>
-          <label className="block font-semibold mb-2">Drywall Type</label>
-          <select
-            value={drywallType}
-            onChange={(e) => setDrywallType(e.target.value)}
-            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-cyan-500 focus:outline-none text-lg"
-          >
-            {Object.entries(DRYWALL_TYPES).map(([key, type]) => (
-              <option key={key} value={key}>
-                {type.name}
-              </option>
+          <label className="block font-semibold mb-2 text-gray-700">Drywall Thickness</label>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {Object.entries(THICKNESS_SPECS).map(([key, spec]) => (
+              <button
+                key={key}
+                onClick={() => setThickness(key)}
+                className={`p-4 rounded-lg border-2 transition ${
+                  thickness === key
+                    ? 'border-cyan-500 bg-cyan-50 text-cyan-900'
+                    : 'border-gray-300 hover:border-gray-400'
+                }`}
+              >
+                <div className="font-semibold">{spec.name}</div>
+                <div className="text-xs text-gray-600 mt-1">{spec.application}</div>
+              </button>
             ))}
-          </select>
-          <p className="text-sm text-gray-600 mt-1">{DRYWALL_TYPES[drywallType].description}</p>
+          </div>
         </div>
 
         {/* Calculate Button */}
         <button
-          onClick={calculateDebris}
+          onClick={calculateMaterials}
           className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 text-white py-4 rounded-lg font-bold text-lg hover:shadow-lg transition transform hover:scale-[1.02]"
         >
-          Calculate Drywall Disposal Needs
+          Calculate Materials Needed
         </button>
 
         {/* Results */}
         {results && (
-          <div ref={resultsRef} className="space-y-4 mt-6 pt-6 border-t-2 border-gray-200 scroll-mt-24">
-            {/* Main Results Box */}
-            <div className="bg-gradient-to-r from-slate-700 to-slate-600 text-white rounded-xl p-6">
-              <div className="text-center mb-4">
-                <div className="text-3xl font-bold">{results.recommendedSize}</div>
-                <div className="text-lg">Recommended Dumpster Size</div>
-                <div className="text-cyan-300 font-semibold mt-1">{results.costRange}</div>
-                <div className="text-sm text-gray-300 mt-1">{results.notes}</div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-3">
-                <div className="bg-white/20 rounded-lg p-3 text-center">
-                  <div className="text-2xl font-bold">{results.sheets}</div>
-                  <div className="text-sm">Sheets</div>
+          <div ref={resultsRef} className="mt-8 space-y-6 border-t-4 border-cyan-500 pt-6">
+            {/* Area Summary */}
+            <div className="bg-gradient-to-r from-cyan-50 to-blue-50 rounded-lg p-6">
+              <h4 className="text-xl font-bold text-gray-900 mb-2 flex items-center gap-2">
+                <Square className="w-6 h-6 text-cyan-600" />
+                Coverage Area
+              </h4>
+              <p className="text-sm text-gray-600 mb-4">Total for {results.roomCount} room{results.roomCount > 1 ? 's' : ''}</p>
+              <div className="grid md:grid-cols-4 gap-4">
+                <div className="bg-white rounded-lg p-4 text-center">
+                  <div className="text-3xl font-bold text-cyan-600">{results.wallArea}</div>
+                  <div className="text-sm text-gray-600 mt-1">Wall Area (sq ft)</div>
                 </div>
-                <div className="bg-white/20 rounded-lg p-3 text-center">
-                  <div className="text-2xl font-bold">{results.weightTons}</div>
-                  <div className="text-sm">Tons</div>
-                </div>
-                <div className="bg-white/20 rounded-lg p-3 text-center">
-                  <div className="text-2xl font-bold">{results.volume}</div>
-                  <div className="text-sm">Cu Yards</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Details */}
-            <div className="bg-gray-50 rounded-lg p-4 space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Total Area:</span>
-                <span className="font-semibold">{results.sqft} sq ft</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Type:</span>
-                <span className="font-semibold">{results.drywallTypeName}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Thickness:</span>
-                <span className="font-semibold">{results.thicknessDisplay}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Total Weight:</span>
-                <span className="font-semibold">{results.weight.toLocaleString()} lbs</span>
-              </div>
-            </div>
-
-            {/* Info Note */}
-            <div className="bg-blue-50 border-l-4 border-blue-500 p-4">
-              <div className="flex gap-2">
-                <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                <div className="text-blue-800 text-sm">
-                  <strong>Mixed Debris Note:</strong> If disposing of drywall WITH other materials (wood, metal, etc.), 
-                  consider ordering the next size up. Mixed debris doesn't compact as efficiently as pure drywall.
+                {parseInt(results.ceilingArea) > 0 && (
+                  <div className="bg-white rounded-lg p-4 text-center">
+                    <div className="text-3xl font-bold text-blue-600">{results.ceilingArea}</div>
+                    <div className="text-sm text-gray-600 mt-1">Ceiling Area (sq ft)</div>
+                  </div>
+                )}
+                {parseInt(results.deductSqFt) > 0 && (
+                  <div className="bg-white rounded-lg p-4 text-center">
+                    <div className="text-3xl font-bold text-orange-600">-{results.deductSqFt}</div>
+                    <div className="text-sm text-gray-600 mt-1">Deductions (sq ft)</div>
+                  </div>
+                )}
+                <div className="bg-white rounded-lg p-4 text-center border-2 border-cyan-500">
+                  <div className="text-3xl font-bold text-gray-900">{results.totalArea}</div>
+                  <div className="text-sm font-semibold text-gray-700 mt-1">Total Area (sq ft)</div>
                 </div>
               </div>
             </div>
 
-            {/* Recycling Note */}
-            <div className="bg-green-50 border-l-4 border-green-500 p-4">
-              <div className="flex gap-2">
-                <div className="text-2xl">♻️</div>
-                <div className="text-green-800 text-sm">
-                  <strong>Recycling Available:</strong> Drywall is 100% recyclable into new drywall or soil amendment. 
-                  Many areas have specialized drywall recycling facilities that charge $50-150 less than standard dumpsters. 
-                  Check disposal options below.
+            {/* Material Requirements */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h4 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <Package className="w-6 h-6 text-cyan-600" />
+                Materials Required
+              </h4>
+              
+              <div className="space-y-4">
+                {/* Drywall Sheets */}
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <div className="font-bold text-gray-900">Drywall Sheets</div>
+                    <div className="text-sm text-gray-600">{results.sheetSizeDisplay} × {results.thicknessDisplay}</div>
+                    <div className="text-xs text-gray-500 mt-1">Includes 10% waste factor</div>
+                  </div>
+                  <div className="text-3xl font-bold text-cyan-600">{results.sheets}</div>
+                </div>
+
+                {/* Joint Compound */}
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <div className="font-bold text-gray-900">Joint Compound (All-Purpose)</div>
+                    <div className="text-sm text-gray-600">USG spec: 280 sq ft/gallon per coat</div>
+                    <div className="text-xs text-gray-500 mt-1">Level 4 finish (3 coats)</div>
+                  </div>
+                  <div className="text-3xl font-bold text-blue-600">{results.mudGallons} gal</div>
+                </div>
+
+                {/* Drywall Tape */}
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <div className="font-bold text-gray-900">Paper Drywall Tape</div>
+                    <div className="text-sm text-gray-600">{results.tapeFeet} linear feet</div>
+                    <div className="text-xs text-gray-500 mt-1">Standard 250 ft rolls</div>
+                  </div>
+                  <div className="text-3xl font-bold text-green-600">{results.tapeRolls} rolls</div>
+                </div>
+
+                {/* Screws */}
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <div className="font-bold text-gray-900">Drywall Screws (1¼" coarse thread)</div>
+                    <div className="text-sm text-gray-600">{results.screws.toLocaleString()} screws total</div>
+                    <div className="text-xs text-gray-500 mt-1">ASTM C840: 12" o.c. on walls, 12" o.c. on ceilings</div>
+                  </div>
+                  <div className="text-3xl font-bold text-purple-600">{results.screwPounds} lbs</div>
+                </div>
+
+                {/* Weight */}
+                <div className="flex items-center justify-between p-4 bg-cyan-50 rounded-lg border-2 border-cyan-200">
+                  <div>
+                    <div className="font-bold text-gray-900">Total Material Weight</div>
+                    <div className="text-sm text-gray-600">For planning delivery/disposal</div>
+                  </div>
+                  <div className="text-3xl font-bold text-cyan-700">{results.totalWeight.toLocaleString()} lbs</div>
                 </div>
               </div>
+            </div>
+
+            {/* Industry Standards Reference */}
+            <div className="bg-blue-50 rounded-lg p-5 border-l-4 border-blue-500">
+              <h5 className="font-bold text-gray-900 mb-2">Industry Standards Applied:</h5>
+              <ul className="space-y-1 text-sm text-gray-700">
+                <li>• <strong>ASTM C840</strong> - Fastener spacing and installation methods</li>
+                <li>• <strong>GA-216</strong> - Gypsum Association finishing levels (Level 4 standard)</li>
+                <li>• <strong>USG Specifications</strong> - Material coverage rates and application guidelines</li>
+                <li>• <strong>10% Waste Factor</strong> - Standard allowance for cuts, breakage, and odd angles</li>
+                <li>• <strong>IRC Chapter 7</strong> - Wall covering thickness and fire rating requirements</li>
+              </ul>
             </div>
 
             {/* Reset Button */}
             <button
               onClick={reset}
-              className="w-full bg-gray-500 text-white py-3 rounded-lg hover:bg-gray-600 transition"
+              className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 rounded-lg font-semibold transition"
             >
-              Start New Calculation
+              Reset Calculator
             </button>
           </div>
         )}

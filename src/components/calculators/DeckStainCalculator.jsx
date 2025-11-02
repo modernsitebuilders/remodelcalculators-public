@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { Info, AlertCircle, Droplets, Layers, Calculator } from 'lucide-react';
+import { trackCalculation } from '@/utils/tracking';
 
 const DeckStainCalculator = () => {
   const [showResults, setShowResults] = useState(false);

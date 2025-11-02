@@ -1,4 +1,5 @@
 'use client';
+import { trackCalculation } from '@/utils/tracking';
 
 import React, { useState } from 'react';
 import { Calculator, Ruler, TrendingUp, Info, AlertCircle, CheckCircle } from 'lucide-react';

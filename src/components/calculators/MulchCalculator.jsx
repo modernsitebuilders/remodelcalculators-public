@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { Calculator, Info, AlertCircle } from 'lucide-react';
+import { trackCalculation } from '@/utils/tracking';
 
 const MulchCalculator = () => {
   // State management

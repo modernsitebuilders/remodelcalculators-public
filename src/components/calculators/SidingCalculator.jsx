@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Calculator, Home, Ruler, Package, FileText, ChevronRight, ChevronLeft } from 'lucide-react';
+import { trackCalculation } from '@/utils/tracking';
 
 const SidingCalculator = () => {
   const [step, setStep] = useState(1);
@@ -190,6 +191,18 @@ const SidingCalculator = () => {
     });
 
     setStep(5);
+
+    trackCalculation('deck-stain', {
+  deckLength: inputs.deckLength,
+  deckWidth: inputs.deckWidth,
+  woodType: inputs.woodType,
+  stainType: inputs.stainType,
+  coats: inputs.coats,
+  includeUnderside: inputs.includeUnderside
+}, {
+  totalGallons: results.totalWithWaste,
+  totalArea: results.totalArea
+});
   };
 
   const calculateAccessories = () => {

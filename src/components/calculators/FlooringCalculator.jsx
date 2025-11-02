@@ -1,8 +1,8 @@
 'use client';
 
-'use client';
 
 import { useState } from 'react';
+import { trackCalculation } from '@/utils/tracking';
 
 export default function FlooringCalculator() {
   const [selectedFlooringType, setSelectedFlooringType] = useState('');
@@ -186,6 +186,18 @@ export default function FlooringCalculator() {
     setTimeout(() => {
       document.getElementById('results-section')?.scrollIntoView({ behavior: 'smooth' });
     }, 100);
+
+    trackCalculation('deck-stain', {
+  deckLength: inputs.deckLength,
+  deckWidth: inputs.deckWidth,
+  woodType: inputs.woodType,
+  stainType: inputs.stainType,
+  coats: inputs.coats,
+  includeUnderside: inputs.includeUnderside
+}, {
+  totalGallons: results.totalWithWaste,
+  totalArea: results.totalArea
+});
   };
 
   const handleReset = () => {

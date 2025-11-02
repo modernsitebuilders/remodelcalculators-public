@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Calculator, Info, Package, Ruler, AlertCircle } from 'lucide-react';
+import { trackCalculation } from '@/utils/tracking';
 
 const ConcreteCalculator = () => {
   // Project Type Selection
@@ -320,8 +321,23 @@ const ConcreteCalculator = () => {
       wireMeshRolls,
       baseThickness
     });
+  
+  // ADD THIS TRACKING CALL
+  trackCalculation('concrete', {
+    projectType,
+    psiRating,
+    region,
+    dimensions: projectType === 'slab' ? 
+      { length: slabLength, width: slabWidth, thickness: slabThickness } :
+      projectType === 'footing' ?
+      { length: footingLength, width: footingWidth, depth: footingDepth } :
+      { type: projectType }
+  }, {
+    cubicYards: cubicYards.toFixed(2),
+    bags80lb,
+    totalCost: null // or calculate if you want
+  });
   };
-
   const handleCalculate = () => {
     calculateConcrete();
   };

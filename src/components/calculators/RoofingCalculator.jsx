@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { trackCalculation } from '@/utils/tracking';
 
 const RoofingMaterialsCalculator = () => {
   // State for all inputs
