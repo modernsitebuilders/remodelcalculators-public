@@ -8,7 +8,7 @@ export default function DrywallGuide() {
           <div className="text-3xl">💡</div>
           <div>
             <div className="font-semibold text-lg mb-2 text-gray-900">Quick Answer</div>
-            <p className="text-gray-700">For 1,000 square feet of wall/ceiling area, you need approximately <strong>28 sheets</strong> of 4×8 drywall (with 10% waste), <strong>350 screws</strong>, <strong>290 feet</strong> of tape, and <strong>3.5 gallons</strong> of joint compound for three-coat finish.</p>
+            <p className="text-gray-700">For 1,000 square feet of wall/ceiling area, you need approximately <strong>32 sheets</strong> of 4×8 drywall (with 10% waste), <strong>1,000-1,250 screws</strong> (depending on wall/ceiling mix), <strong>5,000 feet</strong> of tape (10 rolls), and <strong>11 gallons</strong> of joint compound for three-coat Level 4 finish.</p>
           </div>
         </div>
       </div>
@@ -27,11 +27,15 @@ export default function DrywallGuide() {
                 <span className="font-semibold">32 sq ft</span>
               </div>
               <div className="flex justify-between py-2 border-b border-gray-100">
-                <span className="font-medium">Waste factor:</span>
-                <span className="font-semibold">10-15%</span>
+                <span className="font-medium">Waste factor (walls):</span>
+                <span className="font-semibold">10%</span>
+              </div>
+              <div className="flex justify-between py-2 border-b border-gray-100">
+                <span className="font-medium">Waste factor (ceilings):</span>
+                <span className="font-semibold">14%</span>
               </div>
               <div className="bg-blue-50 rounded-lg p-3 text-sm">
-                <strong>Formula:</strong> (Square feet ÷ 32) × 1.10 = sheets needed
+                <strong>Formula:</strong> (Wall sq ft × 1.10 + Ceiling sq ft × 1.14) ÷ 32 = sheets needed
               </div>
             </div>
           </div>
@@ -41,15 +45,15 @@ export default function DrywallGuide() {
             <h3 className="text-xl font-bold text-gray-900 mb-4">Joint Compound</h3>
             <div className="space-y-3 text-gray-700">
               <div className="flex justify-between py-2 border-b border-gray-100">
-                <span className="font-medium">Per 1000 sq ft:</span>
-                <span className="font-semibold">3-4 gallons</span>
+                <span className="font-medium">Per coat coverage:</span>
+                <span className="font-semibold">280 sq ft/gallon</span>
               </div>
               <div className="flex justify-between py-2 border-b border-gray-100">
-                <span className="font-medium">Coverage per gallon:</span>
-                <span className="font-semibold">250-300 sq ft</span>
+                <span className="font-medium">Level 4 finish (3 coats):</span>
+                <span className="font-semibold">~93 sq ft/gallon</span>
               </div>
               <div className="bg-green-50 rounded-lg p-3 text-sm">
-                <strong>Note:</strong> Based on three-coat application (tape, fill, finish). Add 20% for textured ceilings.
+                <strong>USG Spec:</strong> 280 sq ft per gallon per coat. Three-coat application = (Total sq ft ÷ 280) × 3. Add 20% for textured ceilings.
               </div>
             </div>
           </div>
@@ -59,15 +63,15 @@ export default function DrywallGuide() {
             <h3 className="text-xl font-bold text-gray-900 mb-4">Drywall Tape</h3>
             <div className="space-y-3 text-gray-700">
               <div className="flex justify-between py-2 border-b border-gray-100">
-                <span className="font-medium">Per sheet (4×8):</span>
-                <span className="font-semibold">10 linear feet</span>
+                <span className="font-medium">Industry standard:</span>
+                <span className="font-semibold">500 ft per 100 sq ft</span>
               </div>
               <div className="flex justify-between py-2 border-b border-gray-100">
                 <span className="font-medium">Roll length:</span>
-                <span className="font-semibold">250-500 feet</span>
+                <span className="font-semibold">500 feet</span>
               </div>
               <div className="bg-purple-50 rounded-lg p-3 text-sm">
-                <strong>Types:</strong> Paper tape for flat joints, mesh for patches/ceilings.
+                <strong>Formula:</strong> (Total sq ft ÷ 100) × 500 = linear feet needed. Paper tape for flat joints, mesh for patches.
               </div>
             </div>
           </div>
@@ -77,15 +81,15 @@ export default function DrywallGuide() {
             <h3 className="text-xl font-bold text-gray-900 mb-4">Drywall Screws</h3>
             <div className="space-y-3 text-gray-700">
               <div className="flex justify-between py-2 border-b border-gray-100">
-                <span className="font-medium">Per sheet (walls):</span>
-                <span className="font-semibold">32 screws</span>
+                <span className="font-medium">Walls (16" o.c.):</span>
+                <span className="font-semibold">1.0 per sq ft</span>
               </div>
               <div className="flex justify-between py-2 border-b border-gray-100">
-                <span className="font-medium">Per sheet (ceiling):</span>
-                <span className="font-semibold">40 screws</span>
+                <span className="font-medium">Ceilings (12" o.c.):</span>
+                <span className="font-semibold">1.25 per sq ft</span>
               </div>
               <div className="bg-orange-50 rounded-lg p-3 text-sm">
-                <strong>Spacing:</strong> 12" on center for walls, 8" for ceilings per ASTM C840.
+                <strong>ASTM C840:</strong> 16" on center spacing for walls, 12" on center for ceilings. ~300 screws per pound.
               </div>
             </div>
           </div>
@@ -136,7 +140,7 @@ export default function DrywallGuide() {
             </table>
           </div>
           <div className="bg-gray-50 px-6 py-4 text-sm text-gray-600">
-            <strong>IRC Requirement:</strong> 1/2" minimum for walls with 16" stud spacing. 5/8" required for fire-rated assemblies and garage ceilings.
+            <strong>IRC Requirement:</strong> 1/2" minimum for walls with 16" stud spacing. 5/8" required for fire-rated assemblies and ceilings with 24" o.c. joists per GA-216.
           </div>
         </div>
       </section>
@@ -151,52 +155,46 @@ export default function DrywallGuide() {
               <thead className="bg-gradient-to-r from-green-50 to-emerald-50">
                 <tr>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Type</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Coverage</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Dry Time</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Best Use</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Application</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Drying Time</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Best For</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 <tr className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm text-gray-900 font-medium">All-Purpose</td>
-                  <td className="px-6 py-4 text-sm text-gray-700">280 sq ft/gal</td>
+                  <td className="px-6 py-4 text-sm text-gray-700">Taping, filling, finishing</td>
                   <td className="px-6 py-4 text-sm text-gray-700">24 hours</td>
-                  <td className="px-6 py-4 text-sm text-gray-700">Taping, coating, finishing</td>
+                  <td className="px-6 py-4 text-sm text-gray-700">General use, DIY projects</td>
                 </tr>
                 <tr className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm text-gray-900 font-medium">Taping Compound</td>
-                  <td className="px-6 py-4 text-sm text-gray-700">300 sq ft/gal</td>
+                  <td className="px-6 py-4 text-sm text-gray-700">Embedding tape (first coat)</td>
                   <td className="px-6 py-4 text-sm text-gray-700">24 hours</td>
-                  <td className="px-6 py-4 text-sm text-gray-700">First coat, embedding tape</td>
+                  <td className="px-6 py-4 text-sm text-gray-700">High-strength tape application</td>
                 </tr>
                 <tr className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm text-gray-900 font-medium">Topping Compound</td>
-                  <td className="px-6 py-4 text-sm text-gray-700">350 sq ft/gal</td>
+                  <td className="px-6 py-4 text-sm text-gray-700">Final coats only</td>
                   <td className="px-6 py-4 text-sm text-gray-700">24 hours</td>
-                  <td className="px-6 py-4 text-sm text-gray-700">Final coat, smooth finish</td>
+                  <td className="px-6 py-4 text-sm text-gray-700">Smooth finish, easy sanding</td>
                 </tr>
                 <tr className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm text-gray-900 font-medium">Lightweight</td>
-                  <td className="px-6 py-4 text-sm text-gray-700">300 sq ft/gal</td>
-                  <td className="px-6 py-4 text-sm text-gray-700">24 hours</td>
-                  <td className="px-6 py-4 text-sm text-gray-700">All coats, easier sanding</td>
-                </tr>
-                <tr className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm text-gray-900 font-medium">Quick-Set (20 min)</td>
-                  <td className="px-6 py-4 text-sm text-gray-700">250 sq ft/gal</td>
-                  <td className="px-6 py-4 text-sm text-gray-700">20-90 minutes</td>
-                  <td className="px-6 py-4 text-sm text-gray-700">Repairs, same-day coat</td>
+                  <td className="px-6 py-4 text-sm text-gray-700">All coats</td>
+                  <td className="px-6 py-4 text-sm text-gray-700">12-24 hours</td>
+                  <td className="px-6 py-4 text-sm text-gray-700">Easier handling, professional use</td>
                 </tr>
               </tbody>
             </table>
           </div>
           <div className="bg-gray-50 px-6 py-4 text-sm text-gray-600">
-            <strong>Professional tip:</strong> Use taping compound for first coat, all-purpose for second, and topping for final coat. Lightweight reduces sanding time.
+            <strong>Coverage Rate:</strong> 280 sq ft per gallon per coat (USG specification). Level 4 finish requires 3 coats minimum.
           </div>
         </div>
       </section>
 
-      {/* Material List by Room Size */}
+      {/* Materials Needed by Room Size */}
       <section className="mb-16">
         <h2 className="text-3xl font-bold text-gray-900 mb-8">🏠 Materials Needed by Room Size</h2>
         
@@ -209,7 +207,7 @@ export default function DrywallGuide() {
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Wall Area</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Sheets (4×8)</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Mud (gal)</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Screws</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Tape (ft)</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -217,35 +215,35 @@ export default function DrywallGuide() {
                   <td className="px-6 py-4 text-sm text-gray-900 font-medium">10×10 bedroom</td>
                   <td className="px-6 py-4 text-sm text-gray-700">320 sq ft</td>
                   <td className="px-6 py-4 text-sm text-gray-700">11 sheets</td>
-                  <td className="px-6 py-4 text-sm text-gray-700">1.5 gallons</td>
-                  <td className="px-6 py-4 text-sm text-gray-700">350 screws</td>
+                  <td className="px-6 py-4 text-sm text-gray-700">4 gallons</td>
+                  <td className="px-6 py-4 text-sm text-gray-700">1,600 feet</td>
                 </tr>
                 <tr className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm text-gray-900 font-medium">12×15 living room</td>
                   <td className="px-6 py-4 text-sm text-gray-700">432 sq ft</td>
                   <td className="px-6 py-4 text-sm text-gray-700">15 sheets</td>
-                  <td className="px-6 py-4 text-sm text-gray-700">2 gallons</td>
-                  <td className="px-6 py-4 text-sm text-gray-700">480 screws</td>
+                  <td className="px-6 py-4 text-sm text-gray-700">5 gallons</td>
+                  <td className="px-6 py-4 text-sm text-gray-700">2,160 feet</td>
                 </tr>
                 <tr className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm text-gray-900 font-medium">20×20 great room</td>
                   <td className="px-6 py-4 text-sm text-gray-700">640 sq ft</td>
                   <td className="px-6 py-4 text-sm text-gray-700">22 sheets</td>
-                  <td className="px-6 py-4 text-sm text-gray-700">3 gallons</td>
-                  <td className="px-6 py-4 text-sm text-gray-700">700 screws</td>
+                  <td className="px-6 py-4 text-sm text-gray-700">7 gallons</td>
+                  <td className="px-6 py-4 text-sm text-gray-700">3,200 feet</td>
                 </tr>
                 <tr className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm text-gray-900 font-medium">Garage (20×24)</td>
                   <td className="px-6 py-4 text-sm text-gray-700">880 sq ft</td>
                   <td className="px-6 py-4 text-sm text-gray-700">30 sheets</td>
-                  <td className="px-6 py-4 text-sm text-gray-700">4 gallons</td>
-                  <td className="px-6 py-4 text-sm text-gray-700">960 screws</td>
+                  <td className="px-6 py-4 text-sm text-gray-700">10 gallons</td>
+                  <td className="px-6 py-4 text-sm text-gray-700">4,400 feet</td>
                 </tr>
               </tbody>
             </table>
           </div>
           <div className="bg-gray-50 px-6 py-4 text-sm text-gray-600">
-            <strong>Calculation:</strong> Wall area = (Room perimeter × 8' ceiling) + ceiling if applicable. Includes 10% waste factor on sheets.
+            <strong>Calculation:</strong> Wall area = (Room perimeter × 8' ceiling). Includes 10% waste on sheets. Tape = (sq ft ÷ 100) × 500. Mud = (sq ft ÷ 280) × 3 coats.
           </div>
         </div>
       </section>
@@ -262,7 +260,7 @@ export default function DrywallGuide() {
               </div>
               <div>
                 <h3 className="font-bold text-gray-900 mb-2">Fastener Spacing (ASTM C840)</h3>
-                <p className="text-gray-700 text-sm">Walls: 12" on center. Ceilings: 8" on center for 1/2", 12" for 5/8". Field screws 8-12" from edges to prevent edge cracking.</p>
+                <p className="text-gray-700 text-sm">Walls: 16" on center. Ceilings: 12" on center. Field screws 8-12" from edges to prevent edge cracking. Screws must penetrate framing minimum 5/8".</p>
               </div>
             </div>
 
@@ -278,31 +276,21 @@ export default function DrywallGuide() {
 
             <div className="flex items-start gap-4 pb-4 border-b border-gray-100">
               <div className="bg-purple-100 rounded-full p-3 flex-shrink-0">
-                <span className="text-2xl">🔄</span>
-              </div>
-              <div>
-                <h3 className="font-bold text-gray-900 mb-2">Joint Offset</h3>
-                <p className="text-gray-700 text-sm">Stagger end joints 24" minimum between adjacent rows. Never align joints over door/window openings.</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4 pb-4 border-b border-gray-100">
-              <div className="bg-orange-100 rounded-full p-3 flex-shrink-0">
                 <span className="text-2xl">🎯</span>
               </div>
               <div>
-                <h3 className="font-bold text-gray-900 mb-2">Taping Standards (GA-214)</h3>
-                <p className="text-gray-700 text-sm">Three-coat system: tape/fill coat, second coat extends 2-3" wider, finish coat extends 2" wider again. Total finished joint width: 10-12".</p>
+                <h3 className="font-bold text-gray-900 mb-2">Joint Treatment</h3>
+                <p className="text-gray-700 text-sm">Level 4 finish standard: Tape coat, fill coat, final coat. Each coat must dry 24 hours. Sand between coats with 120-grit paper.</p>
               </div>
             </div>
 
             <div className="flex items-start gap-4">
-              <div className="bg-red-100 rounded-full p-3 flex-shrink-0">
-                <span className="text-2xl">🔥</span>
+              <div className="bg-orange-100 rounded-full p-3 flex-shrink-0">
+                <span className="text-2xl">⚠️</span>
               </div>
               <div>
-                <h3 className="font-bold text-gray-900 mb-2">Fire-Rated Assemblies</h3>
-                <p className="text-gray-700 text-sm">5/8" Type X drywall required for 1-hour fire rating. Garage ceilings under living space require 5/8" per IRC R302.6.</p>
+                <h3 className="font-bold text-gray-900 mb-2">Ceiling Requirements (GA-216)</h3>
+                <p className="text-gray-700 text-sm">5/8" minimum thickness for ceilings with 24" o.c. joists. Install perpendicular to joists. Additional 4% waste factor for overhead difficulty.</p>
               </div>
             </div>
           </div>
@@ -316,7 +304,7 @@ export default function DrywallGuide() {
         <div className="bg-white rounded-xl shadow-lg p-8">
           <div className="space-y-6">
             <div className="bg-blue-50 rounded-lg p-6">
-              <h3 className="font-bold text-gray-900 mb-4 text-lg">Example: 12×15 Room (8' Ceiling)</h3>
+              <h3 className="font-bold text-gray-900 mb-4 text-lg">Example: 12×15 Room (8' Ceiling + Ceiling Drywall)</h3>
               
               <div className="space-y-4 text-sm">
                 <div className="bg-white rounded-lg p-4">
@@ -328,20 +316,27 @@ export default function DrywallGuide() {
                 <div className="bg-white rounded-lg p-4">
                   <p className="font-semibold text-gray-900 mb-2">Step 2: Calculate ceiling area</p>
                   <p className="text-gray-700 font-mono">Ceiling = 12 × 15 = 180 sq ft</p>
-                  <p className="text-gray-700 font-mono">Total area = 432 + 180 = 612 sq ft</p>
                 </div>
 
                 <div className="bg-white rounded-lg p-4">
-                  <p className="font-semibold text-gray-900 mb-2">Step 3: Calculate sheets needed</p>
-                  <p className="text-gray-700 font-mono">Sheets = 612 ÷ 32 = 19.1</p>
-                  <p className="text-gray-700 font-mono">With 10% waste = 19.1 × 1.10 = 21 sheets</p>
+                  <p className="font-semibold text-gray-900 mb-2">Step 3: Apply waste factors</p>
+                  <p className="text-gray-700 font-mono">Wall with waste = 432 × 1.10 = 475 sq ft</p>
+                  <p className="text-gray-700 font-mono">Ceiling with waste = 180 × 1.14 = 205 sq ft</p>
+                  <p className="text-gray-700 font-mono">Total = 475 + 205 = 680 sq ft</p>
                 </div>
 
                 <div className="bg-white rounded-lg p-4">
-                  <p className="font-semibold text-gray-900 mb-2">Step 4: Calculate other materials</p>
-                  <p className="text-gray-700 font-mono">Screws: 21 sheets × 35 avg = 735 screws (1 lb box)</p>
-                  <p className="text-gray-700 font-mono">Tape: 21 × 10 ft = 210 feet (1 roll)</p>
-                  <p className="text-gray-700 font-mono">Mud: 612 ÷ 280 = 2.2 gallons (buy 3)</p>
+                  <p className="font-semibold text-gray-900 mb-2">Step 4: Calculate sheets needed</p>
+                  <p className="text-gray-700 font-mono">Sheets = 680 ÷ 32 = 21.25 → 22 sheets</p>
+                </div>
+
+                <div className="bg-white rounded-lg p-4">
+                  <p className="font-semibold text-gray-900 mb-2">Step 5: Calculate other materials</p>
+                  <p className="text-gray-700 font-mono">Screws (walls): 475 × 1.0 = 475 screws</p>
+                  <p className="text-gray-700 font-mono">Screws (ceiling): 205 × 1.25 = 256 screws</p>
+                  <p className="text-gray-700 font-mono">Total screws: 731 screws (3 lbs)</p>
+                  <p className="text-gray-700 font-mono">Tape: (612 ÷ 100) × 500 = 3,060 feet (7 rolls)</p>
+                  <p className="text-gray-700 font-mono">Mud: (612 ÷ 280) × 3 = 6.6 gallons (buy 7)</p>
                 </div>
               </div>
             </div>
@@ -349,10 +344,10 @@ export default function DrywallGuide() {
             <div className="bg-gray-50 rounded-lg p-6">
               <h3 className="font-bold text-gray-900 mb-3">Quick Formulas</h3>
               <div className="space-y-2 text-sm text-gray-700">
-                <p className="font-mono bg-white p-3 rounded">Sheets = (Total sq ft ÷ 32) × 1.10</p>
-                <p className="font-mono bg-white p-3 rounded">Screws = Sheets × 35 (average per sheet)</p>
-                <p className="font-mono bg-white p-3 rounded">Tape = Sheets × 10 linear feet</p>
-                <p className="font-mono bg-white p-3 rounded">Mud = Total sq ft ÷ 280 sq ft per gallon</p>
+                <p className="font-mono bg-white p-3 rounded">Sheets = (Wall sq ft × 1.10 + Ceiling sq ft × 1.14) ÷ 32</p>
+                <p className="font-mono bg-white p-3 rounded">Screws = (Wall sq ft × 1.0) + (Ceiling sq ft × 1.25)</p>
+                <p className="font-mono bg-white p-3 rounded">Tape = (Total sq ft ÷ 100) × 500 linear feet</p>
+                <p className="font-mono bg-white p-3 rounded">Mud = (Total sq ft ÷ 280) × 3 coats</p>
               </div>
             </div>
           </div>
@@ -367,17 +362,17 @@ export default function DrywallGuide() {
           <div className="space-y-4 text-sm text-gray-700">
             <div className="pb-4 border-b border-gray-100">
               <p className="font-semibold text-gray-900 mb-1">ASTM C840 - Application of Gypsum Board</p>
-              <p>Standard specification for fastener spacing, screw depth, joint treatment, and installation methods for gypsum panels.</p>
+              <p>Standard specification for fastener spacing (16" o.c. walls, 12" o.c. ceilings), screw depth, joint treatment, and installation methods for gypsum panels.</p>
             </div>
             
             <div className="pb-4 border-b border-gray-100">
               <p className="font-semibold text-gray-900 mb-1">GA-216 - Gypsum Board Finishing</p>
-              <p>Gypsum Association standard for finishing levels 0-5. Level 4 standard for painted walls, Level 5 for critical lighting.</p>
+              <p>Gypsum Association standard for finishing levels 0-5. Level 4 standard for painted walls, Level 5 for critical lighting. Specifies 5/8" minimum for ceilings with 24" o.c. joists.</p>
             </div>
             
             <div className="pb-4 border-b border-gray-100">
               <p className="font-semibold text-gray-900 mb-1">USG Technical Documentation</p>
-              <p>Manufacturer specifications for Sheetrock products including coverage rates, weight limits, and fire-rated assemblies.</p>
+              <p>Manufacturer specifications for Sheetrock products including coverage rates (280 sq ft per gallon per coat), weight limits, and fire-rated assemblies.</p>
             </div>
             
             <div>
