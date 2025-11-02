@@ -199,6 +199,9 @@ export default function FenceInstallationCalculator() {
     
     setMaterials(materialsData);
     setHasCalculated(true);
+
+    // After setHasCalculated(true);
+window.scrollTo({ top: 0, behavior: 'smooth' });
     
     // Track the calculation
     trackCalculation('fence', {
