@@ -23,7 +23,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}>
-        <GoogleAnalytics measurementId="G-YZ67KQ3ML8" />
+        <GoogleAnalytics measurementId="G-KZBWPC3X69" />
         <Header />
         <main className="flex-grow">
           {children}
