@@ -179,9 +179,9 @@ const ExteriorPaintCalculator = () => {
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
             <Home className="w-10 h-10 text-blue-600" />
-            <h1 className="text-4xl font-bold text-gray-800">
+            <h2 className="text-4xl font-bold text-gray-800">
               Exterior Paint Calculator
-            </h1>
+            </h2>
           </div>
           <p className="text-gray-600 text-lg">
             Calculate exactly how much paint and primer you need

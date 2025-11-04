@@ -346,9 +346,9 @@ const DeckStainCalculator = () => {
     <div className="max-w-6xl mx-auto p-6">
       <div className="bg-white rounded-lg shadow-xl p-8 mb-8">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-3">
+          <h2 className="text-4xl font-bold text-gray-800 mb-3">
             Deck Stain Calculator
-          </h1>
+          </h2>
           <p className="text-gray-600 text-lg">
             Calculate exact stain quantities based on industry research
           </p>

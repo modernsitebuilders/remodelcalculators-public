@@ -193,7 +193,7 @@ const RoofingMaterialsCalculator = () => {
         <div className="bg-white rounded-xl shadow-2xl overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6 text-white">
-            <h1 className="text-3xl font-bold mb-2">Professional Roofing Materials Calculator</h1>
+            <h2 className="text-3xl font-bold mb-2">Professional Roofing Materials Calculator</h2>
             <p className="text-blue-100">Industry-standard calculations based on IRC, IBC, and manufacturer specifications</p>
           </div>
 

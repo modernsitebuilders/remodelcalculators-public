@@ -251,7 +251,7 @@ export default function FlooringCalculator() {
           margin-bottom: 64px;
         }
 
-        .header h1 {
+        .header h2 {
           font-size: 48px;
           font-weight: 800;
           color: #0f0f0f;
@@ -653,7 +653,7 @@ export default function FlooringCalculator() {
 
       <div className="container">
         <div className="header">
-          <h1>Flooring Calculator</h1>
+          <h2>Flooring Calculator</h2>
           <p>Calculate materials needed for your flooring project</p>
         </div>
 

@@ -290,9 +290,9 @@ export default function FenceInstallationCalculator() {
               <Calculator className="w-10 h-10 text-white" />
             </div>
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-green-700 to-emerald-600 bg-clip-text text-transparent">
+              <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-green-700 to-emerald-600 bg-clip-text text-transparent">
                 Professional Fence Materials Calculator
-              </h1>
+              </h2>
               <p className="text-gray-600 mt-2 text-lg">Industry-standard material estimator • 2025</p>
             </div>
           </div>

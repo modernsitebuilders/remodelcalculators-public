@@ -279,7 +279,7 @@ export default function PaintCalculator() {
               <Calculator className="w-8 h-8 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-800">Interior Paint Calculator</h1>
+              <h2 className="text-3xl font-bold text-gray-800">Interior Paint Calculator</h2>
               <p className="text-gray-600">Professional estimation based on industry standards</p>
             </div>
           </div>
