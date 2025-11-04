@@ -42,3 +42,26 @@ export function generateCalculatorBreadcrumbSchema(calculatorData) {
     ],
   };
 }
+
+// Add this to the end of your file:
+
+// Generate HowTo schema for calculator instructions
+export function generateHowToSchema(calculatorData) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: `How to Use the ${calculatorData.name}`,
+    description: calculatorData.description,
+    step: calculatorData.howToUse.steps.map((step, index) => ({
+      '@type': 'HowToStep',
+      position: index + 1,
+      name: `Step ${index + 1}`,
+      text: step,
+    })),
+    tool: {
+      '@type': 'HowToTool',
+      name: calculatorData.name,
+    },
+    totalTime: 'PT5M',
+  };
+}
