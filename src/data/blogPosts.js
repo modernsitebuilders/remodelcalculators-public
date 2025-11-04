@@ -9,6 +9,7 @@ export const blogPosts = [
     image: '🏗️',
     keywords: ['concrete calculator', 'cubic yards', 'concrete bags', 'slab thickness', 'ACI 318'],
     author: 'Construction Calculators',
+    calculatorSlug: 'concrete-calculator',
   },
   {
     slug: 'drywall-material-guide',
@@ -20,6 +21,7 @@ export const blogPosts = [
     image: '🧱',
     keywords: ['drywall calculator', 'joint compound', 'drywall tape', 'sheet coverage'],
     author: 'Construction Calculators',
+    calculatorSlug: 'drywall-calculator',
   },
   {
     slug: 'roofing-square-calculator',
@@ -31,6 +33,7 @@ export const blogPosts = [
     image: '🏠',
     keywords: ['roofing square', 'shingle calculator', 'roofing materials', 'pitch factor'],
     author: 'Construction Calculators',
+    calculatorSlug: 'roofing-calculator',
   },
   {
     slug: 'interior-paint-coverage-guide',
@@ -42,6 +45,7 @@ export const blogPosts = [
     image: '🎨',
     keywords: ['interior paint calculator', 'paint per room', 'wall coverage', 'primer coverage'],
     author: 'Construction Calculators',
+    calculatorSlug: 'interior-paint-calculator',
   },
   {
     slug: 'exterior-paint-coverage-guide',
@@ -53,6 +57,7 @@ export const blogPosts = [
     image: '🏡',
     keywords: ['exterior paint calculator', 'house paint', 'siding coverage', 'exterior primer'],
     author: 'Construction Calculators',
+    calculatorSlug: 'exterior-paint-calculator',
   },
   {
     slug: 'deck-stain-coverage-guide',
@@ -64,6 +69,7 @@ export const blogPosts = [
     image: '🪵',
     keywords: ['deck stain calculator', 'stain coverage', 'wood deck', 'deck sealer'],
     author: 'Construction Calculators',
+    calculatorSlug: 'deck-stain-calculator',
   },
   {
     slug: 'flooring-material-calculator',
@@ -75,6 +81,7 @@ export const blogPosts = [
     image: '📐',
     keywords: ['flooring calculator', 'tile calculator', 'hardwood flooring', 'waste factor'],
     author: 'Construction Calculators',
+    calculatorSlug: 'flooring-calculator',
   },
   {
     slug: 'fence-post-spacing-guide',
@@ -86,6 +93,7 @@ export const blogPosts = [
     image: '🚧',
     keywords: ['fence calculator', 'post spacing', 'building codes', 'fence footings'],
     author: 'Construction Calculators',
+    calculatorSlug: 'fence-calculator',
   },
   {
     slug: 'siding-material-calculator',
@@ -97,6 +105,7 @@ export const blogPosts = [
     image: '🏘️',
     keywords: ['siding calculator', 'vinyl siding', 'fiber cement', 'house siding'],
     author: 'Construction Calculators',
+    calculatorSlug: 'siding-calculator',
   },
   {
     slug: 'mulch-calculator-guide',
@@ -108,6 +117,7 @@ export const blogPosts = [
     image: '🌱',
     keywords: ['mulch calculator', 'cubic yards mulch', 'landscaping', 'mulch depth'],
     author: 'Construction Calculators',
+    calculatorSlug: 'mulch-calculator',
   },
 ];
 

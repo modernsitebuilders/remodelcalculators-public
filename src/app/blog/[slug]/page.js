@@ -229,7 +229,7 @@ export default async function BlogPost({ params }) {
             Use our free calculator to get accurate material estimates based on industry standards.
           </p>
           <Link
-            href={`/${post.slug.replace('-guide', '').replace('-calculator', '')}`}
+            href={`/${post.calculatorSlug}`}
             className="inline-block bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-50 transition-colors shadow-lg"
           >
             Try the Calculator →
