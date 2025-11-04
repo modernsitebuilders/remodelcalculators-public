@@ -1,6 +1,7 @@
 export const metadata = {
   title: 'Contact Us | Job Calculators',
   description: 'Get in touch with Job Calculators for questions, feedback, or support.',
+  alternates: { canonical: 'https://jobcalculators.com/contact' },
 };
 
 export default function Contact() {

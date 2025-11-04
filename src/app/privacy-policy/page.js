@@ -1,6 +1,7 @@
 export const metadata = {
   title: 'Privacy Policy | Job Calculators',
   description: 'Privacy policy for Job Calculators - how we handle user data and protect your privacy.',
+  alternates: { canonical: 'https://jobcalculators.com/privacy-policy' },
 };
 
 export default function PrivacyPolicy() {

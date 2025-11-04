@@ -1,7 +1,11 @@
-'use client';
-
 import Link from 'next/link';
 import DumpsterCalculatorPromo from '@/components/DumpsterCalculatorPromo';
+
+export const metadata = {
+  title: "Job Calculators - Professional Construction Material Calculators",
+  description: "Free construction calculators for accurate material estimation.",
+  alternates: { canonical: 'https://jobcalculators.com' },
+};
 
 import { 
   Calculator, 

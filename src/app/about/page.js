@@ -1,6 +1,7 @@
 export const metadata = {
   title: 'About Us | Job Calculators',
   description: 'Learn about Job Calculators - free construction material calculators for contractors, builders, and DIY enthusiasts.',
+  alternates: { canonical: 'https://jobcalculators.com/about' },
 };
 
 export default function About() {
