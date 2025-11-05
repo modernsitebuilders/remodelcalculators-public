@@ -82,7 +82,7 @@ export default function Header() {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-200">
+          <div className="md:hidden py-4 border-t border-gray-200 max-h-[80vh] overflow-y-auto">
             <div className="flex flex-col gap-2">
               <Link
                 href="/"
@@ -91,6 +91,14 @@ export default function Header() {
               >
                 Home
               </Link>
+
+              <Link
+  href="/blog"
+  onClick={() => setMobileMenuOpen(false)}
+  className="px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors font-medium"
+>
+  Guides
+</Link>
               
               <div className="px-4 py-2 text-sm font-semibold text-gray-500 uppercase tracking-wider">
                 Calculators
