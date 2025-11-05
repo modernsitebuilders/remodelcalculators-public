@@ -21,7 +21,7 @@ export default function PrivacyPolicy() {
               Job Calculators ("we," "our," or "us") operates jobcalculators.com. This Privacy Policy explains how we collect, use, and protect information when you use our construction calculator tools.
             </p>
             <p className="text-gray-700">
-              We are committed to protecting your privacy. Our calculators are designed to work entirely in your browser without requiring personal information or user accounts.
+              Our calculators log the measurements and calculations you enter for analysis and improvement purposes. We do not require user accounts or collect personal identifiers such as names, email addresses, or IP addresses.
             </p>
           </section>
 
@@ -29,30 +29,32 @@ export default function PrivacyPolicy() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">Information We Collect</h2>
             
-            <h3 className="text-xl font-semibold text-gray-800 mb-3">Information You Provide</h3>
+            <h3 className="text-xl font-semibold text-gray-800 mb-3">Calculator Input Data</h3>
             <p className="text-gray-700 mb-4">
-              Our calculators process measurements and project specifications that you enter. This information:
+              When you use our calculators, we collect and store:
             </p>
             <ul className="list-disc pl-6 mb-4 text-gray-700 space-y-2">
-              <li>Is processed locally in your browser</li>
-              <li>Is not transmitted to our servers</li>
-              <li>Is not stored or saved by us</li>
-              <li>Disappears when you close or refresh the page</li>
+              <li>Measurements and values you enter</li>
+              <li>Calculation results generated</li>
+              <li>Which calculator was used</li>
+              <li>Timestamp of calculation</li>
             </ul>
+            <p className="text-gray-700 mb-4">
+              This data is logged to help us understand how our calculators are used and to improve accuracy. We do not collect your name, email address, or other personal identifiers with this data.
+            </p>
 
             <h3 className="text-xl font-semibold text-gray-800 mb-3">Automatically Collected Information</h3>
             <p className="text-gray-700 mb-4">
-              When you visit our website, we may automatically collect:
+              When you visit our website, we automatically collect anonymous usage data:
             </p>
             <ul className="list-disc pl-6 mb-4 text-gray-700 space-y-2">
-              <li>Browser type and version</li>
-              <li>Operating system</li>
-              <li>Pages visited and time spent</li>
-              <li>Referring website</li>
-              <li>IP address (anonymized)</li>
+              <li>Which calculators are accessed</li>
+              <li>Page views and navigation patterns</li>
+              <li>Time spent on pages</li>
+              <li>General browser and device information</li>
             </ul>
             <p className="text-gray-700">
-              This information is collected through standard web server logs and analytics tools to improve our service.
+              We do not collect or store IP addresses or other personally identifiable information. All data collected is anonymous and used solely for improving calculator functionality and user experience.
             </p>
           </section>
 
@@ -60,17 +62,17 @@ export default function PrivacyPolicy() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">How We Use Information</h2>
             <p className="text-gray-700 mb-4">
-              We use automatically collected information to:
+              We use calculator input data and usage analytics to:
             </p>
             <ul className="list-disc pl-6 mb-4 text-gray-700 space-y-2">
-              <li>Improve calculator functionality and user experience</li>
+              <li>Verify calculator accuracy and identify potential errors</li>
+              <li>Understand typical use cases and input ranges</li>
+              <li>Improve calculator functionality</li>
               <li>Analyze which calculators are most used</li>
               <li>Identify and fix technical issues</li>
-              <li>Understand website traffic patterns</li>
-              <li>Enhance website security</li>
             </ul>
             <p className="text-gray-700">
-              We do not sell, rent, or share your information with third parties for marketing purposes.
+              We do not sell, rent, or share any data with third parties for marketing purposes.
             </p>
           </section>
 
@@ -78,11 +80,11 @@ export default function PrivacyPolicy() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">Cookies and Tracking Technologies</h2>
             <p className="text-gray-700 mb-4">
-              We may use cookies and similar technologies to:
+              We use cookies and similar technologies to:
             </p>
             <ul className="list-disc pl-6 mb-4 text-gray-700 space-y-2">
-              <li>Remember your preferences (if any)</li>
-              <li>Analyze site traffic and usage patterns</li>
+              <li>Track calculator usage patterns</li>
+              <li>Analyze site traffic</li>
               <li>Improve site functionality</li>
             </ul>
             <p className="text-gray-700 mb-4">
@@ -94,9 +96,14 @@ export default function PrivacyPolicy() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">Third-Party Services</h2>
             <p className="text-gray-700 mb-4">
-              We may use third-party services for analytics and website hosting:
+              We use third-party services for data logging, analytics, and website hosting:
             </p>
             
+            <h3 className="text-xl font-semibold text-gray-800 mb-3">Data Storage</h3>
+            <p className="text-gray-700 mb-4">
+              Calculator inputs and results are logged to Google Sheets for analysis. Google may process this data according to their privacy policy at policies.google.com/privacy.
+            </p>
+
             <h3 className="text-xl font-semibold text-gray-800 mb-3">Hosting</h3>
             <p className="text-gray-700 mb-4">
               Our website is hosted on Vercel. Vercel may collect technical information necessary to provide hosting services. Review Vercel's privacy policy at vercel.com/legal/privacy-policy.
@@ -104,7 +111,7 @@ export default function PrivacyPolicy() {
 
             <h3 className="text-xl font-semibold text-gray-800 mb-3">Analytics</h3>
             <p className="text-gray-700 mb-4">
-              We may use Google Analytics or similar services to understand how visitors use our site. These services collect information anonymously and report website trends without identifying individual visitors.
+              We use analytics services to track calculator usage and site performance. These services collect anonymous data about how visitors use our site without identifying individual users.
             </p>
           </section>
 
@@ -112,10 +119,10 @@ export default function PrivacyPolicy() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">Data Security</h2>
             <p className="text-gray-700 mb-4">
-              We implement reasonable security measures to protect information collected through our website. However, no internet transmission is completely secure. We cannot guarantee absolute security of information transmitted to our site.
+              Calculator inputs and results are logged for analysis purposes. While we do not collect personal identifiers like names or email addresses with this data, the measurements and calculations you enter are stored.
             </p>
             <p className="text-gray-700">
-              Since calculator inputs are processed locally in your browser and not transmitted to our servers, your project measurements remain private on your device.
+              We use standard security measures to protect stored data. However, no internet transmission is completely secure. Do not enter sensitive or confidential project information if privacy is a concern.
             </p>
           </section>
 
@@ -131,17 +138,10 @@ export default function PrivacyPolicy() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">Your Rights</h2>
             <p className="text-gray-700 mb-4">
-              Depending on your location, you may have rights regarding your information:
+              While we log calculator inputs and results, this data is not linked to personal identifiers. Since we do not collect names, email addresses, or user accounts, we cannot identify which specific calculations belong to which users.
             </p>
-            <ul className="list-disc pl-6 mb-4 text-gray-700 space-y-2">
-              <li>Access information we hold about you</li>
-              <li>Request correction of inaccurate information</li>
-              <li>Request deletion of your information</li>
-              <li>Object to processing of your information</li>
-              <li>Withdraw consent where applicable</li>
-            </ul>
             <p className="text-gray-700">
-              Since we do not collect personal information through our calculators, these rights primarily apply to any contact information you may provide through other means.
+              If you have concerns about data we may have collected, contact us. You can control cookie preferences through your browser settings.
             </p>
           </section>
 
