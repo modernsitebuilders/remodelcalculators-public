@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calculator, Info, Package, Ruler, AlertCircle } from 'lucide-react';
 import { trackCalculation } from '@/utils/tracking';
+import { copyCalculation } from '@/utils/copyCalculation';
 
 const ConcreteCalculator = () => {
   // Project Type Selection
@@ -48,6 +49,8 @@ const ConcreteCalculator = () => {
   // Results
   const [results, setResults] = useState(null);
   const [showAdditionalMaterials, setShowAdditionalMaterials] = useState(false);
+
+  const [copyButtonText, setCopyButtonText] = useState('📋 Copy Calculation');
 
   // Calculation Constants (from research)
   const BAG_YIELDS = {
@@ -370,6 +373,51 @@ const ConcreteCalculator = () => {
     setResults(null);
     setShowAdditionalMaterials(false);
   };
+
+  const handleCopyCalculation = async () => {
+  if (!results) return;
+  
+  // Prepare inputs object
+  const inputs = {
+    'Project type': projectType,
+    ...(projectType === 'slab' && {
+      'Length': `${slabLength} feet`,
+      'Width': `${slabWidth} feet`,
+      'Thickness': `${slabThickness} inches`
+    }),
+    ...(projectType === 'footing' && {
+      'Length': `${footingLength} feet`,
+      'Width': `${footingWidth} inches`,
+      'Depth': `${footingDepth} inches`
+    }),
+    ...(projectType === 'post' && {
+      'Post diameter': `${postDiameter} inches`,
+      'Post depth': `${postDepth} inches`,
+      'Number of posts': postCount
+    }),
+    'PSI rating': psiRating
+  };
+  
+  // Prepare outputs object
+  const outputs = {
+    'Concrete needed': `${results.cubicYards} cubic yards`,
+    '80lb bags': `${results.bags80lb} bags`,
+    '60lb bags': `${results.bags60lb} bags`
+  };
+  
+  // Note text
+  const note = `Includes ${results.wasteFactorApplied}% waste factor. Always verify measurements on site.`;
+  
+  // Call the copy function
+  const success = await copyCalculation('Concrete Calculator', inputs, outputs, note);
+  
+  if (success) {
+    setCopyButtonText('✓ Copied!');
+    setTimeout(() => setCopyButtonText('📋 Copy Calculation'), 2000);
+  } else {
+    alert('Unable to copy. Please copy results manually.');
+  }
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4">
@@ -908,7 +956,17 @@ const ConcreteCalculator = () => {
                     <div className="text-sm text-gray-700">
                       <strong>💡 Recommendation:</strong> {results.methodRecommendation}
                     </div>
-                  </div>
+                 </div>
+                </div>
+
+                {/* Copy Calculation Button */}
+                <div className="bg-white rounded-lg shadow-lg p-6">
+                  <button 
+                    onClick={handleCopyCalculation}
+                    className="copy-calc-btn"
+                  >
+                    {copyButtonText}
+                  </button>
                 </div>
 
                 {/* Additional Materials Toggle */}
@@ -943,6 +1001,7 @@ const ConcreteCalculator = () => {
                     )}
                   </div>
                 )}
+                
 
                 {/* Recommendations */}
                 {(results.recommendations.length > 0 || results.regionalNotes.length > 0) && (
