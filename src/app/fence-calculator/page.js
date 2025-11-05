@@ -2,6 +2,16 @@ import { getCalculatorData } from '@/data/calculatorData';
 import FenceCalculator from '@/components/calculators/FenceCalculator';
 import CalculatorBlogLink from '@/components/blog/CalculatorBlogLink';
 import { generateCalculatorSchema, generateCalculatorBreadcrumbSchema } from '@/utils/calculator-schema';
+import CalculatorMethodology from '@/components/trust/CalculatorMethodology';
+import IndustryStandards from '@/components/trust/IndustryStandards';
+import RegionalVariations from '@/components/trust/RegionalVariations';
+
+// Import fence data
+import { 
+  fenceMethodology, 
+  fenceStandards, 
+  fenceRegionalVariations 
+} from '@/data/trustBuilding/fenceCalculatorData';
 
 export async function generateMetadata() {
   const data = getCalculatorData('fence-calculator');
@@ -55,6 +65,24 @@ export default function FenceCalculatorPage() {
         </div>
 
         <FenceCalculator />
+
+        {/* Trust-building components */}
+<CalculatorMethodology
+  calculatorType={fenceMethodology.calculatorType}
+  source={fenceMethodology.source}
+  formulas={fenceMethodology.formulas}
+  constants={fenceMethodology.constants}
+/>
+
+<IndustryStandards
+  standards={fenceStandards.standards}
+  lastVerified={fenceStandards.lastVerified}
+/>
+
+<RegionalVariations
+  variations={fenceRegionalVariations.variations}
+  warningMessage={fenceRegionalVariations.warningMessage}
+/>
 
         <CalculatorBlogLink 
           blogSlug="fence-post-spacing-guide"

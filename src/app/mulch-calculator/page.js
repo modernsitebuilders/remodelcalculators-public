@@ -2,6 +2,15 @@ import { getCalculatorData } from '@/data/calculatorData';
 import MulchCalculator from '@/components/calculators/MulchCalculator';
 import CalculatorBlogLink from '@/components/blog/CalculatorBlogLink';
 import { generateCalculatorSchema, generateCalculatorBreadcrumbSchema } from '@/utils/calculator-schema';
+import CalculatorMethodology from '@/components/trust/CalculatorMethodology';
+import IndustryStandards from '@/components/trust/IndustryStandards';
+import RegionalVariations from '@/components/trust/RegionalVariations';
+
+import { 
+  mulchMethodology, 
+  mulchStandards, 
+  mulchRegionalVariations 
+} from '@/data/trustBuilding/mulchCalculatorData';
 
 export async function generateMetadata() {
   const data = getCalculatorData('mulch-calculator');
@@ -55,6 +64,23 @@ export default function MulchCalculatorPage() {
         </div>
 
         <MulchCalculator />
+
+<CalculatorMethodology
+  calculatorType={mulchMethodology.calculatorType}
+  source={mulchMethodology.source}
+  formulas={mulchMethodology.formulas}
+  constants={mulchMethodology.constants}
+/>
+
+<IndustryStandards
+  standards={mulchStandards.standards}
+  lastVerified={mulchStandards.lastVerified}
+/>
+
+<RegionalVariations
+  variations={mulchRegionalVariations.variations}
+  warningMessage={mulchRegionalVariations.warningMessage}
+/>
 
         <CalculatorBlogLink 
           blogSlug="mulch-calculator-guide"

@@ -2,6 +2,14 @@ import { getCalculatorData } from '@/data/calculatorData';
 import ConcreteCalculator from '@/components/calculators/ConcreteCalculator';
 import CalculatorBlogLink from '@/components/blog/CalculatorBlogLink';
 import { generateCalculatorSchema, generateCalculatorBreadcrumbSchema } from '@/utils/calculator-schema';
+import CalculatorMethodology from '@/components/trust/CalculatorMethodology';
+import IndustryStandards from '@/components/trust/IndustryStandards';
+import RegionalVariations from '@/components/trust/RegionalVariations';
+import { 
+  concreteMethodology, 
+  concreteStandards, 
+  concreteRegionalVariations 
+} from '@/data/trustBuilding/concreteCalculatorData';
 
 export async function generateMetadata() {
   const data = getCalculatorData('concrete-calculator');
@@ -57,6 +65,10 @@ export default function ConcreteCalculatorPage() {
 
         {/* Calculator */}
         <ConcreteCalculator />
+
+<CalculatorMethodology {...concreteMethodology} />
+<IndustryStandards {...concreteStandards} />
+<RegionalVariations {...concreteRegionalVariations} />
 
         {/* Blog Link */}
         <CalculatorBlogLink 

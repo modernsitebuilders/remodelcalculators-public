@@ -2,6 +2,14 @@ import { getCalculatorData } from '@/data/calculatorData';
 import InteriorPaintCalculator from '@/components/calculators/InteriorPaintCalculator';
 import CalculatorBlogLink from '@/components/blog/CalculatorBlogLink';
 import { generateCalculatorSchema, generateCalculatorBreadcrumbSchema } from '@/utils/calculator-schema';
+import CalculatorMethodology from '@/components/trust/CalculatorMethodology';
+import IndustryStandards from '@/components/trust/IndustryStandards';
+import RegionalVariations from '@/components/trust/RegionalVariations';
+import { 
+  paintMethodology, 
+  paintStandards, 
+  paintRegionalVariations 
+} from '@/data/trustBuilding/paintCalculatorData';
 
 export async function generateMetadata() {
   const data = getCalculatorData('interior-paint-calculator');
@@ -55,6 +63,10 @@ export default function InteriorPaintCalculatorPage() {
         </div>
 
         <InteriorPaintCalculator />
+
+        <CalculatorMethodology {...paintMethodology} />
+        <IndustryStandards {...paintStandards} />
+        <RegionalVariations {...paintRegionalVariations} />
 
         <CalculatorBlogLink 
           blogSlug="interior-paint-coverage-guide"

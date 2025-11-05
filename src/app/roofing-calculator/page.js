@@ -2,6 +2,16 @@ import { getCalculatorData } from '@/data/calculatorData';
 import RoofingCalculator from '@/components/calculators/RoofingCalculator';
 import CalculatorBlogLink from '@/components/blog/CalculatorBlogLink';
 import { generateCalculatorSchema, generateCalculatorBreadcrumbSchema } from '@/utils/calculator-schema';
+import CalculatorMethodology from '@/components/trust/CalculatorMethodology';
+import IndustryStandards from '@/components/trust/IndustryStandards';
+import RegionalVariations from '@/components/trust/RegionalVariations';
+
+// Import roofing data
+import { 
+  roofingMethodology, 
+  roofingStandards, 
+  roofingRegionalVariations 
+} from '@/data/trustBuilding/roofingCalculatorData';
 
 export async function generateMetadata() {
   const data = getCalculatorData('roofing-calculator');
@@ -57,6 +67,24 @@ export default function RoofingCalculatorPage() {
 
         {/* Calculator */}
         <RoofingCalculator />
+
+        {/* Trust-building components */}
+<CalculatorMethodology
+  calculatorType={roofingMethodology.calculatorType}
+  source={roofingMethodology.source}
+  formulas={roofingMethodology.formulas}
+  constants={roofingMethodology.constants}
+/>
+
+<IndustryStandards
+  standards={roofingStandards.standards}
+  lastVerified={roofingStandards.lastVerified}
+/>
+
+<RegionalVariations
+  variations={roofingRegionalVariations.variations}
+  warningMessage={roofingRegionalVariations.warningMessage}
+/>
 
         {/* Blog Link */}
         <CalculatorBlogLink 

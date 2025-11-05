@@ -2,6 +2,15 @@ import { getCalculatorData } from '@/data/calculatorData';
 import ExteriorPaintCalculator from '@/components/calculators/ExteriorPaintCalculator';
 import CalculatorBlogLink from '@/components/blog/CalculatorBlogLink';
 import { generateCalculatorSchema, generateCalculatorBreadcrumbSchema } from '@/utils/calculator-schema';
+import CalculatorMethodology from '@/components/trust/CalculatorMethodology';
+import IndustryStandards from '@/components/trust/IndustryStandards';
+import RegionalVariations from '@/components/trust/RegionalVariations';
+
+import { 
+  exteriorPaintMethodology, 
+  exteriorPaintStandards, 
+  exteriorPaintRegionalVariations 
+} from '@/data/trustBuilding/exteriorPaintCalculatorData';
 
 export async function generateMetadata() {
   const data = getCalculatorData('exterior-paint-calculator');
@@ -55,6 +64,23 @@ export default function ExteriorPaintCalculatorPage() {
         </div>
 
         <ExteriorPaintCalculator />
+
+<CalculatorMethodology
+  calculatorType={exteriorPaintMethodology.calculatorType}
+  source={exteriorPaintMethodology.source}
+  formulas={exteriorPaintMethodology.formulas}
+  constants={exteriorPaintMethodology.constants}
+/>
+
+<IndustryStandards
+  standards={exteriorPaintStandards.standards}
+  lastVerified={exteriorPaintStandards.lastVerified}
+/>
+
+<RegionalVariations
+  variations={exteriorPaintRegionalVariations.variations}
+  warningMessage={exteriorPaintRegionalVariations.warningMessage}
+/>
 
         <CalculatorBlogLink 
           blogSlug="exterior-paint-coverage-guide"

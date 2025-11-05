@@ -2,6 +2,15 @@ import { getCalculatorData } from '@/data/calculatorData';
 import FlooringCalculator from '@/components/calculators/FlooringCalculator';
 import CalculatorBlogLink from '@/components/blog/CalculatorBlogLink';
 import { generateCalculatorSchema, generateCalculatorBreadcrumbSchema } from '@/utils/calculator-schema';
+import CalculatorMethodology from '@/components/trust/CalculatorMethodology';
+import IndustryStandards from '@/components/trust/IndustryStandards';
+import RegionalVariations from '@/components/trust/RegionalVariations';
+
+import { 
+  flooringMethodology, 
+  flooringStandards, 
+  flooringRegionalVariations 
+} from '@/data/trustBuilding/flooringCalculatorData';
 
 export async function generateMetadata() {
   const data = getCalculatorData('flooring-calculator');
@@ -55,6 +64,23 @@ export default function FlooringCalculatorPage() {
         </div>
 
         <FlooringCalculator />
+
+<CalculatorMethodology
+  calculatorType={flooringMethodology.calculatorType}
+  source={flooringMethodology.source}
+  formulas={flooringMethodology.formulas}
+  constants={flooringMethodology.constants}
+/>
+
+<IndustryStandards
+  standards={flooringStandards.standards}
+  lastVerified={flooringStandards.lastVerified}
+/>
+
+<RegionalVariations
+  variations={flooringRegionalVariations.variations}
+  warningMessage={flooringRegionalVariations.warningMessage}
+/>
 
         <CalculatorBlogLink 
           blogSlug="flooring-material-calculator"

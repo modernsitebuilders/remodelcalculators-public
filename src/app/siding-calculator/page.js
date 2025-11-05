@@ -2,6 +2,15 @@ import { getCalculatorData } from '@/data/calculatorData';
 import SidingCalculator from '@/components/calculators/SidingCalculator';
 import CalculatorBlogLink from '@/components/blog/CalculatorBlogLink';
 import { generateCalculatorSchema, generateCalculatorBreadcrumbSchema } from '@/utils/calculator-schema';
+import CalculatorMethodology from '@/components/trust/CalculatorMethodology';
+import IndustryStandards from '@/components/trust/IndustryStandards';
+import RegionalVariations from '@/components/trust/RegionalVariations';
+
+import { 
+  sidingMethodology, 
+  sidingStandards, 
+  sidingRegionalVariations 
+} from '@/data/trustBuilding/sidingCalculatorData';
 
 export async function generateMetadata() {
   const data = getCalculatorData('siding-calculator');
@@ -55,6 +64,23 @@ export default function SidingCalculatorPage() {
         </div>
 
         <SidingCalculator />
+
+<CalculatorMethodology
+  calculatorType={sidingMethodology.calculatorType}
+  source={sidingMethodology.source}
+  formulas={sidingMethodology.formulas}
+  constants={sidingMethodology.constants}
+/>
+
+<IndustryStandards
+  standards={sidingStandards.standards}
+  lastVerified={sidingStandards.lastVerified}
+/>
+
+<RegionalVariations
+  variations={sidingRegionalVariations.variations}
+  warningMessage={sidingRegionalVariations.warningMessage}
+/>
 
         <CalculatorBlogLink 
           blogSlug="siding-material-calculator"

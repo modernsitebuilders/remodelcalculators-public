@@ -2,6 +2,15 @@ import { getCalculatorData } from '@/data/calculatorData';
 import DrywallCalculator from '@/components/calculators/DrywallCalculator';
 import CalculatorBlogLink from '@/components/blog/CalculatorBlogLink';
 import { generateCalculatorSchema, generateCalculatorBreadcrumbSchema } from '@/utils/calculator-schema';
+import CalculatorMethodology from '@/components/trust/CalculatorMethodology';
+import IndustryStandards from '@/components/trust/IndustryStandards';
+import RegionalVariations from '@/components/trust/RegionalVariations';
+
+import { 
+  drywallMethodology, 
+  drywallStandards, 
+  drywallRegionalVariations 
+} from '@/data/trustBuilding/drywallCalculatorData';
 
 export async function generateMetadata() {
   const data = getCalculatorData('drywall-calculator');
@@ -57,6 +66,23 @@ export default function DrywallCalculatorPage() {
 
         {/* Calculator */}
         <DrywallCalculator />
+
+<CalculatorMethodology
+  calculatorType={drywallMethodology.calculatorType}
+  source={drywallMethodology.source}
+  formulas={drywallMethodology.formulas}
+  constants={drywallMethodology.constants}
+/>
+
+<IndustryStandards
+  standards={drywallStandards.standards}
+  lastVerified={drywallStandards.lastVerified}
+/>
+
+<RegionalVariations
+  variations={drywallRegionalVariations.variations}
+  warningMessage={drywallRegionalVariations.warningMessage}
+/>
 
         {/* Blog Link */}
         <CalculatorBlogLink 

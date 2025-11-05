@@ -2,6 +2,15 @@ import { getCalculatorData } from '@/data/calculatorData';
 import DeckStainCalculator from '@/components/calculators/DeckStainCalculator';
 import CalculatorBlogLink from '@/components/blog/CalculatorBlogLink';
 import { generateCalculatorSchema, generateCalculatorBreadcrumbSchema } from '@/utils/calculator-schema';
+import CalculatorMethodology from '@/components/trust/CalculatorMethodology';
+import IndustryStandards from '@/components/trust/IndustryStandards';
+import RegionalVariations from '@/components/trust/RegionalVariations';
+
+import { 
+  deckStainMethodology, 
+  deckStainStandards, 
+  deckStainRegionalVariations 
+} from '@/data/trustBuilding/deckStainCalculatorData';
 
 export async function generateMetadata() {
   const data = getCalculatorData('deck-stain-calculator');
@@ -55,6 +64,23 @@ export default function DeckStainCalculatorPage() {
         </div>
 
         <DeckStainCalculator />
+
+<CalculatorMethodology
+  calculatorType={deckStainMethodology.calculatorType}
+  source={deckStainMethodology.source}
+  formulas={deckStainMethodology.formulas}
+  constants={deckStainMethodology.constants}
+/>
+
+<IndustryStandards
+  standards={deckStainStandards.standards}
+  lastVerified={deckStainStandards.lastVerified}
+/>
+
+<RegionalVariations
+  variations={deckStainRegionalVariations.variations}
+  warningMessage={deckStainRegionalVariations.warningMessage}
+/>
 
         <CalculatorBlogLink 
           blogSlug="deck-stain-coverage-guide"
