@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Calculator, Info } from 'lucide-react';
 import { trackCalculation } from '@/utils/tracking';
+import { copyCalculation } from '@/utils/copyCalculation';
 
 export default function PaintCalculator() {
   const [rooms, setRooms] = useState([{ 
@@ -32,6 +33,7 @@ export default function PaintCalculator() {
   const [ceilingSurfaceCondition, setCeilingSurfaceCondition] = useState('painted');
   const [ceilingApplicationMethod, setCeilingApplicationMethod] = useState('roller');
   const [ceilingPaintType, setCeilingPaintType] = useState('standard');
+  const [copyButtonText, setCopyButtonText] = useState('📋 Copy Calculation');
   
   const [showResults, setShowResults] = useState(false);
 
@@ -265,9 +267,75 @@ export default function PaintCalculator() {
       totalWallArea: totalWallArea.toFixed(0),
       totalCeilingArea: totalCeilingArea.toFixed(0)
     };
+};  
+
+  const handleCopyCalculation = async () => {
+    if (!showResults || !results) return;
+    
+    // Prepare inputs
+    const inputsData = {
+      'Number of rooms': rooms.length
+    };
+    
+    // Count total doors and windows
+    let totalDoors = 0;
+    let totalWindows = 0;
+    rooms.forEach(room => {
+      totalDoors += room.doors.length;
+      totalWindows += room.windows.length;
+    });
+    
+    inputsData['Total doors'] = totalDoors;
+    inputsData['Total windows'] = totalWindows;
+    
+    if (paintWalls) {
+      inputsData['Wall paint type'] = wallPaintType;
+      inputsData['Wall coats'] = wallCoats;
+      inputsData['Wall texture'] = wallSurfaceTexture;
+      inputsData['Wall condition'] = wallSurfaceCondition;
+      inputsData['Wall application'] = wallApplicationMethod;
+    }
+    
+    if (paintCeiling) {
+      inputsData['Ceiling paint type'] = ceilingPaintType;
+      inputsData['Ceiling coats'] = ceilingCoats;
+      inputsData['Ceiling condition'] = ceilingSurfaceCondition;
+      inputsData['Ceiling application'] = ceilingApplicationMethod;
+    }
+    
+    // Prepare outputs
+    const outputs = {
+      'Total wall area': `${results.totalWallArea} sq ft`,
+      'Total ceiling area': `${results.totalCeilingArea} sq ft`
+    };
+    
+    if (results.walls) {
+      outputs['Wall paint needed'] = `${results.walls.gallonsNeeded} gallons`;
+      if (results.walls.primerGallons > 0) {
+        outputs['Wall primer needed'] = `${results.walls.primerGallons} gallons`;
+      }
+    }
+    
+    if (results.ceiling) {
+      outputs['Ceiling paint needed'] = `${results.ceiling.gallonsNeeded} gallons`;
+      if (results.ceiling.primerGallons > 0) {
+        outputs['Ceiling primer needed'] = `${results.ceiling.primerGallons} gallons`;
+      }
+    }
+    
+    const note = `Coverage rates: 350-400 sq ft/gallon. Based on PDCA standards with waste factors included.`;
+    
+    const success = await copyCalculation('Interior Paint Calculator', inputsData, outputs, note);
+    
+    if (success) {
+      setCopyButtonText('✓ Copied!');
+      setTimeout(() => setCopyButtonText('📋 Copy Calculation'), 2000);
+    } else {
+      alert('Unable to copy. Please copy results manually.');
+    }
   };
 
-  const results = showResults ? calculatePaint() : null;
+  const results = showResults ? calculatePaint() : null; 
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-8">
@@ -933,8 +1001,19 @@ export default function PaintCalculator() {
                     Complete Interior Painting Guide
                   </a>
                 </li>
-              </ul>
+             </ul>
             </div>
+            
+            {/* ADD THIS BUTTON HERE */}
+            <div className="mt-6">
+              <button 
+                onClick={handleCopyCalculation}
+                className="copy-calc-btn"
+              >
+                {copyButtonText}
+              </button>
+            </div>
+            
           </div>
         </div>
       </div>

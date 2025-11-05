@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Calculator, Home, Ruler, Package, FileText, ChevronRight, ChevronLeft } from 'lucide-react';
 import { trackCalculation } from '@/utils/tracking';
+import { copyCalculation } from '@/utils/copyCalculation';
 
 const SidingCalculator = () => {
   const [step, setStep] = useState(1);
@@ -43,6 +44,7 @@ const SidingCalculator = () => {
   });
 
   const [results, setResults] = useState(null);
+  const [copyButtonText, setCopyButtonText] = useState('📋 Copy Calculation');
 
   // Prevent scroll from changing number inputs
   const preventScrollChange = (e) => {
@@ -235,9 +237,64 @@ const SidingCalculator = () => {
       nails: fasteners?.nails?.total,
       underlaymentRolls: underlayment?.rolls
     });
+};  
+
+  const handleCopyCalculation = async () => {
+    if (!results) return;
+    
+    // Prepare inputs
+    const inputsData = {
+      'Project complexity': projectData.complexity,
+      'Number of walls': projectData.walls.length,
+      'Siding type': projectData.sidingType.replace(/([A-Z])/g, ' $1').trim()
+    };
+    
+    if (projectData.sidingType === 'vinyl') {
+      inputsData['Vinyl profile'] = sidingSpecs.vinyl[projectData.vinylProfile].name;
+    } else if (projectData.sidingType === 'fiberCement') {
+      inputsData['Plank width'] = `${projectData.fiberCementWidth}"`;
+    } else if (projectData.sidingType === 'wood') {
+      inputsData['Wood type'] = projectData.woodType.replace(/-/g, ' ');
+    }
+    
+    if (projectData.includeGables) {
+      inputsData['Gables'] = `${projectData.gables.length} gables`;
+    }
+    
+    inputsData['Windows'] = projectData.windows;
+    inputsData['Doors'] = projectData.doors;
+    inputsData['Garage doors'] = projectData.garageDoors;
+    
+    // Prepare outputs
+    const outputs = {
+      'Wall area': `${results.areas.totalWall.toFixed(0)} sq ft`,
+      'Gable area': `${results.areas.totalGable.toFixed(0)} sq ft`,
+      'Net area': `${results.areas.netArea.toFixed(0)} sq ft`,
+      'Total with waste': `${results.areas.totalWithWaste.toFixed(0)} sq ft (${(results.areas.totalWithWaste / 100).toFixed(2)} squares)`,
+      'Siding squares': results.siding.squares
+    };
+    
+    if (results.siding.boxes) outputs['Boxes/Cartons'] = results.siding.boxes;
+    if (results.siding.planks) outputs['Planks'] = results.siding.planks;
+    if (results.starterStrip) outputs['Starter strip'] = `${results.starterStrip} pieces`;
+    if (results.jChannel) outputs['J-Channel'] = `${results.jChannel} pieces`;
+    if (results.cornerPosts) outputs['Corner posts'] = `Inside: ${results.cornerPosts.inside}, Outside: ${results.cornerPosts.outside}`;
+    if (results.nails) outputs['Nails'] = `${results.nails.toLocaleString()} nails`;
+    if (results.underlaymentRolls) outputs['Underlayment'] = `${results.underlaymentRolls} rolls`;
+    
+    const note = `Waste factor: ${(results.areas.wasteFactor * 100).toFixed(1)}% walls, 30% gables. Per ASTM installation standards.`;
+    
+    const success = await copyCalculation('Siding Calculator', inputsData, outputs, note);
+    
+    if (success) {
+      setCopyButtonText('✓ Copied!');
+      setTimeout(() => setCopyButtonText('📋 Copy Calculation'), 2000);
+    } else {
+      alert('Unable to copy. Please copy results manually.');
+    }
   };
 
-  const calculateAccessories = () => {
+  const calculateAccessories = () => {  
     const accessories = {};
 
     // Starter strip - calculate perimeter
@@ -1216,7 +1273,18 @@ const SidingCalculator = () => {
                     <li className="font-medium text-orange-700">Fiber cement requires 1-1/4" minimum overlap per building codes</li>
                   )}
                 </ul>
+             </div>
+              
+              {/* ADD THIS BUTTON HERE */}
+              <div className="bg-white border border-gray-300 rounded-lg p-6 mt-6">
+                <button 
+                  onClick={handleCopyCalculation}
+                  className="copy-calc-btn"
+                >
+                  {copyButtonText}
+                </button>
               </div>
+              
             </div>
           )}
 

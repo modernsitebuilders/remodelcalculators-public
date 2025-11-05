@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { Info, Home, Droplets } from 'lucide-react';
 import { trackCalculation } from '@/utils/tracking';
+import { copyCalculation } from '@/utils/copyCalculation';
 
 const ExteriorPaintCalculator = () => {
   const [inputs, setInputs] = useState({
@@ -15,6 +16,7 @@ const ExteriorPaintCalculator = () => {
   });
 
   const [showResults, setShowResults] = useState(false);
+  const [copyButtonText, setCopyButtonText] = useState('📋 Copy Calculation');
 
   // Helper function to round UP to nearest 0.1 gallon (never round down)
   const roundUpToTenth = (value) => {
@@ -170,9 +172,50 @@ const ExteriorPaintCalculator = () => {
       needsPrimer: true
     });
     setShowResults(false);
+  };  
+
+  const handleCopyCalculation = async () => {
+    if (!showResults || !calculations) return;
+    
+    // Prepare inputs
+    const inputsData = {
+      'Surface area': `${inputs.squareFeet} sq ft`,
+      'Surface type': surfaceTypes[inputs.surfaceType].name,
+      'Surface condition': inputs.surfaceCondition,
+      'Application method': inputs.applicationMethod,
+      'Number of coats': inputs.coats,
+      'Needs primer': inputs.needsPrimer ? 'Yes' : 'No'
+    };
+    
+    // Prepare outputs
+    const outputs = {
+      'Paint gallons needed': `${calculations.paintGallonsFormatted} gallons`,
+      'Paint to purchase': `${calculations.paintGallonsToPurchase} gallons`,
+      'Coverage rate': `${calculations.effectiveCoverage} sq ft/gallon`,
+      'Total paint cost': `$${calculations.totalPaintCost}`
+    };
+    
+    if (inputs.needsPrimer) {
+      outputs['Primer gallons needed'] = `${calculations.primerGallonsFormatted} gallons`;
+      outputs['Primer to purchase'] = `${calculations.primerGallonsToPurchase} gallons`;
+      outputs['Total primer cost'] = `$${calculations.totalPrimerCost}`;
+    }
+    
+    outputs['Total project cost'] = `$${calculations.totalProjectCost}`;
+    
+    const note = `Based on PCA and MPI standards. Accounts for surface porosity, texture, and application method waste.`;
+    
+    const success = await copyCalculation('Exterior Paint Calculator', inputsData, outputs, note);
+    
+    if (success) {
+      setCopyButtonText('✓ Copied!');
+      setTimeout(() => setCopyButtonText('📋 Copy Calculation'), 2000);
+    } else {
+      alert('Unable to copy. Please copy results manually.');
+    }
   };
 
-  return (
+  return (  
     <div className="w-full max-w-6xl mx-auto p-6 bg-gradient-to-br from-blue-50 to-green-50">
       <div className="bg-white rounded-2xl shadow-2xl p-8">
         {/* Header */}
@@ -438,9 +481,20 @@ const ExteriorPaintCalculator = () => {
                   <p><strong>First coat uses more:</strong> Porous surfaces absorb 15-50% more paint on the first coat.</p>
                   <p><strong>Spray increases waste:</strong> Airless spraying wastes 35% of paint through overspray vs 10% for rolling.</p>
                   <p><strong>Two coats recommended:</strong> Exterior surfaces need two coats for proper weather protection.</p>
-                </div>
+               </div>
               </div>
             </div>
+            
+            {/* ADD THIS BUTTON HERE */}
+            <div className="mt-6">
+              <button 
+                onClick={handleCopyCalculation}
+                className="copy-calc-btn"
+              >
+                {copyButtonText}
+              </button>
+            </div>
+            
             </div>
           )}
         </div>

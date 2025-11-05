@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { trackCalculation } from '@/utils/tracking';
+import { copyCalculation } from '@/utils/copyCalculation';
 
 const RoofingMaterialsCalculator = () => {
   // State for all inputs
@@ -19,6 +20,7 @@ const RoofingMaterialsCalculator = () => {
   const [valleyLength, setValleyLength] = useState(0);
   const [includeRakeStarter, setIncludeRakeStarter] = useState(true);
   const [showResults, setShowResults] = useState(false);
+  const [copyButtonText, setCopyButtonText] = useState('📋 Copy Calculation');
 
   // Handler functions
   const handleCalculate = () => {
@@ -76,6 +78,55 @@ const RoofingMaterialsCalculator = () => {
     setValleyLength(0);
     setIncludeRakeStarter(true);
     setShowResults(false);
+};  
+
+  const handleCopyCalculation = async () => {
+    if (!showResults) return;
+    
+    // Prepare inputs
+    const inputsData = {
+      'Roof size': `${roofLength}' × ${roofWidth}'`,
+      'Roof pitch': `${roofPitch}:12`,
+      'Complexity': roofComplexity.replace('_', ' '),
+      'Shingle type': shingleType.replace('_', ' ').replace('-', ' '),
+      'Underlayment': underlaymentType.replace(/\d+/, ' $&').toUpperCase(),
+      'Wind zone': windZone,
+      'Cold climate': coldClimate ? 'Yes' : 'No',
+      'Ridge length': `${ridgeLength} feet`,
+      'Hip length': `${hipLength} feet`,
+      'Valley length': `${valleyLength} feet`
+    };
+    
+    // Prepare outputs
+    const outputs = {
+      'Roof footprint': `${footprint.toFixed(0)} sq ft`,
+      'Actual roof area': `${actualRoofArea.toFixed(0)} sq ft`,
+      'Area with waste': `${totalWithWaste.toFixed(0)} sq ft`,
+      'Roofing squares': `${squares.toFixed(2)} squares`,
+      'Shingle bundles': `${totalBundles} bundles (${bundlesPerSquare} per square)`,
+      'Underlayment rolls': `${underlaymentRolls} rolls`,
+      'Starter bundles': `${starterBundles} bundles`,
+      'Ridge cap bundles': `${ridgeCapBundles} bundles`,
+      'Drip edge pieces': `${dripEdgePieces} pieces (10ft)`,
+      'Roofing nail boxes': `${nailBoxes} boxes (7200 nails/box)`
+    };
+    
+    if (coldClimate && iceWaterRolls > 0) {
+      outputs['Ice & water shield'] = `${iceWaterRolls} rolls`;
+    }
+    
+    outputs['Ridge vent needed'] = `${adjustedRidgeVent} linear feet`;
+    
+    const note = `Pitch multiplier: ${pitchMultiplier.toFixed(3)}. Waste factor: ${(wasteFactor * 100).toFixed(0)}%. Calculations per NRCA standards and IRC/IBC codes.`;
+    
+    const success = await copyCalculation('Roofing Calculator', inputsData, outputs, note);
+    
+    if (success) {
+      setCopyButtonText('✓ Copied!');
+      setTimeout(() => setCopyButtonText('📋 Copy Calculation'), 2000);
+    } else {
+      alert('Unable to copy. Please copy results manually.');
+    }
   };
 
   // Pitch multipliers table
@@ -683,7 +734,19 @@ const RoofingMaterialsCalculator = () => {
                     <li>• Ventilation calculations assume 1:150 ratio per IRC R806</li>
                   </ul>
                 </div>
+              
+
+              {/* ADD THIS BUTTON HERE */}
+              <div className="bg-white rounded-lg shadow-lg p-6 mt-6">
+                <button 
+                  onClick={handleCopyCalculation}
+                  className="copy-calc-btn"
+                >
+                  {copyButtonText}
+                </button>
               </div>
+              </div>
+              
             ) : (
               <div className="flex items-center justify-center h-full">
                 <div className="text-center p-8">

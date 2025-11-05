@@ -1,8 +1,8 @@
 'use client';
 
-
 import { useState } from 'react';
 import { trackCalculation } from '@/utils/tracking';
+import { copyCalculation } from '@/utils/copyCalculation';
 
 export default function FlooringCalculator() {
   const [selectedFlooringType, setSelectedFlooringType] = useState('');
@@ -20,6 +20,7 @@ export default function FlooringCalculator() {
   const [patternMatch, setPatternMatch] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [results, setResults] = useState(null);
+  const [copyButtonText, setCopyButtonText] = useState('📋 Copy Calculation');
 
   const handleFlooringTypeSelect = (type) => {
     setSelectedFlooringType(type);
@@ -228,9 +229,55 @@ export default function FlooringCalculator() {
     setPatternMatch(false);
     setShowResults(false);
     setResults(null);
+  };  
+
+  const handleCopyCalculation = async () => {
+    if (!showResults || !results) return;
+    
+    // Prepare inputs
+    const inputsData = {
+      'Flooring type': selectedFlooringType.replace(/([A-Z])/g, ' $1').trim(),
+      'Room size': `${roomLength}' × ${roomWidth}'`,
+      'Layout pattern': layoutPattern.replace(/([A-Z])/g, ' $1').toLowerCase(),
+      'Room complexity': roomComplexity,
+      'Installer experience': installerExp
+    };
+    
+    if (selectedFlooringType === 'hardwood') {
+      inputsData['Plank width'] = plankWidth === 'other' ? `${customPlankWidth}"` : `${plankWidth}"`;
+    } else if (selectedFlooringType === 'tile' || selectedFlooringType === 'lvp') {
+      inputsData['Tile size'] = `${tileWidth}" × ${tileLength}"`;
+    } else if (selectedFlooringType === 'carpet') {
+      inputsData['Carpet width'] = `${carpetWidth} feet`;
+      if (patternMatch) inputsData['Pattern match'] = 'Yes';
+    }
+    
+    // Prepare outputs
+    const outputs = {
+      'Room area': `${results.roomArea} sq ft`,
+      'Material needed': `${results.materialNeeded} sq ft`,
+      'Waste factor': `${results.wasteFactor}%`,
+      'Total with waste': `${results.totalWithWaste} sq ft`
+    };
+    
+    if (results.boxes) outputs['Boxes/Cartons'] = results.boxes;
+    if (results.planks) outputs['Planks'] = results.planks;
+    if (results.tiles) outputs['Tiles'] = results.tiles;
+    if (results.rolls) outputs['Carpet rolls'] = results.rolls;
+    
+    const note = `Per ${selectedFlooringType === 'hardwood' ? 'NWFA' : selectedFlooringType === 'tile' ? 'TCNA' : selectedFlooringType === 'carpet' ? 'CRI' : 'industry'} standards. Includes waste factor for cuts and mistakes.`;
+    
+    const success = await copyCalculation('Flooring Calculator', inputsData, outputs, note);
+    
+    if (success) {
+      setCopyButtonText('✓ Copied!');
+      setTimeout(() => setCopyButtonText('📋 Copy Calculation'), 2000);
+    } else {
+      alert('Unable to copy. Please copy results manually.');
+    }
   };
 
-  return (
+  return (  
     <>
       <style jsx>{`
         * {
@@ -925,6 +972,17 @@ export default function FlooringCalculator() {
                 <span className="note-highlight-icon">💡</span>
                 <span className="note-highlight-text">Order 5-10% extra material beyond installation needs for future repairs and batch matching</span>
               </div>
+              
+              {/* ADD THIS BUTTON HERE */}
+              <div style={{ marginTop: '20px' }}>
+                <button 
+                  onClick={handleCopyCalculation}
+                  className="copy-calc-btn"
+                >
+                  {copyButtonText}
+                </button>
+              </div>
+              
             </div>
           </div>
         )}

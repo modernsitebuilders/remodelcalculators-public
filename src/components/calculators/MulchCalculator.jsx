@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { Calculator, Info, AlertCircle } from 'lucide-react';
 import { trackCalculation } from '@/utils/tracking';
+import { copyCalculation } from '@/utils/copyCalculation'; 
 
 const MulchCalculator = () => {
   // State management
@@ -17,6 +18,7 @@ const MulchCalculator = () => {
   const [includeWaste, setIncludeWaste] = useState(true);
   const [customDepth, setCustomDepth] = useState('');
   const [showResults, setShowResults] = useState(false);
+  const [copyButtonText, setCopyButtonText] = useState('📋 Copy Calculation'); 
 
   // Material weights (lbs per cubic yard)
   const materialWeights = {
@@ -140,9 +142,56 @@ const MulchCalculator = () => {
     setIncludeWaste(true);
     setCustomDepth('');
     setShowResults(false);
+}; 
+
+  const handleCopyCalculation = async () => {
+    if (!showResults || !hasResults) return;
+    
+    // Prepare inputs
+    const inputs = {
+      'Shape': shape === 'rectangle' ? 'Rectangle' : 'Circle'
+    };
+    
+    if (shape === 'rectangle') {
+      inputs['Length'] = `${length} feet`;
+      inputs['Width'] = `${width} feet`;
+    } else {
+      inputs['Diameter'] = `${diameter} feet`;
+    }
+    
+    inputs['Depth'] = `${actualDepth} inches`;
+    inputs['Material type'] = materialType.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+    inputs['Purchase format'] = purchaseFormat === 'bulk' ? 'Bulk (cubic yards)' : 'Bagged';
+    
+    // Prepare outputs
+    const outputs = {
+      'Area covered': `${squareFootage.toFixed(1)} square feet`,
+      'Cubic yards needed': `${cubicYards.toFixed(2)} cubic yards`,
+      'Cubic feet': `${cubicFeet.toFixed(1)} cubic feet`
+    };
+    
+    if (purchaseFormat === 'bags') {
+      outputs['Bags needed'] = `${bagsNeeded} bags (${bagSize} cu ft each)`;
+    }
+    
+    outputs['Estimated weight'] = `${estimatedWeight.toLocaleString()} lbs (${(estimatedWeight / 2000).toFixed(2)} tons)`;
+    outputs['Truck loads'] = `~${truckLoads} loads`;
+    
+    const note = includeWaste 
+      ? 'Includes 5% waste factor. Keep mulch 3-6 inches from plant stems.' 
+      : 'No waste factor applied. Consider adding 5% for irregular areas.';
+    
+    const success = await copyCalculation('Mulch Calculator', inputs, outputs, note);
+    
+    if (success) {
+      setCopyButtonText('✓ Copied!');
+      setTimeout(() => setCopyButtonText('📋 Copy Calculation'), 2000);
+    } else {
+      alert('Unable to copy. Please copy results manually.');
+    }
   };
 
-  return (
+  return ( 
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
@@ -438,6 +487,16 @@ const MulchCalculator = () => {
                       </ul>
                     </div>
                   </div>
+                </div>
+
+                {/* ADD THIS BUTTON HERE */}
+                <div className="bg-white rounded-lg shadow-lg p-6">
+                  <button 
+                    onClick={handleCopyCalculation}
+                    className="copy-calc-btn"
+                  >
+                    {copyButtonText}
+                  </button>
                 </div>
 
                 {/* Weight Warning */}

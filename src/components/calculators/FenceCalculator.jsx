@@ -1,5 +1,6 @@
 'use client';
 import { trackCalculation } from '@/utils/tracking';
+import { copyCalculation } from '@/utils/copyCalculation'; 
 
 import React, { useState } from 'react';
 import { Calculator, Ruler, TrendingUp, Info, AlertCircle, CheckCircle } from 'lucide-react';
@@ -24,6 +25,7 @@ export default function FenceInstallationCalculator() {
   const [fenceLayout, setFenceLayout] = useState('continuous');
   const [materials, setMaterials] = useState({});
   const [hasCalculated, setHasCalculated] = useState(false);
+  const [copyButtonText, setCopyButtonText] = useState('📋 Copy Calculation');  // ADD THIS
   
   const fenceTypes = {
     'standard-privacy': { name: 'Standard Privacy (Wood)', postSpacing: 8, railsPerHeight: 3, needsWood: true },
@@ -279,9 +281,68 @@ export default function FenceInstallationCalculator() {
       meshFabric: meshFabric,
       fenceTypeName: fenceTypes[fenceType].name
     });
+};  
+  
+  const handleCopyCalculation = async () => {
+    if (!hasCalculated || !materials || !materials.posts) return;
+    
+    // Prepare inputs
+    const inputs = {
+      'Fence length': `${linearFeet} linear feet`,
+      'Fence type': fenceTypes[fenceType].name,
+      'Height': `${height} feet`,
+      'Post spacing': `${fenceTypes[fenceType].postSpacing} feet`,
+      'Terrain': terrain
+    };
+    
+    // Add gates if any
+    const totalGates = parseInt(gates3ft || 0) + parseInt(gates4ft || 0) + parseInt(gates6ft || 0) + parseInt(gates10ft || 0) + parseInt(gates12ft || 0);
+    if (totalGates > 0) {
+      const gateList = [];
+      if (gates3ft > 0) gateList.push(`${gates3ft}×3ft`);
+      if (gates4ft > 0) gateList.push(`${gates4ft}×4ft`);
+      if (gates6ft > 0) gateList.push(`${gates6ft}×6ft`);
+      if (gates10ft > 0) gateList.push(`${gates10ft}×10ft`);
+      if (gates12ft > 0) gateList.push(`${gates12ft}×12ft`);
+      inputs['Gates'] = `${totalGates} gates (${gateList.join(', ')})`;
+    }
+    
+    // Prepare outputs
+    const outputs = {
+      'Total posts': `${materials.posts.total} posts`,
+      'Concrete needed': `${materials.concrete.bags} bags (80lb)`,
+      'Gravel needed': `${materials.gravel.bags} bags`
+    };
+    
+    if (materials.posts.post4x4 > 0) {
+      outputs['4×4 Posts'] = `${materials.posts.post4x4} posts (${materials.posts.length.toFixed(1)}ft each)`;
+    }
+    if (materials.posts.post6x6 > 0) {
+      outputs['6×6 Posts'] = `${materials.posts.post6x6} posts (${materials.posts.length.toFixed(1)}ft each)`;
+    }
+    if (materials.rails && materials.rails.totalLength > 0) {
+      outputs['Rails needed'] = `${materials.rails.totalLength} linear feet`;
+    }
+    if (materials.pickets && materials.pickets.count > 0) {
+      outputs['Pickets needed'] = `${materials.pickets.count} pickets`;
+    }
+    if (materials.panels > 0) {
+      outputs['Panels needed'] = `${materials.panels} panels`;
+    }
+    
+    const note = `Post depth: ${frostDepth}" (1/3 rule). IRC standard post spacing. ${materials.posts.post6x6 > 0 ? '6×6 posts for corners, gates, and tall fences.' : ''}`;
+    
+    const success = await copyCalculation('Fence Calculator', inputs, outputs, note);
+    
+    if (success) {
+      setCopyButtonText('✓ Copied!');
+      setTimeout(() => setCopyButtonText('📋 Copy Calculation'), 2000);
+    } else {
+      alert('Unable to copy. Please copy results manually.');
+    }
   };
   
-  return (
+  return (  
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         <div className="bg-white rounded-2xl shadow-2xl p-6 md:p-8 mb-6 border border-gray-200">
@@ -585,6 +646,17 @@ export default function FenceInstallationCalculator() {
                   )}
                 </div>
               </div>
+              
+              {/* ADD THE BUTTON HERE */}
+              <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 mt-4">
+                <button 
+                  onClick={handleCopyCalculation}
+                  className="copy-calc-btn"
+                >
+                  {copyButtonText}
+                </button>
+              </div>
+              
               </>
             )}
           </div>

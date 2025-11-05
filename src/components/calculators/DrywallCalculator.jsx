@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { Calculator, Info, Square, Ruler, Package } from 'lucide-react';
 import { trackCalculation } from '@/utils/tracking';
+import { copyCalculation } from '@/utils/copyCalculation';
 
 // Industry standards based on USG specifications and ASTM C840
 const SHEET_SIZES = {
@@ -45,6 +46,7 @@ export default function DrywallCalculator() {
   const [results, setResults] = useState(null);
   
   const resultsRef = useRef(null);
+  const [copyButtonText, setCopyButtonText] = useState('📋 Copy Calculation');
 
   const updateRoom = (index, field, value) => {
     const newRooms = [...rooms];
@@ -194,6 +196,48 @@ export default function DrywallCalculator() {
     setSheetSize('4x8');
     setThickness('half');
     setResults(null);
+  };
+
+ const handleCopyCalculation = async () => {
+    if (!results) return;
+    
+    // Prepare inputs
+    const inputsData = {
+      'Number of rooms': rooms.length,
+      'Sheet size': SHEET_SIZES[sheetSize].name,
+      'Thickness': THICKNESS_SPECS[thickness].name
+    };
+    
+    // Add room details
+    rooms.forEach((room, index) => {
+      if (room.length && room.width && room.height) {
+        inputsData[`Room ${index + 1}`] = `${room.length}' × ${room.width}' × ${room.height}'${room.includeCeiling ? ' (with ceiling)' : ''}`;
+      }
+    });
+    
+    // Prepare outputs
+    const outputs = {
+      'Total wall area': `${results.totalWallArea} sq ft`,
+      'Total ceiling area': `${results.totalCeilingArea} sq ft`,
+      'Combined area': `${results.combinedArea} sq ft`,
+      'Drywall sheets needed': `${results.sheets} sheets`,
+      'Joint compound (all-purpose)': `${results.jointCompoundBuckets} buckets`,
+      'Joint tape': `${results.jointTapeRolls} rolls (250ft)`,
+      'Corner bead': `${results.cornerBeadPieces} pieces (8ft)`,
+      'Screws': `${results.screwsBoxes} boxes (1lb)`,
+      'Total weight': `${results.totalWeight.toLocaleString()} lbs`
+    };
+    
+    const note = `Includes 10% waste factor per ASTM C840 standards. Weight based on ${THICKNESS_SPECS[thickness].name} thickness.`;
+    
+    const success = await copyCalculation('Drywall Calculator', inputsData, outputs, note);
+    
+    if (success) {
+      setCopyButtonText('✓ Copied!');
+      setTimeout(() => setCopyButtonText('📋 Copy Calculation'), 2000);
+    } else {
+      alert('Unable to copy. Please copy results manually.');
+    }
   };
 
   return (
@@ -495,6 +539,18 @@ export default function DrywallCalculator() {
                     </p>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* ADD THIS BUTTON HERE */}
+            {results && (
+              <div className="mb-4">
+                <button 
+                  onClick={handleCopyCalculation}
+                  className="copy-calc-btn"
+                >
+                  {copyButtonText}
+                </button>
               </div>
             )}
 

@@ -3,9 +3,11 @@
 import React, { useState, useMemo } from 'react';
 import { Info, AlertCircle, Droplets, Layers, Calculator } from 'lucide-react';
 import { trackCalculation } from '@/utils/tracking';
+import { copyCalculation } from '@/utils/copyCalculation'; 
 
 const DeckStainCalculator = () => {
   const [showResults, setShowResults] = useState(false);
+  const [copyButtonText, setCopyButtonText] = useState('📋 Copy Calculation');
   
   const [inputs, setInputs] = useState({
     deckLength: '',
@@ -340,9 +342,65 @@ const DeckStainCalculator = () => {
       totalWithWaste: roundedGallons || 0,
       wastePercentage: Math.round((wasteFactor - 1) * 100)
     };
-  }, [inputs]);
+}, [inputs]);  
 
-  return (
+  const handleCopyCalculation = async () => {
+    if (!showResults || results.totalArea === 0) return;
+    
+    // Prepare inputs
+    const inputsData = {
+      'Deck size': `${inputs.deckLength}' × ${inputs.deckWidth}'`
+    };
+    
+    if (inputs.includeRailing) {
+      inputsData['Railing'] = `${inputs.railingLinearFeet} linear feet`;
+    }
+    if (inputs.includeStairs) {
+      inputsData['Stairs'] = `${inputs.numberOfSteps} steps (${inputs.stepWidth}" wide)`;
+    }
+    if (inputs.includeLandings) {
+      inputsData['Landings'] = `${inputs.numberOfLandings} landings`;
+    }
+    if (inputs.includeBeams) {
+      inputsData['Beams'] = `${inputs.numberOfBeams} beams (${inputs.beamLength}' each)`;
+    }
+    if (inputs.includeUnderside) {
+      inputsData['Underside'] = 'Included';
+    }
+    
+    inputsData['Wood type'] = woodTypes[inputs.woodType].name;
+    inputsData['Wood condition'] = woodConditions[inputs.woodCondition].name;
+    inputsData['Stain type'] = stainTypes[inputs.stainType].name;
+    inputsData['Application method'] = applicationMethods[inputs.applicationMethod].name;
+    inputsData['Number of coats'] = inputs.coats;
+    
+    // Prepare outputs
+    const outputs = {
+      'Total area to stain': `${results.totalArea} square feet`,
+      'Stain needed': `${results.totalWithWaste} gallons`,
+      'Coverage rate': `${results.effectiveCoverage} sq ft/gallon (per coat)`,
+      'Waste factor': `${results.wastePercentage}%`
+    };
+    
+    if (results.deckArea > 0) outputs['Deck surface'] = `${results.deckArea} sq ft`;
+    if (results.deckRailingArea > 0) outputs['Deck railing'] = `${results.deckRailingArea} sq ft`;
+    if (results.stairsArea > 0) outputs['Stairs'] = `${results.stairsArea} sq ft`;
+    if (results.landingsArea > 0) outputs['Landings'] = `${results.landingsArea} sq ft`;
+    if (results.beamsArea > 0) outputs['Beams'] = `${results.beamsArea} sq ft`;
+    
+    const note = `${inputs.coats} coat${inputs.coats > 1 ? 's' : ''}. Coverage adjusted for wood type, condition, and application method.`;
+    
+    const success = await copyCalculation('Deck Stain Calculator', inputsData, outputs, note);
+    
+    if (success) {
+      setCopyButtonText('✓ Copied!');
+      setTimeout(() => setCopyButtonText('📋 Copy Calculation'), 2000);
+    } else {
+      alert('Unable to copy. Please copy results manually.');
+    }
+  };
+
+  return ( 
     <div className="max-w-6xl mx-auto p-6">
       <div className="bg-white rounded-lg shadow-xl p-8 mb-8">
         <div className="text-center mb-8">
@@ -953,9 +1011,21 @@ const DeckStainCalculator = () => {
                   <div className="text-xs text-gray-500 mt-1">
                     Base: {results.baseCoverage} sq ft/gal adjusted for wood condition & surface texture
                   </div>
-                </div>
+ </div>
 
-                <div className="space-y-3 mb-6">
+      {/* ADD THIS BUTTON HERE */}
+      {showResults && results.totalArea > 0 && (
+        <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+          <button 
+            onClick={handleCopyCalculation}
+            className="copy-calc-btn"
+          >
+            {copyButtonText}
+          </button>
+        </div>
+      )}
+
+      <div className="mt-8 bg-gray-50 rounded-lg p-6">
                   <div className="flex justify-between items-center text-sm text-gray-600">
                     <span>Raw calculation ({inputs.coats} coat{inputs.coats > 1 ? 's' : ''}):</span>
                     <span>{results.totalGallonsRaw} gal</span>
