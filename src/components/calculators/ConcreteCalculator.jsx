@@ -5,6 +5,8 @@ import { Calculator, Info, Package, Ruler, AlertCircle } from 'lucide-react';
 import { trackCalculation } from '@/utils/tracking';
 import { copyCalculation } from '@/utils/copyCalculation';
 import { printCalculation } from '@/utils/printCalculation';
+import { validateAllInputs, CommonRules, ValidationTypes } from '@/utils/validation';
+import ValidationWarning from '@/components/ValidationWarning';
 
 const ConcreteCalculator = () => {
   // Project Type Selection
@@ -50,6 +52,7 @@ const ConcreteCalculator = () => {
   // Results
   const [results, setResults] = useState(null);
   const [showAdditionalMaterials, setShowAdditionalMaterials] = useState(false);
+  const [violations, setViolations] = useState([]);
 
   const [copyButtonText, setCopyButtonText] = useState('📋 Copy Calculation');
 
@@ -66,6 +69,93 @@ const ConcreteCalculator = () => {
     '3000': 'Residential driveways, garage floors, standard slabs',
     '4000': 'Commercial garages, industrial floors, heavy equipment',
     '5000': 'Warehouses, factory floors, parking structures'
+  };
+
+  // ADD THIS ENTIRE SECTION HERE (line 73)
+  // Validation rules for concrete calculator
+  const validationRules = {
+    slabLength: [
+      CommonRules.unrealistic(1, 100, 'Slab length'),
+      {
+        condition: (val) => parseFloat(val) > 50,
+        message: 'Large slab length (>50 feet) - consider expansion joints per ACI 302',
+        type: ValidationTypes.INFO
+      }
+    ],
+    slabWidth: [
+      CommonRules.unrealistic(1, 100, 'Slab width')
+    ],
+    slabThickness: [
+      {
+        condition: (val) => parseFloat(val) > 0 && parseFloat(val) < 3.5,
+        message: '⚠️ IRC requires 3.5" minimum thickness for residential slabs',
+        type: ValidationTypes.ERROR
+      },
+      CommonRules.tooLarge(12, 'Slab thickness >12" is uncommon - please verify')
+    ],
+    footingWidth: [
+      {
+        condition: (val) => parseFloat(val) > 0 && parseFloat(val) < 12,
+        message: '⚠️ IRC R403 requires 12" minimum width for footings',
+        type: ValidationTypes.ERROR
+      }
+    ],
+    footingDepth: [
+      {
+        condition: (val) => parseFloat(val) > 0 && parseFloat(val) < 12,
+        message: '⚠️ IRC R403 requires 12" minimum depth for footings',
+        type: ValidationTypes.ERROR
+      }
+    ],
+    postDiameter: [
+      CommonRules.unrealistic(6, 24, 'Post diameter')
+    ],
+    postDepth: [
+      {
+        condition: (val) => parseFloat(val) > 0 && parseFloat(val) < 24,
+        message: 'Post depth <24" may not provide adequate support (1/3 rule recommended)',
+        type: ValidationTypes.WARNING
+      },
+      CommonRules.tooLarge(72, 'Post depth >72" is uncommon - please verify')
+    ],
+    wallHeight: [
+      CommonRules.unrealistic(12, 240, 'Wall height')
+    ],
+    columnHeight: [
+      CommonRules.unrealistic(12, 240, 'Column height')
+    ],
+    // ADD THESE STAIR VALIDATIONS
+    stairWidth: [
+      {
+        condition: (val) => parseFloat(val) > 0 && parseFloat(val) < 36,
+        message: '⚠️ IRC requires 36" minimum stair width',
+        type: ValidationTypes.ERROR
+      },
+      CommonRules.tooLarge(96, 'Stair width >96" is uncommon - please verify')
+    ],
+    riserHeight: [
+      {
+        condition: (val) => parseFloat(val) > 7.75,
+        message: '⚠️ IRC limits residential riser height to 7.75" maximum (7" for commercial)',
+        type: ValidationTypes.ERROR
+      },
+      {
+        condition: (val) => parseFloat(val) > 0 && parseFloat(val) < 4,
+        message: 'Riser height <4" is uncommon and may not meet code',
+        type: ValidationTypes.WARNING
+      }
+    ],
+    treadDepth: [
+      {
+        condition: (val) => parseFloat(val) > 0 && parseFloat(val) < 10,
+        message: '⚠️ IRC requires minimum 10" tread depth',
+        type: ValidationTypes.ERROR
+      },
+      CommonRules.tooLarge(14, 'Tread depth >14" is uncommon - please verify')
+    ],
+    numberOfSteps: [
+      CommonRules.unrealistic(1, 30, 'Number of steps')
+    ]
   };
 
   // Automatic waste factors based on project type and complexity
@@ -90,6 +180,33 @@ const ConcreteCalculator = () => {
       default:
         return 7.5;
     }
+ };
+
+  // ADD THIS FUNCTION HERE (line 97)
+  const checkValidations = () => {
+    const values = {
+      slabLength,
+      slabWidth,
+      slabThickness,
+      footingLength,
+      footingWidth,
+      footingDepth,
+      postDiameter,
+      postDepth,
+      postCount,
+      wallLength,
+      wallHeight,
+      wallThickness,
+      stairWidth,
+      riserHeight,
+      treadDepth,
+      numberOfSteps,
+      columnDiameter,
+      columnHeight
+    };
+    
+    const newViolations = validateAllInputs(values, validationRules);
+    setViolations(newViolations);
   };
 
   const calculateConcrete = () => {
@@ -482,7 +599,10 @@ const ConcreteCalculator = () => {
                     <input
                       type="number"
                       value={slabLength}
-                      onChange={(e) => setSlabLength(e.target.value)}
+                      onChange={(e) => {
+  setSlabLength(e.target.value);
+  setTimeout(checkValidations, 100);
+}}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Enter length"
                       step="0.1"
@@ -495,7 +615,10 @@ const ConcreteCalculator = () => {
                     <input
                       type="number"
                       value={slabWidth}
-                      onChange={(e) => setSlabWidth(e.target.value)}
+                      onChange={(e) => {
+                        setSlabWidth(e.target.value);
+                        setTimeout(checkValidations, 100);
+                      }}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Enter width"
                       step="0.1"
@@ -507,7 +630,10 @@ const ConcreteCalculator = () => {
                     </label>
                     <select
                       value={slabThickness}
-                      onChange={(e) => setSlabThickness(e.target.value)}
+                      onChange={(e) => {
+                        setSlabThickness(e.target.value);
+                        setTimeout(checkValidations, 100);
+                      }}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="3.5">3.5" - Minimum IRC</option>
@@ -529,7 +655,10 @@ const ConcreteCalculator = () => {
                     <input
                       type="number"
                       value={footingLength}
-                      onChange={(e) => setFootingLength(e.target.value)}
+                      onChange={(e) => {
+  setFootingLength(e.target.value);
+  setTimeout(checkValidations, 100);
+}}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Enter length"
                       step="0.1"
@@ -541,7 +670,10 @@ const ConcreteCalculator = () => {
                     </label>
                     <select
                       value={footingWidth}
-                      onChange={(e) => setFootingWidth(e.target.value)}
+                      onChange={(e) => {
+                        setFootingWidth(e.target.value);
+                        setTimeout(checkValidations, 100);
+                      }}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="12">12" - IRC minimum</option>
@@ -556,7 +688,10 @@ const ConcreteCalculator = () => {
                     </label>
                     <select
                       value={footingDepth}
-                      onChange={(e) => setFootingDepth(e.target.value)}
+                      onChange={(e) => {
+                        setFootingDepth(e.target.value);
+                        setTimeout(checkValidations, 100);
+                      }}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="12">12" - IRC minimum</option>
@@ -576,7 +711,10 @@ const ConcreteCalculator = () => {
                     </label>
                     <select
                       value={postDiameter}
-                      onChange={(e) => setPostDiameter(e.target.value)}
+                      onChange={(e) => {
+                        setPostDiameter(e.target.value);
+                        setTimeout(checkValidations, 100);
+                      }}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="8">8" - Small posts</option>
@@ -593,7 +731,10 @@ const ConcreteCalculator = () => {
                     </label>
                     <select
                       value={postDepth}
-                      onChange={(e) => setPostDepth(e.target.value)}
+                      onChange={(e) => {
+                        setPostDepth(e.target.value);
+                        setTimeout(checkValidations, 100);
+                      }}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="24">24" - 6' fence (1/3 rule)</option>
@@ -610,7 +751,10 @@ const ConcreteCalculator = () => {
                     <input
                       type="number"
                       value={postCount}
-                      onChange={(e) => setPostCount(e.target.value)}
+                      onChange={(e) => {
+                        setPostCount(e.target.value);
+                        setTimeout(checkValidations, 100);
+                      }}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Enter count"
                       min="1"
@@ -628,7 +772,10 @@ const ConcreteCalculator = () => {
                     <input
                       type="number"
                       value={stairWidth}
-                      onChange={(e) => setStairWidth(e.target.value)}
+                      onChange={(e) => {
+                        setStairWidth(e.target.value);
+                        setTimeout(checkValidations, 100);
+                      }}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Enter width"
                     />
@@ -640,7 +787,10 @@ const ConcreteCalculator = () => {
                     <input
                       type="number"
                       value={numberOfSteps}
-                      onChange={(e) => setNumberOfSteps(e.target.value)}
+                      onChange={(e) => {
+                        setNumberOfSteps(e.target.value);
+                        setTimeout(checkValidations, 100);
+                      }}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Enter count"
                       min="1"
@@ -652,7 +802,10 @@ const ConcreteCalculator = () => {
                     </label>
                     <select
                       value={riserHeight}
-                      onChange={(e) => setRiserHeight(e.target.value)}
+                      onChange={(e) => {
+                        setRiserHeight(e.target.value);
+                        setTimeout(checkValidations, 100);
+                      }}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="6">6" - Low rise</option>
@@ -667,7 +820,10 @@ const ConcreteCalculator = () => {
                     </label>
                     <select
                       value={treadDepth}
-                      onChange={(e) => setTreadDepth(e.target.value)}
+                      onChange={(e) => {
+                        setTreadDepth(e.target.value);
+                        setTimeout(checkValidations, 100);
+                      }}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="10">10" - IRC minimum</option>
@@ -688,7 +844,10 @@ const ConcreteCalculator = () => {
                     <input
                       type="number"
                       value={wallLength}
-                      onChange={(e) => setWallLength(e.target.value)}
+                      onChange={(e) => {
+                        setWallLength(e.target.value);
+                        setTimeout(checkValidations, 100);
+                      }}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Enter length"
                       step="0.1"
@@ -700,7 +859,10 @@ const ConcreteCalculator = () => {
                     </label>
                     <select
                       value={wallHeight}
-                      onChange={(e) => setWallHeight(e.target.value)}
+                      onChange={(e) => {
+                        setWallHeight(e.target.value);
+                        setTimeout(checkValidations, 100);
+                      }}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="48">48" - 4' retaining</option>
@@ -715,7 +877,10 @@ const ConcreteCalculator = () => {
                     </label>
                     <select
                       value={wallThickness}
-                      onChange={(e) => setWallThickness(e.target.value)}
+                      onChange={(e) => {
+                        setWallThickness(e.target.value);
+                        setTimeout(checkValidations, 100);
+                      }}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="6">6" - Minimum/short walls</option>
@@ -735,7 +900,10 @@ const ConcreteCalculator = () => {
                     </label>
                     <select
                       value={columnDiameter}
-                      onChange={(e) => setColumnDiameter(e.target.value)}
+                      onChange={(e) => {
+                        setColumnDiameter(e.target.value);
+                        setTimeout(checkValidations, 100);
+                      }}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="8">8" - Small column</option>
@@ -753,7 +921,10 @@ const ConcreteCalculator = () => {
                     <input
                       type="number"
                       value={columnHeight}
-                      onChange={(e) => setColumnHeight(e.target.value)}
+                      onChange={(e) => {
+                        setColumnHeight(e.target.value);
+                        setTimeout(checkValidations, 100);
+                      }}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Enter height"
                     />
@@ -765,7 +936,10 @@ const ConcreteCalculator = () => {
                     <input
                       type="number"
                       value={columnCount}
-                      onChange={(e) => setColumnCount(e.target.value)}
+                      onChange={(e) => {
+                        setColumnCount(e.target.value);
+                        setTimeout(checkValidations, 100);
+                      }}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Enter count"
                       min="1"
@@ -851,6 +1025,7 @@ const ConcreteCalculator = () => {
 
             {/* Action Buttons */}
             <div className="bg-white rounded-lg shadow-lg p-6">
+              <ValidationWarning violations={violations} />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <button
                   onClick={handleCalculate}
