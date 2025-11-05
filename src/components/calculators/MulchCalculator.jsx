@@ -3,7 +3,8 @@
 import React, { useState, useMemo } from 'react';
 import { Calculator, Info, AlertCircle } from 'lucide-react';
 import { trackCalculation } from '@/utils/tracking';
-import { copyCalculation } from '@/utils/copyCalculation'; 
+import { copyCalculation } from '@/utils/copyCalculation';
+import { printCalculation } from '@/utils/printCalculation';
 
 const MulchCalculator = () => {
   // State management
@@ -489,15 +490,25 @@ const MulchCalculator = () => {
                   </div>
                 </div>
 
-                {/* ADD THIS BUTTON HERE */}
-                <div className="bg-white rounded-lg shadow-lg p-6">
-                  <button 
-                    onClick={handleCopyCalculation}
-                    className="copy-calc-btn"
-                  >
-                    {copyButtonText}
-                  </button>
-                </div>
+                {/* Copy Calculation Button */}
+<div className="bg-white rounded-lg shadow-lg p-6">
+  <div className="flex gap-3">
+    <button 
+      onClick={handleCopyCalculation}
+      className="copy-calc-btn flex-1"
+    >
+      {copyButtonText}
+    </button>
+    
+    {/* ADD THIS PRINT BUTTON */}
+    <button 
+      onClick={() => printCalculation('Mulch Calculator')}
+      className="copy-calc-btn flex-1"
+    >
+      🖨️ Print Results
+    </button>
+  </div>
+</div>
 
                 {/* Weight Warning */}
                 {estimatedWeight > 2000 && (

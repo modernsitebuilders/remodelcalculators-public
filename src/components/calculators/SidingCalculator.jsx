@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Calculator, Home, Ruler, Package, FileText, ChevronRight, ChevronLeft } from 'lucide-react';
 import { trackCalculation } from '@/utils/tracking';
 import { copyCalculation } from '@/utils/copyCalculation';
+import { printCalculation } from '@/utils/printCalculation';
 
 const SidingCalculator = () => {
   const [step, setStep] = useState(1);
@@ -1275,15 +1276,25 @@ const SidingCalculator = () => {
                 </ul>
              </div>
               
-              {/* ADD THIS BUTTON HERE */}
-              <div className="bg-white border border-gray-300 rounded-lg p-6 mt-6">
-                <button 
-                  onClick={handleCopyCalculation}
-                  className="copy-calc-btn"
-                >
-                  {copyButtonText}
-                </button>
-              </div>
+              {/* Copy Calculation Button */}
+<div className="bg-white rounded-lg shadow-lg p-6">
+  <div className="flex gap-3">
+    <button 
+      onClick={handleCopyCalculation}
+      className="copy-calc-btn flex-1"
+    >
+      {copyButtonText}
+    </button>
+    
+    {/* ADD THIS PRINT BUTTON */}
+    <button 
+      onClick={() => printCalculation('Siding Calculator')}
+      className="copy-calc-btn flex-1"
+    >
+      🖨️ Print Results
+    </button>
+  </div>
+</div>
               
             </div>
           )}

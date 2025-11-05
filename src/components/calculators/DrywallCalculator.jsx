@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { Calculator, Info, Square, Ruler, Package } from 'lucide-react';
 import { trackCalculation } from '@/utils/tracking';
 import { copyCalculation } from '@/utils/copyCalculation';
+import { printCalculation } from '@/utils/printCalculation';
 
 // Industry standards based on USG specifications and ASTM C840
 const SHEET_SIZES = {
@@ -542,17 +543,25 @@ export default function DrywallCalculator() {
               </div>
             )}
 
-            {/* ADD THIS BUTTON HERE */}
-            {results && (
-              <div className="mb-4">
-                <button 
-                  onClick={handleCopyCalculation}
-                  className="copy-calc-btn"
-                >
-                  {copyButtonText}
-                </button>
-              </div>
-            )}
+            {/* Copy Calculation Button */}
+<div className="bg-white rounded-lg shadow-lg p-6">
+  <div className="flex gap-3">
+    <button 
+      onClick={handleCopyCalculation}
+      className="copy-calc-btn flex-1"
+    >
+      {copyButtonText}
+    </button>
+    
+    {/* ADD THIS PRINT BUTTON */}
+    <button 
+      onClick={() => printCalculation('Drywall Calculator')}
+      className="copy-calc-btn flex-1"
+    >
+      🖨️ Print Results
+    </button>
+  </div>
+</div>
 
             {/* Reset Button */}
             <button

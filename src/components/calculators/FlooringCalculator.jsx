@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { trackCalculation } from '@/utils/tracking';
 import { copyCalculation } from '@/utils/copyCalculation';
+import { printCalculation } from '@/utils/printCalculation';
 
 export default function FlooringCalculator() {
   const [selectedFlooringType, setSelectedFlooringType] = useState('');
@@ -973,15 +974,25 @@ export default function FlooringCalculator() {
                 <span className="note-highlight-text">Order 5-10% extra material beyond installation needs for future repairs and batch matching</span>
               </div>
               
-              {/* ADD THIS BUTTON HERE */}
-              <div style={{ marginTop: '20px' }}>
-                <button 
-                  onClick={handleCopyCalculation}
-                  className="copy-calc-btn"
-                >
-                  {copyButtonText}
-                </button>
-              </div>
+              {/* Copy Calculation Button */}
+<div className="bg-white rounded-lg shadow-lg p-6">
+  <div className="flex gap-3">
+    <button 
+      onClick={handleCopyCalculation}
+      className="copy-calc-btn flex-1"
+    >
+      {copyButtonText}
+    </button>
+    
+    {/* ADD THIS PRINT BUTTON */}
+    <button 
+      onClick={() => printCalculation('Flooring Calculator')}
+      className="copy-calc-btn flex-1"
+    >
+      🖨️ Print Results
+    </button>
+  </div>
+</div>
               
             </div>
           </div>

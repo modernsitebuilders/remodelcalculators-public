@@ -3,7 +3,8 @@
 import React, { useState, useMemo } from 'react';
 import { Info, AlertCircle, Droplets, Layers, Calculator } from 'lucide-react';
 import { trackCalculation } from '@/utils/tracking';
-import { copyCalculation } from '@/utils/copyCalculation'; 
+import { copyCalculation } from '@/utils/copyCalculation';
+import { printCalculation } from '@/utils/printCalculation';
 
 const DeckStainCalculator = () => {
   const [showResults, setShowResults] = useState(false);
@@ -1013,17 +1014,25 @@ const DeckStainCalculator = () => {
                   </div>
  </div>
 
-      {/* ADD THIS BUTTON HERE */}
-      {showResults && results.totalArea > 0 && (
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-          <button 
-            onClick={handleCopyCalculation}
-            className="copy-calc-btn"
-          >
-            {copyButtonText}
-          </button>
-        </div>
-      )}
+      {/* Copy Calculation Button */}
+<div className="bg-white rounded-lg shadow-lg p-6">
+  <div className="flex gap-3">
+    <button 
+      onClick={handleCopyCalculation}
+      className="copy-calc-btn flex-1"
+    >
+      {copyButtonText}
+    </button>
+    
+    {/* ADD THIS PRINT BUTTON */}
+    <button 
+      onClick={() => printCalculation('Deck Stain Calculator')}
+      className="copy-calc-btn flex-1"
+    >
+      🖨️ Print Results
+    </button>
+  </div>
+</div>
 
       <div className="mt-8 bg-gray-50 rounded-lg p-6">
                   <div className="flex justify-between items-center text-sm text-gray-600">

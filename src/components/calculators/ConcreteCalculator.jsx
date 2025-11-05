@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Calculator, Info, Package, Ruler, AlertCircle } from 'lucide-react';
 import { trackCalculation } from '@/utils/tracking';
 import { copyCalculation } from '@/utils/copyCalculation';
+import { printCalculation } from '@/utils/printCalculation';
 
 const ConcreteCalculator = () => {
   // Project Type Selection
@@ -960,14 +961,24 @@ const ConcreteCalculator = () => {
                 </div>
 
                 {/* Copy Calculation Button */}
-                <div className="bg-white rounded-lg shadow-lg p-6">
-                  <button 
-                    onClick={handleCopyCalculation}
-                    className="copy-calc-btn"
-                  >
-                    {copyButtonText}
-                  </button>
-                </div>
+<div className="bg-white rounded-lg shadow-lg p-6">
+  <div className="flex gap-3">
+    <button 
+      onClick={handleCopyCalculation}
+      className="copy-calc-btn flex-1"
+    >
+      {copyButtonText}
+    </button>
+    
+    {/* ADD THIS PRINT BUTTON */}
+    <button 
+      onClick={() => printCalculation('Concrete Calculator')}
+      className="copy-calc-btn flex-1"
+    >
+      🖨️ Print Results
+    </button>
+  </div>
+</div>
 
                 {/* Additional Materials Toggle */}
                 {projectType === 'slab' && results.squareFeet > 0 && (

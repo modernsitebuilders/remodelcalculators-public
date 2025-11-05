@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { trackCalculation } from '@/utils/tracking';
 import { copyCalculation } from '@/utils/copyCalculation';
+import { printCalculation } from '@/utils/printCalculation';
 
 const RoofingMaterialsCalculator = () => {
   // State for all inputs
@@ -736,15 +737,25 @@ const RoofingMaterialsCalculator = () => {
                 </div>
               
 
-              {/* ADD THIS BUTTON HERE */}
-              <div className="bg-white rounded-lg shadow-lg p-6 mt-6">
-                <button 
-                  onClick={handleCopyCalculation}
-                  className="copy-calc-btn"
-                >
-                  {copyButtonText}
-                </button>
-              </div>
+              {/* Copy Calculation Button */}
+<div className="bg-white rounded-lg shadow-lg p-6">
+  <div className="flex gap-3">
+    <button 
+      onClick={handleCopyCalculation}
+      className="copy-calc-btn flex-1"
+    >
+      {copyButtonText}
+    </button>
+    
+    {/* ADD THIS PRINT BUTTON */}
+    <button 
+      onClick={() => printCalculation('Roofing Calculator')}
+      className="copy-calc-btn flex-1"
+    >
+      🖨️ Print Results
+    </button>
+  </div>
+</div>
               </div>
               
             ) : (

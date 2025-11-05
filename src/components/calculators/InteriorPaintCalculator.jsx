@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Calculator, Info } from 'lucide-react';
 import { trackCalculation } from '@/utils/tracking';
 import { copyCalculation } from '@/utils/copyCalculation';
+import { printCalculation } from '@/utils/printCalculation';
 
 export default function PaintCalculator() {
   const [rooms, setRooms] = useState([{ 
@@ -1004,15 +1005,25 @@ export default function PaintCalculator() {
              </ul>
             </div>
             
-            {/* ADD THIS BUTTON HERE */}
-            <div className="mt-6">
-              <button 
-                onClick={handleCopyCalculation}
-                className="copy-calc-btn"
-              >
-                {copyButtonText}
-              </button>
-            </div>
+            {/* Copy Calculation Button */}
+<div className="bg-white rounded-lg shadow-lg p-6">
+  <div className="flex gap-3">
+    <button 
+      onClick={handleCopyCalculation}
+      className="copy-calc-btn flex-1"
+    >
+      {copyButtonText}
+    </button>
+    
+    {/* ADD THIS PRINT BUTTON */}
+    <button 
+      onClick={() => printCalculation('Interior Paint Calculator')}
+      className="copy-calc-btn flex-1"
+    >
+      🖨️ Print Results
+    </button>
+  </div>
+</div>
             
           </div>
         </div>

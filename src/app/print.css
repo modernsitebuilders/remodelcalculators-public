@@ -1,0 +1,161 @@
+/* Universal Print Styles - Works for ALL Calculators */
+@media print {
+  /* Hide everything that shouldn't print */
+  nav,
+  header,
+  footer,
+  button,
+  .copy-calc-btn,
+  input,
+  select,
+  textarea,
+  form,
+  [class*="nav"],
+  [class*="header"],
+  [class*="footer"],
+  [class*="sidebar"],
+  [class*="menu"],
+  [type="button"],
+  [type="submit"] {
+    display: none !important;
+  }
+
+  /* Reset page */
+  * {
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  body {
+    margin: 0;
+    padding: 20px;
+    font-size: 12pt;
+    line-height: 1.4;
+  }
+
+  /* Page setup */
+  @page {
+    margin: 0.75in;
+    size: letter portrait;
+  }
+
+  /* Results section - auto-detects and formats */
+  [class*="result"],
+  [class*="Result"],
+  [id*="result"],
+  [id*="Result"] {
+    display: block !important;
+    page-break-inside: avoid;
+  }
+
+  /* Headings */
+  h1, h2, h3 {
+    color: #000 !important;
+    page-break-after: avoid;
+    margin-top: 0.5em;
+    margin-bottom: 0.3em;
+  }
+
+  h1 { font-size: 18pt; border-bottom: 2px solid #000; padding-bottom: 0.2em; }
+  h2 { font-size: 14pt; }
+  h3 { font-size: 12pt; }
+
+  /* Lists and data */
+  ul, ol {
+    margin: 0.5em 0;
+    padding-left: 1.5em;
+  }
+
+  /* Tables (if any) */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1em 0;
+  }
+
+  table, th, td {
+    border: 1px solid #000 !important;
+  }
+
+  th, td {
+    padding: 8px;
+    text-align: left;
+  }
+
+  /* Key-value pairs */
+  [class*="flex"] {
+    display: block !important;
+  }
+
+  /* Spacing */
+  [class*="space-y"] > * + * {
+    margin-top: 0.5em !important;
+  }
+
+  [class*="gap"] {
+    gap: 0.5em !important;
+  }
+
+  /* Cards/sections */
+  [class*="card"],
+  [class*="Card"],
+  [class*="rounded"],
+  [class*="shadow"],
+  [class*="border"] {
+    border: 1px solid #ddd !important;
+    padding: 10px !important;
+    margin: 10px 0 !important;
+    page-break-inside: avoid;
+  }
+
+  /* Print header - auto-generated */
+  body::before {
+    content: "Calculation Results - " attr(data-calculator-name);
+    display: block;
+    font-size: 20pt;
+    font-weight: bold;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #000;
+  }
+
+  /* Print footer with date */
+  body::after {
+    content: "Calculated: " attr(data-print-date) " | jobcalculators.com";
+    display: block;
+    margin-top: 30px;
+    padding-top: 10px;
+    border-top: 1px solid #000;
+    font-size: 9pt;
+    color: #666 !important;
+    text-align: center;
+  }
+
+  /* Ensure all text is visible */
+  svg, img {
+    display: none !important;
+  }
+
+  /* Force show important numbers/results */
+  [class*="font-bold"],
+  [class*="font-semibold"] {
+    font-weight: bold !important;
+  }
+
+  /* Clean up gradients and colors */
+  [class*="gradient"],
+  [class*="bg-"] {
+    background: white !important;
+  }
+
+  /* Page breaks */
+  .page-break {
+    page-break-before: always;
+  }
+
+  .no-break {
+    page-break-inside: avoid;
+  }
+}

@@ -1,6 +1,7 @@
 'use client';
 import { trackCalculation } from '@/utils/tracking';
-import { copyCalculation } from '@/utils/copyCalculation'; 
+import { copyCalculation } from '@/utils/copyCalculation';
+import { printCalculation } from '@/utils/printCalculation';
 
 import React, { useState } from 'react';
 import { Calculator, Ruler, TrendingUp, Info, AlertCircle, CheckCircle } from 'lucide-react';
@@ -647,15 +648,25 @@ export default function FenceInstallationCalculator() {
                 </div>
               </div>
               
-              {/* ADD THE BUTTON HERE */}
-              <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 mt-4">
-                <button 
-                  onClick={handleCopyCalculation}
-                  className="copy-calc-btn"
-                >
-                  {copyButtonText}
-                </button>
-              </div>
+              {/* Copy Calculation Button */}
+<div className="bg-white rounded-lg shadow-lg p-6">
+  <div className="flex gap-3">
+    <button 
+      onClick={handleCopyCalculation}
+      className="copy-calc-btn flex-1"
+    >
+      {copyButtonText}
+    </button>
+    
+    {/* ADD THIS PRINT BUTTON */}
+    <button 
+      onClick={() => printCalculation('Fence Calculator')}
+      className="copy-calc-btn flex-1"
+    >
+      🖨️ Print Results
+    </button>
+  </div>
+</div>
               
               </>
             )}
