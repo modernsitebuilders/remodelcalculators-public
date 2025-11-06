@@ -1,12 +1,14 @@
 import { getCalculatorData } from '@/data/calculatorData';
 import RoofingCalculator from '@/components/calculators/RoofingCalculator';
 import CalculatorBlogLink from '@/components/blog/CalculatorBlogLink';
-import { generateCalculatorSchema, generateCalculatorBreadcrumbSchema } from '@/utils/calculator-schema';
 import CalculatorMethodology from '@/components/trust/CalculatorMethodology';
 import IndustryStandards from '@/components/trust/IndustryStandards';
 import RegionalVariations from '@/components/trust/RegionalVariations';
-
-// Import roofing data
+import { 
+  generateCalculatorSchema, 
+  generateCalculatorBreadcrumbSchema,
+  generateHowToSchema
+} from '@/utils/calculator-schema';
 import { 
   roofingMethodology, 
   roofingStandards, 
@@ -45,6 +47,7 @@ export default function RoofingCalculatorPage() {
   // Generate schema
   const calculatorSchema = generateCalculatorSchema(data);
   const breadcrumbSchema = generateCalculatorBreadcrumbSchema(data);
+  const howToSchema = generateHowToSchema(data);
 
   return (
     <>
@@ -57,7 +60,7 @@ export default function RoofingCalculatorPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
-
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }} /> 
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Header */}
         <div className="mb-8">

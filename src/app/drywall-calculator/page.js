@@ -1,11 +1,14 @@
 import { getCalculatorData } from '@/data/calculatorData';
 import DrywallCalculator from '@/components/calculators/DrywallCalculator';
 import CalculatorBlogLink from '@/components/blog/CalculatorBlogLink';
-import { generateCalculatorSchema, generateCalculatorBreadcrumbSchema } from '@/utils/calculator-schema';
 import CalculatorMethodology from '@/components/trust/CalculatorMethodology';
 import IndustryStandards from '@/components/trust/IndustryStandards';
 import RegionalVariations from '@/components/trust/RegionalVariations';
-
+import { 
+  generateCalculatorSchema, 
+  generateCalculatorBreadcrumbSchema,
+  generateHowToSchema
+} from '@/utils/calculator-schema';
 import { 
   drywallMethodology, 
   drywallStandards, 
@@ -44,6 +47,7 @@ export default function DrywallCalculatorPage() {
   // Generate schema
   const calculatorSchema = generateCalculatorSchema(data);
   const breadcrumbSchema = generateCalculatorBreadcrumbSchema(data);
+  const howToSchema = generateHowToSchema(data);
 
   return (
     <>
@@ -56,7 +60,7 @@ export default function DrywallCalculatorPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
-
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }} /> 
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Header */}
         <div className="mb-8">

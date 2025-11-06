@@ -1,11 +1,14 @@
 import { getCalculatorData } from '@/data/calculatorData';
 import DeckStainCalculator from '@/components/calculators/DeckStainCalculator';
 import CalculatorBlogLink from '@/components/blog/CalculatorBlogLink';
-import { generateCalculatorSchema, generateCalculatorBreadcrumbSchema } from '@/utils/calculator-schema';
 import CalculatorMethodology from '@/components/trust/CalculatorMethodology';
 import IndustryStandards from '@/components/trust/IndustryStandards';
 import RegionalVariations from '@/components/trust/RegionalVariations';
-
+import { 
+  generateCalculatorSchema, 
+  generateCalculatorBreadcrumbSchema,
+  generateHowToSchema
+} from '@/utils/calculator-schema';
 import { 
   deckStainMethodology, 
   deckStainStandards, 
@@ -44,6 +47,7 @@ export default function DeckStainCalculatorPage() {
   // Generate schema
   const calculatorSchema = generateCalculatorSchema(data);
   const breadcrumbSchema = generateCalculatorBreadcrumbSchema(data);
+  const howToSchema = generateHowToSchema(data);
 
   return (
     <>
@@ -62,7 +66,7 @@ export default function DeckStainCalculatorPage() {
           <h1 className="text-4xl font-bold mb-4 text-gray-900">{data.h1}</h1>
           <p className="text-lg text-gray-700 leading-relaxed">{data.intro}</p>
         </div>
-
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }} /> 
         <DeckStainCalculator />
 
 <CalculatorMethodology
