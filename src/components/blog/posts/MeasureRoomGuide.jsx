@@ -68,13 +68,13 @@ export default function MeasureRoomGuide() {
               Measure along the baseboard from corner to corner. Hold tape measure level.
             </p>
             <div className="bg-gray-50 rounded-lg p-4">
-              <p className="font-semibold text-gray-900 mb-2">Tips:</p>
-              <ul className="space-y-2 text-gray-700 text-sm">
-                <li>• Don't measure diagonally</li>
-                <li>• Account for baseboards (subtract 1-2 inches if measuring at baseboard height)</li>
-                <li>• Measure each wall separately - rooms are rarely perfect rectangles</li>
-              </ul>
-            </div>
+  <p className="font-semibold text-gray-900 mb-2">Tips:</p>
+  <ul className="space-y-2 text-gray-700 text-sm">
+    <li>• Don't measure diagonally</li>
+    <li>• Measure at any height - wall length is the same top to bottom</li>
+    <li>• Measure each wall separately - rooms are rarely perfect rectangles</li>
+  </ul>
+</div>
           </div>
 
           {/* Step 2 */}
