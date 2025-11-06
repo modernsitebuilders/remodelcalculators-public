@@ -2,9 +2,10 @@
 import { trackCalculation } from '@/utils/tracking';
 import { copyCalculation } from '@/utils/copyCalculation';
 import { printCalculation } from '@/utils/printCalculation';
-
 import React, { useState } from 'react';
 import { Calculator, Ruler, TrendingUp, Info, AlertCircle, CheckCircle } from 'lucide-react';
+import { CommonRules, ValidationTypes } from '@/utils/validation';
+import { useValidation } from '@/hooks/useValidation';
 
 export default function FenceInstallationCalculator() {
   const [linearFeet, setLinearFeet] = useState('');
@@ -41,6 +42,71 @@ export default function FenceInstallationCalculator() {
     'composite': { name: 'Composite', postSpacing: 8, railsPerHeight: 0, needsWood: false },
     'wrought-iron': { name: 'Wrought Iron', postSpacing: 8, railsPerHeight: 0, needsWood: false }
   };
+
+  // Add after your state declarations, before calculateMaterials
+const validationRules = {
+  linearFeet: [
+    CommonRules.unrealistic(5, 1000, 'Fence length'),
+    {
+      condition: (val) => parseFloat(val) > 500,
+      message: 'Large fence project (>500 feet) - consider breaking into phases',
+      type: ValidationTypes.INFO
+    }
+  ],
+  height: [
+    {
+      condition: (val) => parseFloat(val) < 3,
+      message: 'Fence height <3 feet is uncommon - verify this is correct',
+      type: ValidationTypes.WARNING
+    },
+    {
+      condition: (val) => parseFloat(val) > 8,
+      message: 'Fence height >8 feet may require engineering approval in most jurisdictions',
+      type: ValidationTypes.ERROR
+    },
+    CommonRules.unrealistic(2, 12, 'Fence height')
+  ],
+  boardWidth: [
+    CommonRules.unrealistic(3, 12, 'Board width'),
+    {
+      condition: (val) => parseFloat(val) < 4,
+      message: 'Board width <4" may not meet privacy fence standards',
+      type: ValidationTypes.WARNING
+    }
+  ],
+  frostDepth: [
+    {
+      condition: (val) => parseFloat(val) < 24,
+      message: 'Frost depth <24" - verify local frost line requirements',
+      type: ValidationTypes.WARNING
+    },
+    CommonRules.unrealistic(12, 72, 'Frost depth')
+  ],
+  corners: [
+    CommonRules.unrealistic(0, 20, 'Number of corners'),
+    {
+      condition: (val, allVals) => {
+        const num = parseFloat(val);
+        const linear = parseFloat(allVals.linearFeet);
+        return num > 0 && num > linear / 20;
+      },
+      message: 'High number of corners for fence length - please verify',
+      type: ValidationTypes.WARNING
+    }
+  ]
+};
+
+const getValues = () => ({
+  linearFeet,
+  height,
+  boardWidth,
+  frostDepth,
+  corners
+});
+
+const { validate, ValidationDisplay } = useValidation(validationRules);
+
+
   
   const calculateMaterials = () => {
     const linearFt = parseFloat(linearFeet);
@@ -371,12 +437,24 @@ export default function FenceInstallationCalculator() {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Linear Feet of Fencing</label>
-                  <input type="number" value={linearFeet} onChange={(e) => setLinearFeet(e.target.value)} onWheel={(e) => e.target.blur()} className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" min="1" placeholder="Enter linear feet (e.g., 150)" />
+                  <input type="number"
+                         value={linearFeet}
+                         onChange={(e) => {
+                           setLinearFeet(e.target.value);
+                           setTimeout(() => validate(getValues()), 100);
+                         }} 
+                         onWheel={(e) => e.target.blur()} 
+                         className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" 
+                         min="1" 
+                         placeholder="Enter linear feet (e.g., 150)" />
                 </div>
                 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Fence Height (feet)</label>
-                  <select value={height} onChange={(e) => setHeight(parseInt(e.target.value))} className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                  <select value={height} onChange={(e) => {
+                    setHeight(parseInt(e.target.value));
+                    setTimeout(() => validate(getValues()), 100);
+                  }} className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                     <option value="3">3 feet</option>
                     <option value="4">4 feet</option>
                     <option value="5">5 feet</option>
@@ -388,7 +466,10 @@ export default function FenceInstallationCalculator() {
                 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Number of Corners</label>
-                  <input type="number" value={corners} onChange={(e) => setCorners(e.target.value)} onWheel={(e) => e.target.blur()} className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" min="0" placeholder="Enter number of corners (e.g., 4)" />
+                  <input type="number" value={corners} onChange={(e) => {
+                    setCorners(e.target.value);
+                    setTimeout(() => validate(getValues()), 100);
+                  }} onWheel={(e) => e.target.blur()} className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" min="0" placeholder="Enter number of corners (e.g., 4)" />
                 </div>
                 
                 <div>
@@ -436,7 +517,10 @@ export default function FenceInstallationCalculator() {
                   <>
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">Board Width (actual inches)</label>
-                      <select value={boardWidth} onChange={(e) => setBoardWidth(parseFloat(e.target.value))} className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                    <select value={boardWidth} onChange={(e) => { 
+  setBoardWidth(parseFloat(e.target.value)); 
+  setTimeout(() => validate(getValues()), 100);
+}} className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                         <option value="3.5">1×4 (3.5" actual)</option>
                         <option value="5.5">1×6 (5.5" actual)</option>
                         <option value="7.25">1×8 (7.25" actual)</option>
@@ -501,7 +585,7 @@ export default function FenceInstallationCalculator() {
                 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Frost Depth (inches)</label>
-                  <select value={frostDepth} onChange={(e) => setFrostDepth(parseInt(e.target.value))} className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                  <select value={frostDepth} onChange={(e) => { setFrostDepth(parseInt(e.target.value)); setTimeout(() => validate(getValues()), 100); }} className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                     <option value="0">No frost</option>
                     <option value="24">24"</option>
                     <option value="36">36"</option>
@@ -512,6 +596,8 @@ export default function FenceInstallationCalculator() {
                 </div>
               </div>
             </div>
+
+            <ValidationDisplay />
             
             <div className="bg-gradient-to-br from-green-600 to-emerald-700 rounded-xl shadow-2xl p-8 text-center">
               <button onClick={calculateMaterials} className="w-full bg-white text-green-700 font-bold text-xl py-6 px-8 rounded-xl shadow-lg hover:bg-green-50 hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center justify-center gap-3">

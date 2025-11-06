@@ -5,6 +5,8 @@ import { Calculator, Home, Ruler, Package, FileText, ChevronRight, ChevronLeft }
 import { trackCalculation } from '@/utils/tracking';
 import { copyCalculation } from '@/utils/copyCalculation';
 import { printCalculation } from '@/utils/printCalculation';
+import { CommonRules, ValidationTypes } from '@/utils/validation';
+import { useValidation } from '@/hooks/useValidation';
 
 const SidingCalculator = () => {
   const [step, setStep] = useState(1);
@@ -82,6 +84,59 @@ const SidingCalculator = () => {
     gabled: 0.125,
     complex: 0.15
   };
+
+  const validationRules = {
+  'wall0-width': [
+    CommonRules.unrealistic(4, 100, 'Wall width')
+  ],
+  'wall0-height': [
+    {
+      condition: (val) => parseFloat(val) < 7,
+      message: 'Wall height <7 feet is uncommon for exterior walls',
+      type: ValidationTypes.WARNING
+    },
+    CommonRules.unrealistic(6, 40, 'Wall height')
+  ],
+  'gable0-width': [
+    {
+      condition: (val, allVals) => {
+        const gableWidth = parseFloat(val);
+        const wallWidth = parseFloat(allVals['wall0-width']) || 0;
+        return gableWidth > 0 && wallWidth > 0 && gableWidth > wallWidth * 1.5;
+      },
+      message: 'Gable width significantly exceeds wall width - verify measurement',
+      type: ValidationTypes.WARNING
+    }
+  ],
+  garageDoors: [
+    CommonRules.unrealistic(0, 6, 'Number of garage doors')
+  ],
+  windows: [
+    {
+      condition: (val) => parseFloat(val) > 50,
+      message: 'Large number of windows (>50) - verify count',
+      type: ValidationTypes.INFO
+    }
+  ]
+};
+
+// Dynamic getValues based on walls/gables arrays
+const getValues = () => {
+  const values = { garageDoors, windows, doors: projectData.doors };
+  projectData.walls.forEach((wall, index) => {
+    values[`wall${index}-width`] = wall.width;
+    values[`wall${index}-height`] = wall.height;
+  });
+  if (projectData.includeGables) {
+    projectData.gables.forEach((gable, index) => {
+      values[`gable${index}-width`] = gable.width;
+      values[`gable${index}-height`] = gable.height;
+    });
+  }
+  return values;
+};
+
+const { validate, ValidationDisplay } = useValidation(validationRules);
 
   const gableWasteFactor = 0.30;
 
@@ -604,7 +659,7 @@ const SidingCalculator = () => {
                         type="number"
                         step="0.1"
                         value={wall.width || ''}
-                        onChange={(e) => updateWall(index, 'width', e.target.value)}
+                        onChange={(e) => { updateWall(index, 'width', e.target.value); setTimeout(() => validate(getValues()), 100); }}
                         onWheel={preventScrollChange}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                         placeholder="0"
@@ -618,7 +673,7 @@ const SidingCalculator = () => {
                         type="number"
                         step="0.1"
                         value={wall.height || ''}
-                        onChange={(e) => updateWall(index, 'height', e.target.value)}
+                        onChange={(e) => { updateWall(index, 'height', e.target.value); setTimeout(() => validate(getValues()), 100); }}
                         onWheel={preventScrollChange}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                         placeholder="0"
@@ -652,7 +707,7 @@ const SidingCalculator = () => {
                   <input
                     type="checkbox"
                     checked={projectData.includeGables}
-                    onChange={(e) => updateProjectData('includeGables', e.target.checked)}
+                    onChange={(e) => { updateProjectData('includeGables', e.target.checked); setTimeout(() => validate(getValues()), 100); }}
                     className="w-4 h-4 text-indigo-600 rounded cursor-pointer"
                   />
                   <span className="text-lg font-semibold text-gray-800">Gable Ends</span>
@@ -675,7 +730,7 @@ const SidingCalculator = () => {
                             type="number"
                             step="0.1"
                             value={gable.width || ''}
-                            onChange={(e) => updateGable(index, 'width', e.target.value)}
+                            onChange={(e) => { updateGable(index, 'width', e.target.value); setTimeout(() => validate(getValues()), 100); }}
                             onWheel={preventScrollChange}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                             placeholder="0"
@@ -689,7 +744,7 @@ const SidingCalculator = () => {
                             type="number"
                             step="0.1"
                             value={gable.height || ''}
-                            onChange={(e) => updateGable(index, 'height', e.target.value)}
+                            onChange={(e) => { updateGable(index, 'height', e.target.value); setTimeout(() => validate(getValues()), 100); }}
                             onWheel={preventScrollChange}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                             placeholder="0"
@@ -1323,6 +1378,9 @@ const SidingCalculator = () => {
                 {!canCalculate() && (
                   <p className="text-sm text-red-600">Enter at least one wall section with dimensions to calculate</p>
                 )}
+
+                <ValidationDisplay />
+
                 <button
                   onClick={calculateMaterials}
                   disabled={!canCalculate()}

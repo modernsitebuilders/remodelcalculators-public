@@ -5,6 +5,8 @@ import { Calculator, Info, AlertCircle } from 'lucide-react';
 import { trackCalculation } from '@/utils/tracking';
 import { copyCalculation } from '@/utils/copyCalculation';
 import { printCalculation } from '@/utils/printCalculation';
+import { CommonRules, ValidationTypes } from '@/utils/validation';
+import { useValidation } from '@/hooks/useValidation';
 
 const MulchCalculator = () => {
   // State management
@@ -34,6 +36,58 @@ const MulchCalculator = () => {
     'river-rock': 1250,
     'lava-rock': 800
   };
+
+  const validationRules = {
+  length: [
+    CommonRules.unrealistic(1, 500, 'Area length'),
+    {
+      condition: (val) => parseFloat(val) > 200,
+      message: 'Large area (>200 feet) - consider bulk delivery',
+      type: ValidationTypes.INFO
+    }
+  ],
+  width: [
+    CommonRules.unrealistic(1, 500, 'Area width')
+  ],
+  diameter: [
+    CommonRules.unrealistic(1, 200, 'Circular area diameter')
+  ],
+  depth: [
+    {
+      condition: (val) => {
+        const d = val === 'custom' ? parseFloat(customDepth) : parseFloat(val);
+        return d > 0 && d < 1;
+      },
+      message: 'Mulch depth <1" is too shallow - minimum 2" recommended',
+      type: ValidationTypes.WARNING
+    },
+    {
+      condition: (val) => {
+        const d = val === 'custom' ? parseFloat(customDepth) : parseFloat(val);
+        return d > 6;
+      },
+      message: 'Mulch depth >6" may suffocate plant roots',
+      type: ValidationTypes.ERROR
+    }
+  ],
+  customDepth: [
+    {
+      condition: (val) => depth === 'custom' && parseFloat(val) > 8,
+      message: 'Excessive mulch depth (>8") - verify measurement',
+      type: ValidationTypes.WARNING
+    }
+  ]
+};
+
+const getValues = () => ({
+  length,
+  width,
+  diameter,
+  depth,
+  customDepth
+});
+
+const { validate, ValidationDisplay } = useValidation(validationRules);
 
   // Depth presets by application
   const depthPresets = [
@@ -244,7 +298,7 @@ const MulchCalculator = () => {
                   <input
                     type="number"
                     value={length}
-                    onChange={(e) => setLength(e.target.value)}
+                    onChange={(e) => { setLength(e.target.value); setTimeout(() => validate(getValues()), 100); }}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     placeholder="0"
                     min="0"
@@ -256,7 +310,7 @@ const MulchCalculator = () => {
                   <input
                     type="number"
                     value={width}
-                    onChange={(e) => setWidth(e.target.value)}
+                    onChange={(e) => { setWidth(e.target.value); setTimeout(() => validate(getValues()), 100); }}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     placeholder="0"
                     min="0"
@@ -270,7 +324,7 @@ const MulchCalculator = () => {
                 <input
                   type="number"
                   value={diameter}
-                  onChange={(e) => setDiameter(e.target.value)}
+                  onChange={(e) => { setDiameter(e.target.value); setTimeout(() => validate(getValues()), 100); }}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   placeholder="0"
                   min="0"
@@ -284,7 +338,7 @@ const MulchCalculator = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">Mulch Depth</label>
               <select
                 value={depth}
-                onChange={(e) => setDepth(e.target.value)}
+                onChange={(e) => { setDepth(e.target.value); setTimeout(() => validate(getValues()), 100); }}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
               >
                 {depthPresets.map((preset) => (
@@ -297,7 +351,7 @@ const MulchCalculator = () => {
                 <input
                   type="number"
                   value={customDepth}
-                  onChange={(e) => setCustomDepth(e.target.value)}
+                  onChange={(e) => { setCustomDepth(e.target.value); setTimeout(() => validate(getValues()), 100); }}
                   className="w-full p-3 border border-gray-300 rounded-lg mt-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   placeholder="Enter depth in inches"
                   min="0.5"
@@ -489,6 +543,8 @@ const MulchCalculator = () => {
                     </div>
                   </div>
                 </div>
+
+                <ValidationDisplay />
 
                 {/* Copy Calculation Button */}
 <div className="bg-white rounded-lg shadow-lg p-6">

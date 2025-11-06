@@ -5,6 +5,8 @@ import { Info, Home, Droplets } from 'lucide-react';
 import { trackCalculation } from '@/utils/tracking';
 import { copyCalculation } from '@/utils/copyCalculation';
 import { printCalculation } from '@/utils/printCalculation';
+import { CommonRules, ValidationTypes } from '@/utils/validation';
+import { useValidation } from '@/hooks/useValidation';
 
 const ExteriorPaintCalculator = () => {
   const [inputs, setInputs] = useState({
@@ -163,6 +165,23 @@ const ExteriorPaintCalculator = () => {
     });
   };
 
+  const validationRules = {
+  squareFeet: [
+    CommonRules.unrealistic(100, 20000, 'Surface area'),
+    {
+      condition: (val) => parseFloat(val) > 10000,
+      message: 'Large project (>10,000 sq ft) - consider professional spraying',
+      type: ValidationTypes.INFO
+    }
+  ]
+};
+
+const getValues = () => ({
+  squareFeet: inputs.squareFeet
+});
+
+const { validate, ValidationDisplay } = useValidation(validationRules);
+
   const handleReset = () => {
     setInputs({
       squareFeet: 2000,
@@ -248,7 +267,10 @@ const ExteriorPaintCalculator = () => {
               <input
                 type="number"
                 value={inputs.squareFeet}
-                onChange={(e) => setInputs({...inputs, squareFeet: Number(e.target.value)})}
+                onChange={(e) => {
+  setInputs({...inputs, squareFeet: Number(e.target.value)});
+  setTimeout(() => validate(getValues()), 100);
+}}
                 onFocus={(e) => e.target.select()}
                 className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-lg"
                 min="100"
@@ -363,7 +385,7 @@ const ExteriorPaintCalculator = () => {
                 painted surfaces in good condition with same/darker colors.
               </p>
             </div>
-
+<ValidationDisplay />
             {/* Calculate Button */}
             <div className="pt-4">
               <button

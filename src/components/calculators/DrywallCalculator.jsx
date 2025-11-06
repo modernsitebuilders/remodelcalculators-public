@@ -5,6 +5,8 @@ import { Calculator, Info, Square, Ruler, Package } from 'lucide-react';
 import { trackCalculation } from '@/utils/tracking';
 import { copyCalculation } from '@/utils/copyCalculation';
 import { printCalculation } from '@/utils/printCalculation';
+import { CommonRules, ValidationTypes } from '@/utils/validation';
+import { useValidation } from '@/hooks/useValidation';
 
 // Industry standards based on USG specifications and ASTM C840
 const SHEET_SIZES = {
@@ -48,6 +50,42 @@ export default function DrywallCalculator() {
   
   const resultsRef = useRef(null);
   const [copyButtonText, setCopyButtonText] = useState('📋 Copy Calculation');
+
+  // ADD VALIDATION RULES HERE (after state declarations)
+  const validationRules = {
+    'room0-length': [
+      CommonRules.unrealistic(4, 100, 'Room length')
+    ],
+    'room0-width': [
+      CommonRules.unrealistic(4, 100, 'Room width')
+    ],
+    'room0-height': [
+      {
+        condition: (val) => parseFloat(val) < 7,
+        message: 'Ceiling height <7 feet is uncommon - verify measurement',
+        type: ValidationTypes.WARNING
+      },
+      {
+        condition: (val) => parseFloat(val) > 12,
+        message: 'Ceiling height >12 feet - standard 4×12 sheets may not reach',
+        type: ValidationTypes.INFO
+      },
+      CommonRules.unrealistic(6, 20, 'Ceiling height')
+    ]
+  };
+
+  // getValues can now access rooms because it's inside the component
+  const getValues = () => {
+    const values = {};
+    rooms.forEach((room, index) => {
+      values[`room${index}-length`] = room.length;
+      values[`room${index}-width`] = room.width;
+      values[`room${index}-height`] = room.height;
+    });
+    return values;
+  };
+
+  const { validate, ValidationDisplay } = useValidation(validationRules);
 
   const updateRoom = (index, field, value) => {
     const newRooms = [...rooms];
@@ -280,7 +318,7 @@ export default function DrywallCalculator() {
                   <input
                     type="number"
                     value={room.length}
-                    onChange={(e) => updateRoom(index, 'length', e.target.value)}
+                    onChange={(e) => { updateRoom(index, 'length', e.target.value); setTimeout(() => validate(getValues()), 100); }}
                     step="0.5"
                     min="1"
                     className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-cyan-500 focus:outline-none text-lg"
@@ -295,7 +333,7 @@ export default function DrywallCalculator() {
                   <input
                     type="number"
                     value={room.width}
-                    onChange={(e) => updateRoom(index, 'width', e.target.value)}
+                    onChange={(e) => { updateRoom(index, 'width', e.target.value); setTimeout(() => validate(getValues()), 100); }}
                     step="0.5"
                     min="1"
                     className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-cyan-500 focus:outline-none text-lg"
@@ -310,7 +348,7 @@ export default function DrywallCalculator() {
                   <input
                     type="number"
                     value={room.height}
-                    onChange={(e) => updateRoom(index, 'height', e.target.value)}
+                    onChange={(e) => { updateRoom(index, 'height', e.target.value); setTimeout(() => validate(getValues()), 100); }}
                     step="0.5"
                     min="7"
                     max="20"
@@ -325,7 +363,7 @@ export default function DrywallCalculator() {
                   type="checkbox"
                   id={`includeCeiling-${index}`}
                   checked={room.includeCeiling}
-                  onChange={(e) => updateRoom(index, 'includeCeiling', e.target.checked)}
+                  onChange={(e) => { updateRoom(index, 'includeCeiling', e.target.checked); setTimeout(() => validate(getValues()), 100); }}
                   className="w-5 h-5 text-cyan-600 focus:ring-cyan-500 rounded"
                 />
                 <label htmlFor={`includeCeiling-${index}`} className="font-semibold text-gray-700 cursor-pointer">
@@ -342,7 +380,7 @@ export default function DrywallCalculator() {
                 <input
                   type="number"
                   value={room.deductions}
-                  onChange={(e) => updateRoom(index, 'deductions', e.target.value)}
+                  onChange={(e) => { updateRoom(index, 'deductions', e.target.value); setTimeout(() => validate(getValues()), 100); }}
                   step="1"
                   min="0"
                   className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-cyan-500 focus:outline-none text-lg"
@@ -406,7 +444,7 @@ export default function DrywallCalculator() {
             ))}
           </div>
         </div>
-
+<ValidationDisplay />
         {/* Calculate Button */}
         <button
           onClick={calculateMaterials}

@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import { trackCalculation } from '@/utils/tracking';
 import { copyCalculation } from '@/utils/copyCalculation';
 import { printCalculation } from '@/utils/printCalculation';
+import { CommonRules, ValidationTypes } from '@/utils/validation';
+import { useValidation } from '@/hooks/useValidation';
 
 const RoofingMaterialsCalculator = () => {
   // State for all inputs
@@ -64,6 +66,59 @@ const RoofingMaterialsCalculator = () => {
     });
   };
 
+  const validationRules = {
+  roofLength: [
+    CommonRules.unrealistic(10, 200, 'Roof length')
+  ],
+  roofWidth: [
+    CommonRules.unrealistic(10, 200, 'Roof width')
+  ],
+  roofPitch: [
+    {
+      condition: (val) => parseFloat(val) < 2,
+      message: 'Pitch <2:12 requires special low-slope roofing materials',
+      type: ValidationTypes.WARNING
+    },
+    {
+      condition: (val) => parseFloat(val) > 18,
+      message: 'Steep pitch (>18:12) - consider safety equipment and access',
+      type: ValidationTypes.INFO
+    }
+  ],
+  ridgeLength: [
+    {
+      condition: (val, allVals) => {
+        const ridge = parseFloat(val);
+        const length = parseFloat(allVals.roofLength);
+        return ridge > 0 && ridge > length * 1.5;
+      },
+      message: 'Ridge length exceeds roof length - please verify',
+      type: ValidationTypes.WARNING
+    }
+  ],
+  atticArea: [
+    CommonRules.unrealistic(100, 10000, 'Attic area'),
+    {
+      condition: (val, allVals) => {
+        const attic = parseFloat(val);
+        const footprint = parseFloat(allVals.roofLength) * parseFloat(allVals.roofWidth);
+        return attic > 0 && attic > footprint * 2;
+      },
+      message: 'Attic area exceeds roof footprint significantly - verify measurement',
+      type: ValidationTypes.WARNING
+    }
+  ]
+};
+
+const getValues = () => ({
+  roofLength,
+  roofWidth,
+  roofPitch,
+  ridgeLength,
+  atticArea
+});
+
+const { validate, ValidationDisplay } = useValidation(validationRules);
   const handleStartOver = () => {
     setRoofLength(40);
     setRoofWidth(30);
@@ -269,6 +324,7 @@ const RoofingMaterialsCalculator = () => {
                       onChange={(e) => {
                         const newLength = Number(e.target.value);
                         setRoofLength(newLength);
+                        setTimeout(() => validate(getValues()), 100);
                         // Auto-update ridge length for convenience (user can override)
                         if (ridgeLength === 0 || ridgeLength === roofLength) {
                           setRidgeLength(newLength);
@@ -293,6 +349,7 @@ const RoofingMaterialsCalculator = () => {
                       onChange={(e) => {
                         const newWidth = Number(e.target.value);
                         setRoofWidth(newWidth);
+                        setTimeout(() => validate(getValues()), 100);
                         // Auto-update attic area to match footprint (user can override)
                         const newFootprint = roofLength * newWidth;
                         if (atticArea === 0 || atticArea === roofLength * roofWidth) {
@@ -309,7 +366,7 @@ const RoofingMaterialsCalculator = () => {
                     </label>
                     <select
                       value={roofPitch}
-                      onChange={(e) => setRoofPitch(Number(e.target.value))}
+                      onChange={(e) => { setRoofPitch(Number(e.target.value)); setTimeout(() => validate(getValues()), 100); }}
                       className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       {Object.keys(pitchMultipliers).map(pitch => (
@@ -444,7 +501,7 @@ const RoofingMaterialsCalculator = () => {
                     <input
                       type="number"
                       value={atticArea}
-                      onChange={(e) => setAtticArea(Number(e.target.value))}
+                      onChange={(e) => { setAtticArea(Number(e.target.value)); setTimeout(() => validate(getValues()), 100); }}
                       className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                     <p className="text-xs text-slate-500 mt-1">Required for IRC ventilation compliance. Typically equals footprint (length × width).</p>
@@ -466,7 +523,7 @@ const RoofingMaterialsCalculator = () => {
                     <input
                       type="number"
                       value={ridgeLength}
-                      onChange={(e) => setRidgeLength(Number(e.target.value))}
+                      onChange={(e) => { setRidgeLength(Number(e.target.value)); setTimeout(() => validate(getValues()), 100); }}
                       className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                     <p className="text-xs text-slate-500 mt-1">All roofs have a ridge. For simple gable roofs, typically equals roof length.</p>
@@ -736,7 +793,7 @@ const RoofingMaterialsCalculator = () => {
                   </ul>
                 </div>
               
-
+<ValidationDisplay />
               {/* Copy Calculation Button */}
 <div className="bg-white rounded-lg shadow-lg p-6">
   <div className="flex gap-3">

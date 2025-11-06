@@ -5,6 +5,8 @@ import { Info, AlertCircle, Droplets, Layers, Calculator } from 'lucide-react';
 import { trackCalculation } from '@/utils/tracking';
 import { copyCalculation } from '@/utils/copyCalculation';
 import { printCalculation } from '@/utils/printCalculation';
+import { CommonRules, ValidationTypes } from '@/utils/validation';
+import { useValidation } from '@/hooks/useValidation';
 
 const DeckStainCalculator = () => {
   const [showResults, setShowResults] = useState(false);
@@ -226,12 +228,81 @@ const DeckStainCalculator = () => {
     '8x8': { width: 7.25, height: 7.25, name: '8×8 (7.25" × 7.25")' }
   };
 
-  const handleInputChange = (field, value) => {
-    setInputs(prev => ({
-      ...prev,
-      [field]: parseFloat(value) || value
-    }));
-  };
+  const validationRules = {
+  deckLength: [
+    CommonRules.unrealistic(5, 100, 'Deck length')
+  ],
+  deckWidth: [
+    CommonRules.unrealistic(5, 50, 'Deck width')
+  ],
+  railingLinearFeet: [
+    {
+      condition: (val, allVals) => {
+        const railing = parseFloat(val);
+        const length = parseFloat(allVals.deckLength) || 0;
+        const width = parseFloat(allVals.deckWidth) || 0;
+        const perimeter = 2 * (length + width);
+        return railing > 0 && railing > perimeter * 1.5;
+      },
+      message: 'Railing length exceeds typical deck perimeter - please verify',
+      type: ValidationTypes.WARNING
+    }
+  ],
+  railingPanelHeight: [
+    {
+      condition: (val) => parseFloat(val) < 36,
+      message: '⚠️ IRC requires 36" minimum railing height for decks',
+      type: ValidationTypes.ERROR
+    },
+    CommonRules.tooLarge(48, 'Railing height >48" is uncommon')
+  ],
+  numberOfSteps: [
+    CommonRules.unrealistic(1, 30, 'Number of steps')
+  ],
+  stepWidth: [
+    {
+      condition: (val) => parseFloat(val) < 36,
+      message: '⚠️ IRC requires 36" minimum stair width',
+      type: ValidationTypes.ERROR
+    }
+  ],
+  riserHeight: [
+    {
+      condition: (val) => parseFloat(val) > 7.75,
+      message: '⚠️ IRC limits riser height to 7.75" maximum',
+      type: ValidationTypes.ERROR
+    }
+  ],
+  treadDepth: [
+    {
+      condition: (val) => parseFloat(val) < 10,
+      message: '⚠️ IRC requires minimum 10" tread depth',
+      type: ValidationTypes.ERROR
+    }
+  ]
+};
+
+const getValues = () => ({
+  deckLength: inputs.deckLength,
+  deckWidth: inputs.deckWidth,
+  railingLinearFeet: inputs.railingLinearFeet,
+  railingPanelHeight: inputs.railingPanelHeight,
+  numberOfSteps: inputs.numberOfSteps,
+  stepWidth: inputs.stepWidth,
+  riserHeight: inputs.riserHeight,
+  treadDepth: inputs.treadDepth
+});
+
+const { validate, ValidationDisplay } = useValidation(validationRules);
+
+ const handleInputChange = (field, value) => {
+  setInputs(prev => ({
+    ...prev,
+    [field]: parseFloat(value) || value
+  }));
+  // Trigger validation after state update
+  setTimeout(() => validate(getValues()), 100);
+};
 
   const results = useMemo(() => {
     const deckArea = (parseFloat(inputs.deckLength) || 0) * (parseFloat(inputs.deckWidth) || 0);
@@ -468,7 +539,10 @@ const DeckStainCalculator = () => {
                   <input
                     type="checkbox"
                     checked={inputs.includeRailing}
-                    onChange={(e) => handleInputChange('includeRailing', e.target.checked)}
+                    onChange={(e) => {
+  setState(e.target.value);
+  setTimeout(() => validate(getValues()), 100);
+}}
                     className="w-5 h-5 text-purple-600 rounded focus:ring-2 focus:ring-purple-500"
                   />
                   <span className="text-sm font-medium text-gray-700">Include</span>
@@ -484,7 +558,10 @@ const DeckStainCalculator = () => {
                     <input
                       type="number"
                       value={inputs.railingLinearFeet}
-                      onChange={(e) => handleInputChange('railingLinearFeet', e.target.value)}
+                      onChange={(e) => {
+  setState(e.target.value);
+  setTimeout(() => validate(getValues()), 100);
+}}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       min="0"
                     />
@@ -499,7 +576,10 @@ const DeckStainCalculator = () => {
                     </label>
                     <select
                       value={inputs.railingStyle}
-                      onChange={(e) => handleInputChange('railingStyle', e.target.value)}
+                      onChange={(e) => {
+  setState(e.target.value);
+  setTimeout(() => validate(getValues()), 100);
+}}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     >
                       {Object.entries(railingStyles).map(([key, style]) => (
@@ -520,7 +600,10 @@ const DeckStainCalculator = () => {
                     <input
                       type="number"
                       value={inputs.railingPanelHeight}
-                      onChange={(e) => handleInputChange('railingPanelHeight', e.target.value)}
+                      onChange={(e) => {
+  setState(e.target.value);
+  setTimeout(() => validate(getValues()), 100);
+}}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       min="24"
                       max="48"
@@ -542,7 +625,10 @@ const DeckStainCalculator = () => {
                   <input
                     type="checkbox"
                     checked={inputs.includeStairs}
-                    onChange={(e) => handleInputChange('includeStairs', e.target.checked)}
+                    onChange={(e) => {
+  setState(e.target.checked);
+  setTimeout(() => validate(getValues()), 100);
+}}
                     className="w-5 h-5 text-green-600 rounded focus:ring-2 focus:ring-green-500"
                   />
                   <span className="text-sm font-medium text-gray-700">Include</span>
@@ -915,6 +1001,7 @@ const DeckStainCalculator = () => {
 
         <div className="space-y-6 mt-6">
           <div className="flex gap-4">
+            <ValidationDisplay />
             <button
               onClick={() => {
                 // Validate required inputs

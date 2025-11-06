@@ -5,6 +5,8 @@ import { Calculator, Info } from 'lucide-react';
 import { trackCalculation } from '@/utils/tracking';
 import { copyCalculation } from '@/utils/copyCalculation';
 import { printCalculation } from '@/utils/printCalculation';
+import { CommonRules, ValidationTypes } from '@/utils/validation';
+import { useValidation } from '@/hooks/useValidation';
 
 export default function PaintCalculator() {
   const [rooms, setRooms] = useState([{ 
@@ -130,6 +132,36 @@ export default function PaintCalculator() {
       return room;
     }));
   };
+
+  const validationRules = {
+  'room0-length': [
+    CommonRules.unrealistic(4, 100, 'Room length')
+  ],
+  'room0-width': [
+    CommonRules.unrealistic(4, 100, 'Room width')
+  ],
+  'room0-height': [
+    {
+      condition: (val) => parseFloat(val) < 7,
+      message: 'Ceiling height <7 feet is uncommon - verify measurement',
+      type: ValidationTypes.WARNING
+    },
+    CommonRules.unrealistic(6, 20, 'Ceiling height')
+  ]
+};
+
+// Dynamic getValues based on rooms array
+const getValues = () => {
+  const values = {};
+  rooms.forEach((room, index) => {
+    values[`room${index}-length`] = room.length;
+    values[`room${index}-width`] = room.width;
+    values[`room${index}-height`] = room.height;
+  });
+  return values;
+};
+
+const { validate, ValidationDisplay } = useValidation(validationRules);
 
   const calculatePaint = () => {
     let totalWallArea = 0;
@@ -380,7 +412,7 @@ export default function PaintCalculator() {
                     <input
                       type="number"
                       value={room.length}
-                      onChange={(e) => updateRoom(room.id, 'length', e.target.value)}
+                      onChange={(e) => { updateRoom(room.id, 'length', e.target.value); setTimeout(() => validate(getValues()), 100); }}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                       min="0"
                       step="0.5"
@@ -391,7 +423,7 @@ export default function PaintCalculator() {
                     <input
                       type="number"
                       value={room.width}
-                      onChange={(e) => updateRoom(room.id, 'width', e.target.value)}
+                      onChange={(e) => { updateRoom(room.id, 'width', e.target.value); setTimeout(() => validate(getValues()), 100); }}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                       min="0"
                       step="0.5"
@@ -419,7 +451,7 @@ export default function PaintCalculator() {
                         <input
                           type="checkbox"
                           checked={room.useCustomDoorSizes}
-                          onChange={(e) => updateRoom(room.id, 'useCustomDoorSizes', e.target.checked)}
+                          onChange={(e) => { updateRoom(room.id, 'useCustomDoorSizes', e.target.checked); setTimeout(() => validate(getValues()), 100); }}
                           className="w-3 h-3 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 mr-1"
                         />
                         <span className="text-gray-600">Use custom size</span>
@@ -468,7 +500,7 @@ export default function PaintCalculator() {
                       <input
                         type="number"
                         value={room.customDoorArea}
-                        onChange={(e) => updateRoom(room.id, 'customDoorArea', e.target.value)}
+                        onChange={(e) => { updateRoom(room.id, 'customDoorArea', e.target.value); setTimeout(() => validate(getValues()), 100); }}
                         className="w-full px-3 py-2 border-2 border-indigo-400 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                         placeholder="e.g., 45"
                         min="0"
@@ -488,7 +520,7 @@ export default function PaintCalculator() {
                         <input
                           type="checkbox"
                           checked={room.useCustomWindowSizes}
-                          onChange={(e) => updateRoom(room.id, 'useCustomWindowSizes', e.target.checked)}
+                          onChange={(e) => { updateRoom(room.id, 'useCustomWindowSizes', e.target.checked); setTimeout(() => validate(getValues()), 100); }}
                           className="w-3 h-3 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 mr-1"
                         />
                         <span className="text-gray-600">Use custom size</span>
@@ -538,7 +570,7 @@ export default function PaintCalculator() {
                       <input
                         type="number"
                         value={room.customWindowArea}
-                        onChange={(e) => updateRoom(room.id, 'customWindowArea', e.target.value)}
+                        onChange={(e) => { updateRoom(room.id, 'customWindowArea', e.target.value); setTimeout(() => validate(getValues()), 100); }}
                         className="w-full px-3 py-2 border-2 border-indigo-400 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                         placeholder="e.g., 60"
                         min="0"
@@ -743,7 +775,7 @@ export default function PaintCalculator() {
               )}
             </div>
           </div>
-
+<ValidationDisplay />
           {/* Calculate Button */}
           <button
             onClick={() => {

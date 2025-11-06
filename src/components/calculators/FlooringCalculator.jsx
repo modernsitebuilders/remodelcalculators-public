@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { trackCalculation } from '@/utils/tracking';
 import { copyCalculation } from '@/utils/copyCalculation';
 import { printCalculation } from '@/utils/printCalculation';
+import { CommonRules, ValidationTypes } from '@/utils/validation';
+import { useValidation } from '@/hooks/useValidation';
 
 export default function FlooringCalculator() {
   const [selectedFlooringType, setSelectedFlooringType] = useState('');
@@ -27,6 +29,39 @@ export default function FlooringCalculator() {
     setSelectedFlooringType(type);
     setShowResults(false);
   };
+
+  const validationRules = {
+  roomLength: [
+    CommonRules.unrealistic(3, 100, 'Room length')
+  ],
+  roomWidth: [
+    CommonRules.unrealistic(3, 100, 'Room width')
+  ],
+  plankWidth: [
+    {
+      condition: (val) => val === 'other' && (parseFloat(customPlankWidth) < 1 || parseFloat(customPlankWidth) > 20),
+      message: 'Custom plank width should be between 1-20 inches',
+      type: ValidationTypes.ERROR
+    }
+  ],
+  tileWidth: [
+    CommonRules.unrealistic(4, 48, 'Tile width')
+  ],
+  tileLength: [
+    CommonRules.unrealistic(4, 48, 'Tile length')
+  ]
+};
+
+const getValues = () => ({
+  roomLength,
+  roomWidth,
+  plankWidth,
+  customPlankWidth,
+  tileWidth,
+  tileLength
+});
+
+const { validate, ValidationDisplay } = useValidation(validationRules);
 
   const calculateMaterials = () => {
     const length = parseFloat(roomLength);
@@ -744,11 +779,11 @@ export default function FlooringCalculator() {
               <div className="form-grid form-grid-2">
                 <div className="form-group">
                   <label className="form-label">Length (ft)</label>
-                  <input type="number" className="form-input" value={roomLength} onChange={(e) => setRoomLength(e.target.value)} />
+                  <input type="number" className="form-input" value={roomLength} onChange={(e) => { setRoomLength(e.target.value); setTimeout(() => validate(getValues()), 100); }} />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Width (ft)</label>
-                  <input type="number" className="form-input" value={roomWidth} onChange={(e) => setRoomWidth(e.target.value)} />
+                  <input type="number" className="form-input" value={roomWidth} onChange={(e) => { setRoomWidth(e.target.value); setTimeout(() => validate(getValues()), 100); }} />
                 </div>
               </div>
             </div>
@@ -793,7 +828,7 @@ export default function FlooringCalculator() {
                 <div style={{ marginTop: '20px' }}>
                   <div className="form-group">
                     <label className="form-label">Plank width (inches)</label>
-                    <select className="form-select" style={{ maxWidth: '280px' }} value={plankWidth} onChange={(e) => setPlankWidth(e.target.value)}>
+                    <select className="form-select" style={{ maxWidth: '280px' }} value={plankWidth} onChange={(e) => { setPlankWidth(e.target.value); setTimeout(() => validate(getValues()), 100); }}>
                       <option value="1.5">1.5" - Narrow strip</option>
                       <option value="2.25">2.25" - Standard strip</option>
                       <option value="3">3" - Wide strip</option>
@@ -817,7 +852,7 @@ export default function FlooringCalculator() {
                           max="20"
                           style={{ maxWidth: '280px' }}
                           value={customPlankWidth}
-                          onChange={(e) => setCustomPlankWidth(e.target.value)}
+                          onChange={(e) => { setCustomPlankWidth(e.target.value); setTimeout(() => validate(getValues()), 100); }}
                         />
                       </div>
                     )}
@@ -831,7 +866,7 @@ export default function FlooringCalculator() {
                   <div className="form-grid form-grid-3">
                     <div className="form-group">
                       <label className="form-label">Tile width (inches)</label>
-                      <select className="form-select" value={tileWidth} onChange={(e) => setTileWidth(e.target.value)}>
+                      <select className="form-select" value={tileWidth} onChange={(e) => { setTileWidth(e.target.value); setTimeout(() => validate(getValues()), 100); }}>
                         <option value="4">4"</option>
                         <option value="6">6"</option>
                         <option value="8">8"</option>
@@ -848,7 +883,7 @@ export default function FlooringCalculator() {
                     </div>
                     <div className="form-group">
                       <label className="form-label">Tile length (inches)</label>
-                      <select className="form-select" value={tileLength} onChange={(e) => setTileLength(e.target.value)}>
+                      <select className="form-select" value={tileLength} onChange={(e) => { setTileLength(e.target.value); setTimeout(() => validate(getValues()), 100); }}>
                         <option value="4">4"</option>
                         <option value="6">6"</option>
                         <option value="8">8"</option>
@@ -901,7 +936,7 @@ export default function FlooringCalculator() {
                 </div>
               )}
             </div>
-
+<ValidationDisplay />
             <div className="button-group">
               <button className="btn btn-primary" onClick={calculateMaterials}>
                 Calculate materials
