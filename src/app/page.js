@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import DumpsterCalculatorPromo from '@/components/DumpsterCalculatorPromo';
+import PopularGuidesSection from '@/components/home/PopularGuidesSection';
 
 export const metadata = {
   title: "Job Calculators - Professional Construction Material Calculators",
@@ -127,6 +128,8 @@ export default function HomePage() {
             </div>
           </div>
         </div>
+
+        <PopularGuidesSection />
       {/* ADD THIS - After popular calculators, before footer */}
       <div className="max-w-4xl mx-auto mt-16 mb-8">
         <DumpsterCalculatorPromo />
