@@ -277,20 +277,6 @@ export default function DrywallGuide() {
           </div>
         </div>
       </section>
-
-      {/* Calculator CTA */}
-      <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl p-8 text-center">
-        <h2 className="text-3xl font-bold mb-4">Need Exact Calculations?</h2>
-        <p className="text-lg mb-6 opacity-90">
-          Use our free drywall calculator for precise material estimates based on your specific room dimensions.
-        </p>
-        <a 
-          href="/drywall-calculator"
-          className="inline-block bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition shadow-lg"
-        >
-          Go to Drywall Calculator →
-        </a>
-      </div>
     </div>
   );
 }

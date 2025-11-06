@@ -485,20 +485,6 @@ export default function InteriorPaintingGuide() {
         </div>
       </section>
 
-      {/* Calculator CTA */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl shadow-lg p-8 text-white mb-12">
-        <h2 className="text-2xl font-bold mb-4">Start Your Painting Project Right</h2>
-        <p className="mb-6">
-          Calculate exact material requirements before you shop. Includes primer recommendations and waste factors.
-        </p>
-        <Link 
-          href="/interior-paint-calculator"
-          className="inline-block bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition"
-        >
-          Calculate Materials Needed →
-        </Link>
-      </div>
-
       {/* Related Guides */}
       <div className="bg-gray-50 rounded-xl p-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">Related Guides</h2>

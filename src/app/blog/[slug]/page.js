@@ -19,6 +19,7 @@ import DarkToLightGuide from '@/components/blog/posts/DarkToLightGuide';
 import PaintSheenGuide from '@/components/blog/posts/PaintSheenGuide';
 import TexturedWallGuide from '@/components/blog/posts/TexturedWallGuide';
 import InteriorPaintingGuide from '@/components/blog/posts/InteriorPaintingGuide';
+import BlogCalculatorCTA from '@/components/blog/BlogCalculatorCTA';
 
 // Map slugs to components
 const postComponents = {
@@ -229,25 +230,8 @@ export default async function BlogPost({ params }) {
       {/* Article Content */}
       <article className="bg-white">
         <PostComponent />
+        <BlogCalculatorCTA blogSlug={resolvedParams.slug} />
       </article>
-
-      {/* CTA Section */}
-      <div className="bg-gradient-to-br from-blue-600 to-indigo-700 py-16">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
-            Ready to Calculate Your Materials?
-          </h2>
-          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            Use our free calculator to get accurate material estimates based on industry standards.
-          </p>
-          <Link
-            href={`/${post.calculatorSlug}`}
-            className="inline-block bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-50 transition-colors shadow-lg"
-          >
-            Try the Calculator →
-          </Link>
-        </div>
-      </div>
 
       {/* Related Posts */}
       <div className="bg-gray-50 py-16">

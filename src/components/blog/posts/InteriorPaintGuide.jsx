@@ -230,20 +230,6 @@ export default function InteriorPaintGuide() {
           </div>
         </div>
       </section>
-
-      {/* Calculator CTA */}
-      <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl p-8 text-center">
-        <h2 className="text-3xl font-bold mb-4">Calculate Your Interior Paint Needs</h2>
-        <p className="text-lg mb-6 opacity-90">
-          Get room-specific calculations for walls, ceilings, and trim with automatic deductions and waste factors.
-        </p>
-        <a 
-          href="/interior-paint-calculator"
-          className="inline-block bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition shadow-lg"
-        >
-          Go to Interior Paint Calculator →
-        </a>
-      </div>
     </div>
   );
 }

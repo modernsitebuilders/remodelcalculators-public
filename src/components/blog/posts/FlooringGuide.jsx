@@ -248,20 +248,6 @@ export default function FlooringGuide() {
           </div>
         </div>
       </section>
-
-      {/* Calculator CTA */}
-      <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl p-8 text-center">
-        <h2 className="text-3xl font-bold mb-4">Calculate Your Flooring Materials</h2>
-        <p className="text-lg mb-6 opacity-90">
-          Get precise material estimates for hardwood, tile, laminate, vinyl, and carpet with our free calculator.
-        </p>
-        <a 
-          href="/flooring-calculator"
-          className="inline-block bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition shadow-lg"
-        >
-          Go to Flooring Calculator →
-        </a>
-      </div>
     </div>
   );
 }
