@@ -235,52 +235,6 @@ export default function PrimerGuide() {
         </div>
       </section>
 
-      {/* Cost Analysis */}
-      <section className="mb-12">
-        <h2 className="text-3xl font-bold text-gray-900 mb-6">Is Primer Worth the Cost?</h2>
-        
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="font-bold text-gray-900 mb-3">Scenario: Painting 400 sq ft Room</h3>
-              
-              <div className="space-y-4">
-                <div className="bg-red-50 rounded-lg p-4">
-                  <p className="font-semibold text-gray-900 mb-2">Without Primer (Dark to Light)</p>
-                  <ul className="text-sm text-gray-700 space-y-1">
-                    <li>• 3 coats of premium paint needed</li>
-                    <li>• 3 gallons @ $45 each = $135</li>
-                    <li>• Total labor: 6-7 hours</li>
-                  </ul>
-                </div>
-
-                <div className="bg-green-50 rounded-lg p-4">
-                  <p className="font-semibold text-gray-900 mb-2">With Tinted Primer</p>
-                  <ul className="text-sm text-gray-700 space-y-1">
-                    <li>• 1 coat primer + 2 coats paint</li>
-                    <li>• 1 gal primer ($25) + 2 gal paint ($90) = $115</li>
-                    <li>• Total labor: 6-7 hours</li>
-                    <li><strong className="text-green-700">Savings: $20 + better coverage</strong></li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-center">
-              <div className="bg-blue-50 rounded-xl p-6 border-2 border-blue-200">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Bottom Line</h3>
-                <p className="text-gray-700 text-sm mb-4">
-                  Primer costs less per gallon than finish paint. When needed, it saves money by reducing the number of finish coats required.
-                </p>
-                <div className="bg-white rounded p-3 text-center">
-                  <p className="text-2xl font-bold text-blue-600">Use primer</p>
-                  <p className="text-sm text-gray-600">when specifications call for it</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Calculator CTA */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl shadow-lg p-8 text-white mb-12">
