@@ -6,6 +6,7 @@ import { copyCalculation } from '@/utils/copyCalculation';
 import { printCalculation } from '@/utils/printCalculation';
 import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
+import { FAQSection } from '@/components/FAQSection';
 
 const RoofingMaterialsCalculator = () => {
   // State for all inputs
@@ -834,6 +835,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
           <p>Based on NRCA standards, IRC/IBC codes, and manufacturer specifications from GAF, CertainTeed, Owens Corning, and IKO</p>
         </div>
       </div>
+      <FAQSection calculatorId="roofing-calculator" />
     </div>
   );
 };

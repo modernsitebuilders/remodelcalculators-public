@@ -7,6 +7,7 @@ import { copyCalculation } from '@/utils/copyCalculation';
 import { printCalculation } from '@/utils/printCalculation';
 import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
+import { FAQSection } from '@/components/FAQSection';
 
 const ConcreteCalculator = () => {
   // Project Type Selection
@@ -1268,6 +1269,7 @@ const ConcreteCalculator = () => {
           </div>
         </div>
       </div>
+      <FAQSection calculatorId="concrete-calculator" />
     </div>
   );
 };

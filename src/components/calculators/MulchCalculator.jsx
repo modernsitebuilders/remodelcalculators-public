@@ -7,6 +7,7 @@ import { copyCalculation } from '@/utils/copyCalculation';
 import { printCalculation } from '@/utils/printCalculation';
 import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
+import { FAQSection } from '@/components/FAQSection';
 
 const MulchCalculator = () => {
   // State management
@@ -615,6 +616,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
           </div>
         </div>
       </div>
+      <FAQSection calculatorId="mulch-calculator" />
     </div>
   );
 };

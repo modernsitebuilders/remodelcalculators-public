@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import { Calculator, Ruler, TrendingUp, Info, AlertCircle, CheckCircle } from 'lucide-react';
 import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
+import { FAQSection } from '@/components/FAQSection';
 
 export default function FenceInstallationCalculator() {
   const [linearFeet, setLinearFeet] = useState('');
@@ -759,6 +760,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
           </div>
         </div>
       </div>
+      <FAQSection calculatorId="fence-calculator" />
     </div>
   );
 }

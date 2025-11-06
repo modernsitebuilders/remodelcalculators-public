@@ -7,6 +7,7 @@ import { copyCalculation } from '@/utils/copyCalculation';
 import { printCalculation } from '@/utils/printCalculation';
 import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
+import { FAQSection } from '@/components/FAQSection';
 
 export default function PaintCalculator() {
   const [rooms, setRooms] = useState([{ 
@@ -1059,6 +1060,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
           </div>
         </div>
       </div>
+      <FAQSection calculatorId="interior-paint-calculator" />
     </div>
   );
 }

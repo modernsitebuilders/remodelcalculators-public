@@ -7,6 +7,7 @@ import { copyCalculation } from '@/utils/copyCalculation';
 import { printCalculation } from '@/utils/printCalculation';
 import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
+import { FAQSection } from '@/components/FAQSection';
 
 const DeckStainCalculator = () => {
   const [showResults, setShowResults] = useState(false);
@@ -1217,6 +1218,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
           </p>
         </div>
       </div>
+      <FAQSection calculatorId="deck-stain-calculator" />
     </div>
   );
 };

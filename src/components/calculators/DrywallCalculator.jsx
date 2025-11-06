@@ -7,6 +7,7 @@ import { copyCalculation } from '@/utils/copyCalculation';
 import { printCalculation } from '@/utils/printCalculation';
 import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
+import { FAQSection } from '@/components/FAQSection';
 
 // Industry standards based on USG specifications and ASTM C840
 const SHEET_SIZES = {
@@ -611,6 +612,7 @@ export default function DrywallCalculator() {
           </div>
         )}
       </div>
+      <FAQSection calculatorId="drywall-calculator" />
     </div>
   );
 }

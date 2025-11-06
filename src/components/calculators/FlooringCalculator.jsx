@@ -6,6 +6,7 @@ import { copyCalculation } from '@/utils/copyCalculation';
 import { printCalculation } from '@/utils/printCalculation';
 import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
+import { FAQSection } from '@/components/FAQSection';
 
 export default function FlooringCalculator() {
   const [selectedFlooringType, setSelectedFlooringType] = useState('');
@@ -1036,6 +1037,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
         <div className="footer">
           <p className="footer-text">Based on NWFA, NTCA, TCNA, CRI, and RFCI industry standards</p>
         </div>
+        <FAQSection calculatorId="flooring-calculator" />
       </div>
     </>
   );
