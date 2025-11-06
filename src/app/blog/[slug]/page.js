@@ -13,6 +13,12 @@ import FlooringGuide from '@/components/blog/posts/FlooringGuide';
 import FenceGuide from '@/components/blog/posts/FenceGuide';
 import SidingGuide from '@/components/blog/posts/SidingGuide';
 import MulchGuide from '@/components/blog/posts/MulchGuide';
+import MeasureRoomGuide from '@/components/blog/posts/MeasureRoomGuide';
+import PrimerGuide from '@/components/blog/posts/PrimerGuide';
+import DarkToLightGuide from '@/components/blog/posts/DarkToLightGuide';
+import PaintSheenGuide from '@/components/blog/posts/PaintSheenGuide';
+import TexturedWallGuide from '@/components/blog/posts/TexturedWallGuide';
+import InteriorPaintingGuide from '@/components/blog/posts/InteriorPaintingGuide';
 
 // Map slugs to components
 const postComponents = {
@@ -26,6 +32,12 @@ const postComponents = {
   'fence-post-spacing-guide': FenceGuide,
   'siding-material-calculator': SidingGuide,
   'mulch-calculator-guide': MulchGuide,
+  'measure-room-square-footage': MeasureRoomGuide,
+  'when-you-need-primer': PrimerGuide,
+  'dark-to-light-painting': DarkToLightGuide,
+  'paint-sheen-guide': PaintSheenGuide,
+  'textured-wall-painting': TexturedWallGuide,
+  'interior-painting-guide': InteriorPaintingGuide,
 };
 
 // Generate static paths for all blog posts

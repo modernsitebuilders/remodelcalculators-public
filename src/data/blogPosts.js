@@ -119,6 +119,60 @@ export const blogPosts = [
     author: 'Construction Calculators',
     calculatorSlug: 'mulch-calculator',
   },
+{
+  slug: 'measure-room-square-footage',
+  title: 'How to Measure Your Room & Calculate Square Footage',
+  description: 'Professional measurement techniques for accurate paint material calculations.',
+  date: '2025-11-05',
+  author: 'Job Calculators',
+  category: 'Painting',
+  keywords: ['room measurement', 'square footage calculator', 'wall measurement', 'paint calculation', 'measuring for paint']
+},
+{
+  slug: 'when-you-need-primer',
+  title: 'When You Actually Need Primer',
+  description: 'Industry guidelines on primer requirements with no marketing BS.',
+  date: '2025-11-05',
+  author: 'Job Calculators',
+  category: 'Painting',
+  keywords: ['primer', 'paint primer', 'when to use primer', 'primer requirements', 'painting prep']
+},
+{
+  slug: 'dark-to-light-painting',
+  title: 'Dark to Light Color Changes: Professional Guide',
+  description: 'Industry-standard methods for covering dark paint with light colors.',
+  date: '2025-11-05',
+  author: 'Job Calculators',
+  category: 'Painting',
+  keywords: ['dark to light paint', 'covering dark paint', 'painting over dark colors', 'tinted primer', 'paint color change']
+},
+{
+  slug: 'paint-sheen-guide',
+  title: 'Choosing the Right Paint Sheen',
+  description: 'Professional guide to paint finishes - flat, eggshell, satin, semi-gloss, and gloss.',
+  date: '2025-11-05',
+  author: 'Job Calculators',
+  category: 'Painting',
+  keywords: ['paint sheen', 'paint finish', 'flat paint', 'eggshell paint', 'satin paint', 'semi-gloss paint']
+},
+{
+  slug: 'textured-wall-painting',
+  title: 'Textured Wall Painting Tips',
+  description: 'Professional techniques for painting knockdown, orange peel, and popcorn textures.',
+  date: '2025-11-05',
+  author: 'Job Calculators',
+  category: 'Painting',
+  keywords: ['textured walls', 'knockdown texture', 'orange peel texture', 'popcorn ceiling', 'painting texture']
+},
+{
+  slug: 'interior-painting-guide',
+  title: 'Complete Interior Painting Guide',
+  description: 'Professional start-to-finish guide for interior painting projects.',
+  date: '2025-11-05',
+  author: 'Job Calculators',
+  category: 'Painting',
+  keywords: ['interior painting', 'painting guide', 'how to paint', 'painting tips', 'professional painting']
+}
 ];
 
 export function getBlogPost(slug) {

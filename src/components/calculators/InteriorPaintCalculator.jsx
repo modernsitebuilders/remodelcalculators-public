@@ -1,5 +1,5 @@
 'use client';
-
+import Link from 'next/link';
 import React, { useState } from 'react';
 import { Calculator, Info } from 'lucide-react';
 import { trackCalculation } from '@/utils/tracking';
@@ -1002,39 +1002,38 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
             
             <div className="p-4 bg-indigo-50 rounded-lg border border-indigo-200">
               <h3 className="font-semibold text-gray-700 mb-2 text-sm">📚 Helpful Guides:</h3>
-              <ul className="text-xs space-y-1.5">
-                <li>
-                  <a href="#" className="text-indigo-600 hover:text-indigo-800 underline font-medium">
-                    🎓 How to Measure Your Room & Calculate Square Footage
-                  </a>
-                  <span className="text-gray-500 ml-1">(Start here!)</span>
-                </li>
-                <li>
-                  <a href="#" className="text-indigo-600 hover:text-indigo-800 underline">
-                    When You Actually Need Primer
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-indigo-600 hover:text-indigo-800 underline">
-                    Dark to Light Color Changes
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-indigo-600 hover:text-indigo-800 underline">
-                    Choosing the Right Paint Sheen
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-indigo-600 hover:text-indigo-800 underline">
-                    Textured Wall Painting Tips
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-indigo-600 hover:text-indigo-800 underline">
-                    Complete Interior Painting Guide
-                  </a>
-                </li>
-             </ul>
+              <ul className="space-y-2">
+  <li>
+    <Link href="/blog/measure-room-square-footage" className="text-indigo-600 hover:text-indigo-800 underline">
+      How to Measure Your Room & Calculate Square Footage (Start here!)
+    </Link>
+  </li>
+  <li>
+    <Link href="/blog/when-you-need-primer" className="text-indigo-600 hover:text-indigo-800 underline">
+      When You Actually Need Primer
+    </Link>
+  </li>
+  <li>
+    <Link href="/blog/dark-to-light-painting" className="text-indigo-600 hover:text-indigo-800 underline">
+      Dark to Light Color Changes
+    </Link>
+  </li>
+  <li>
+    <Link href="/blog/paint-sheen-guide" className="text-indigo-600 hover:text-indigo-800 underline">
+      Choosing the Right Paint Sheen
+    </Link>
+  </li>
+  <li>
+    <Link href="/blog/textured-wall-painting" className="text-indigo-600 hover:text-indigo-800 underline">
+      Textured Wall Painting Tips
+    </Link>
+  </li>
+  <li>
+    <Link href="/blog/interior-painting-guide" className="text-indigo-600 hover:text-indigo-800 underline">
+      Complete Interior Painting Guide
+    </Link>
+  </li>
+</ul>
             </div>
             
             {/* Copy Calculation Button */}
