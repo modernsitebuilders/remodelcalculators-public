@@ -1,5 +1,5 @@
 'use client';
-
+import Link from 'next/link';
 import React, { useState, useMemo } from 'react';
 import { Info, Home, Droplets } from 'lucide-react';
 import { trackCalculation } from '@/utils/tracking';
@@ -531,7 +531,53 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
             </div>
           )}
         </div>
-
+{/* Helpful Guides Section */}
+        {showResults && (
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <h3 className="font-semibold text-gray-700 mb-2 text-sm">Calculation Standards:</h3>
+              <ul className="text-xs text-gray-600 space-y-1">
+                <li>• Industry coverage: 250-400 sq ft/gal (varies by surface)</li>
+                <li>• Primer coverage: 200-300 sq ft/gal</li>
+                <li>• Rough surfaces reduce coverage 30-50%</li>
+                <li>• PCA & MPI professional standards</li>
+                <li>• Includes waste factors by application method</li>
+              </ul>
+            </div>
+            
+            <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <h3 className="font-semibold text-gray-700 mb-2 text-sm">📚 Helpful Guides:</h3>
+              <ul className="text-xs space-y-1.5">
+                <li>
+                  <Link href="/blog/measure-room-square-footage" className="text-blue-600 hover:text-blue-800 underline font-medium">
+                    🎓 How to Measure Your Exterior
+                  </Link>
+                  <span className="text-gray-500 ml-1">(Start here!)</span>
+                </li>
+                <li>
+                  <Link href="/blog/when-you-need-primer" className="text-blue-600 hover:text-blue-800 underline font-medium">
+                    When You Actually Need Primer
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/blog/paint-sheen-guide" className="text-blue-600 hover:text-blue-800 underline font-medium">
+                    Choosing the Right Paint Sheen
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/blog/textured-wall-painting" className="text-blue-600 hover:text-blue-800 underline font-medium">
+                    Painting Textured Surfaces
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/blog/dark-to-light-painting" className="text-blue-600 hover:text-blue-800 underline font-medium">
+                    Dark to Light Color Changes
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          </div>
+        )}
         {/* Footer */}
         <div className="mt-8 pt-6 border-t-2 border-gray-200 text-center text-sm text-gray-600">
           <p>
