@@ -297,12 +297,6 @@ export default function ConcreteGuide() {
                   <li>• Cost-effective over 1 yard</li>
                 </ul>
               </div>
-              
-              <div className="bg-green-50 rounded-lg p-4">
-                <div className="text-sm text-gray-700 mb-1">Typical pricing:</div>
-                <div className="text-2xl font-bold text-green-700">$125-175 <span className="text-base font-normal">per yard</span></div>
-                <div className="text-xs text-gray-600 mt-1">Includes delivery • 1 yard minimum</div>
-              </div>
             </div>
           </div>
 
@@ -339,12 +333,6 @@ export default function ConcreteGuide() {
                   <li>• Store unused bags</li>
                   <li>• Better for small projects</li>
                 </ul>
-              </div>
-              
-              <div className="bg-orange-50 rounded-lg p-4">
-                <div className="text-sm text-gray-700 mb-1">Typical pricing:</div>
-                <div className="text-2xl font-bold text-orange-700">$4-6 <span className="text-base font-normal">per 80 lb bag</span></div>
-                <div className="text-xs text-gray-600 mt-1">No minimum • Available at most stores</div>
               </div>
               
               <div className="bg-red-50 border-l-4 border-red-500 p-3 mt-4 text-sm text-gray-700">
