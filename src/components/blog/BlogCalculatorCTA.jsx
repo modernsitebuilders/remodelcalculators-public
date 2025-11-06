@@ -62,25 +62,33 @@ export default function BlogCalculatorCTA({ blogSlug, calculatorSlug }) {
   };
 
   // Get calculator info or use provided calculatorSlug as fallback
-  const calc = calculatorInfo[blogSlug] || {
-    name: 'Materials',
-    description: 'Use our free calculator to get accurate material estimates based on industry standards.',
-    slug: calculatorSlug || 'concrete-calculator'
+  const calc = calculatorInfo[blogSlug] || null;
+  
+  // If no calculator mapping exists and no fallback provided, don't render
+  if (!calc && !calculatorSlug) {
+    return null;
+  }
+  
+  // Use provided calculatorSlug if mapping doesn't exist
+  const finalCalc = calc || {
+    name: 'Project',
+    description: 'Get accurate estimates based on your measurements using industry-standard formulas.',
+    slug: calculatorSlug
   };
 
   return (
     <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl p-8 text-center my-12">
       <h2 className="text-3xl font-bold mb-4">
-        Calculate Your {calc.name} Materials
+        Calculate Your {finalCalc.name} Materials
       </h2>
       <p className="text-lg mb-6 opacity-90">
-        {calc.description}
+        {finalCalc.description}
       </p>
       <Link 
-        href={`/${calc.slug}`}
+        href={`/${finalCalc.slug}`}
         className="inline-block bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition shadow-lg"
       >
-        Go to {calc.name} Calculator →
+        Go to {finalCalc.name} Calculator →
       </Link>
     </div>
   );
