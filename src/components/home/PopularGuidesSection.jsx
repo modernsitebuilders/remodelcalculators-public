@@ -65,7 +65,7 @@ export default function PopularGuidesSection() {
   };
 
   return (
-    <div className="bg-gradient-to-b from-gray-50 to-white py-16">
+    <div className="bg-gradient-to-b from-gray-50 to-white py-12">
       <div className="container mx-auto max-w-7xl px-4">
         {/* Section Header */}
         <div className="text-center mb-12">
