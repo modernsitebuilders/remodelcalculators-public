@@ -4,7 +4,7 @@ import PopularGuidesSection from '@/components/home/PopularGuidesSection';
 
 export const metadata = {
   title: "Job Calculators - Professional Construction Material Calculators",
-  description: "Free construction calculators for accurate material estimation.",
+  description: "Free construction calculators for accurate material estimation. Industry-standard formulas for concrete, paint, drywall, roofing, flooring, and more.",
   alternates: { canonical: 'https://jobcalculators.com' },
 };
 
@@ -96,50 +96,60 @@ const calculators = [
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white py-20 px-4">
+    <div className="min-h-screen bg-white">
+      {/* Hero Section - OPTIMIZED */}
+      <div className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white py-14 px-4">
         <div className="container mx-auto max-w-6xl text-center">
           <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
             <Calculator className="w-5 h-5" />
             <span className="text-sm font-medium">Professional Construction Calculators</span>
           </div>
           
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+          <h1 className="text-4xl md:text-5xl font-bold mb-5 leading-tight">
             Calculate Materials.<br />Build with Confidence.
           </h1>
           
-          <p className="text-xl md:text-2xl mb-8 text-blue-50 max-w-3xl mx-auto">
+          <p className="text-lg md:text-xl mb-7 text-blue-50 max-w-3xl mx-auto">
             Industry-standard calculators for accurate material estimation. Free, no login required.
           </p>
           
-          <div className="flex flex-wrap gap-4 justify-center text-sm">
-            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg">
-              <span className="text-green-300">✓</span> Free Forever
+          {/* Improved Badges */}
+          <div className="flex flex-wrap gap-3 justify-center text-sm mb-6">
+            <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2.5 rounded-full border border-white/30 shadow-lg">
+              <svg className="w-4 h-4 text-green-300" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+              </svg>
+              <span className="font-semibold text-white">Free Forever</span>
             </div>
-            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg">
-              <span className="text-green-300">✓</span> No Sign Up
+            <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2.5 rounded-full border border-white/30 shadow-lg">
+              <svg className="w-4 h-4 text-green-300" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+              </svg>
+              <span className="font-semibold text-white">No Sign Up</span>
             </div>
-            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg">
-              <span className="text-green-300">✓</span> Mobile Friendly
+            <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2.5 rounded-full border border-white/30 shadow-lg">
+              <svg className="w-4 h-4 text-green-300" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+              </svg>
+              <span className="font-semibold text-white">Mobile Friendly</span>
             </div>
-            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg">
-              <span className="text-green-300">✓</span> Industry Standards
+            <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2.5 rounded-full border border-white/30 shadow-lg">
+              <svg className="w-4 h-4 text-green-300" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+              </svg>
+              <span className="font-semibold text-white">Industry Standards</span>
             </div>
           </div>
         </div>
-
-        <PopularGuidesSection />
-      {/* ADD THIS - After popular calculators, before footer */}
-      <div className="max-w-4xl mx-auto mt-16 mb-8">
-        <DumpsterCalculatorPromo />
       </div>
-    </div>
 
-      {/* Calculator Grid */}
-      <div className="container mx-auto max-w-7xl px-4 py-16">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+      {/* Smooth Transition */}
+      <div className="bg-gradient-to-b from-blue-50 to-white pt-0.5"></div>
+
+      {/* Calculator Grid - OPTIMIZED SPACING */}
+      <div className="container mx-auto max-w-7xl px-4 py-10">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl font-bold text-gray-900 mb-3">
             All Calculators
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
@@ -154,7 +164,7 @@ export default function HomePage() {
               <Link 
                 key={calc.href}
                 href={calc.href}
-                className="group block bg-white rounded-xl border-2 border-gray-200 hover:border-blue-500 hover:shadow-lg transition-all duration-200 p-6"
+                className="group block bg-white rounded-xl border-2 border-gray-200 hover:border-blue-500 hover:shadow-xl transition-all duration-200 p-6"
               >
                 <div className="flex items-start gap-4">
                   <div className="bg-blue-50 group-hover:bg-blue-100 p-3 rounded-lg transition-colors">
@@ -180,6 +190,13 @@ export default function HomePage() {
         </div>
       </div>
 
+      {/* Popular Guides Section - NOW MORE VISIBLE */}
+      <PopularGuidesSection />
+
+      {/* Dumpster Calculator Promo */}
+      <div className="container mx-auto max-w-4xl px-4 pb-12">
+        <DumpsterCalculatorPromo />
+      </div>
     </div>
   );
 }

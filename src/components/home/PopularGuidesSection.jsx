@@ -65,16 +65,16 @@ export default function PopularGuidesSection() {
   };
 
   return (
-    <div className="bg-gradient-to-b from-gray-50 to-white py-12">
+    <div className="bg-gradient-to-b from-gray-50 to-white py-10">
       <div className="container mx-auto max-w-7xl px-4">
-        {/* Section Header */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-full mb-4">
+        {/* Section Header - TIGHTER */}
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-full mb-3">
             <BookOpen className="w-5 h-5 text-blue-600" />
             <span className="text-sm font-semibold text-blue-600">Professional Guides</span>
           </div>
           
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
             Learn from the Experts
           </h2>
           
@@ -142,7 +142,7 @@ export default function PopularGuidesSection() {
         </div>
 
         {/* Trust Signal */}
-        <div className="mt-12 text-center">
+        <div className="mt-8 text-center">
           <p className="text-sm text-gray-500">
             All guides based on industry standards from{' '}
             <span className="font-semibold text-gray-700">ACI, NWFA, PDCA, PCA, MPI, NRCA</span> and more
