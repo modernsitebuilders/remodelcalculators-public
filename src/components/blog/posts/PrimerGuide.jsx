@@ -34,7 +34,7 @@ export default function PrimerGuide() {
               <ul className="space-y-1 text-gray-700 text-sm">
                 <li>• PVA (polyvinyl acetate) drywall primer</li>
                 <li>• Coverage: 300-400 sq ft per gallon</li>
-                <li>• Dry time: 1-2 hours</li>
+                <li>• Dry time: 2-4 hours</li>
               </ul>
             </div>
           </div>
@@ -204,7 +204,7 @@ export default function PrimerGuide() {
                   <div className="text-sm text-gray-600">Water-based</div>
                 </td>
                 <td className="px-6 py-4 text-gray-700 text-sm">New drywall, joint compound, plaster</td>
-                <td className="px-6 py-4 text-gray-700">1-2 hours</td>
+                <td className="px-6 py-4 text-gray-700">2-4 hours</td>
               </tr>
               <tr>
                 <td className="px-6 py-4">
@@ -212,7 +212,7 @@ export default function PrimerGuide() {
                   <div className="text-sm text-gray-600">Alkyd/Oil</div>
                 </td>
                 <td className="px-6 py-4 text-gray-700 text-sm">Bare wood, stains, glossy surfaces</td>
-                <td className="px-6 py-4 text-gray-700">4-6 hours</td>
+                <td className="px-6 py-4 text-gray-700">6-8 hours</td>
               </tr>
               <tr>
                 <td className="px-6 py-4">
@@ -220,7 +220,7 @@ export default function PrimerGuide() {
                   <div className="text-sm text-gray-600">Alcohol-based</div>
                 </td>
                 <td className="px-6 py-4 text-gray-700 text-sm">Severe stains, smoke, water damage</td>
-                <td className="px-6 py-4 text-gray-700">30-60 minutes</td>
+                <td className="px-6 py-4 text-gray-700">45-60 minutes</td>
               </tr>
               <tr>
                 <td className="px-6 py-4">
@@ -228,7 +228,7 @@ export default function PrimerGuide() {
                   <div className="text-sm text-gray-600">Water-based</div>
                 </td>
                 <td className="px-6 py-4 text-gray-700 text-sm">Glossy surfaces, tile, laminate</td>
-                <td className="px-6 py-4 text-gray-700">1-2 hours</td>
+                <td className="px-6 py-4 text-gray-700">2-4 hours</td>
               </tr>
             </tbody>
           </table>
