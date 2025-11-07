@@ -502,7 +502,9 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     type="number"
                     value={inputs.deckLength}
                     onChange={(e) => handleInputChange('deckLength', e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      !inputs.deckLength ? 'border-orange-400' : 'border-gray-300'
+                    }`}
                     placeholder="Enter length"
                     min="1"
                   />
@@ -516,7 +518,9 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     type="number"
                     value={inputs.deckWidth}
                     onChange={(e) => handleInputChange('deckWidth', e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      !inputs.deckWidth ? 'border-orange-400' : 'border-gray-300'
+                    }`}
                     placeholder="Enter width"
                     min="1"
                   />
@@ -536,18 +540,15 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                 <h2 className="text-xl font-bold text-gray-800">
                   Deck Railing
                 </h2>
-                <label className="flex items-center gap-2 cursor-pointer">
+                <div className="flex items-center gap-2 p-3 border border-yellow-400 rounded-lg">
                   <input
                     type="checkbox"
                     checked={inputs.includeRailing}
-                    onChange={(e) => {
-  setState(e.target.value);
-  setTimeout(() => validate(getValues()), 100);
-}}
+                    onChange={(e) => handleInputChange('includeRailing', e.target.checked)}
                     className="w-5 h-5 text-purple-600 rounded focus:ring-2 focus:ring-purple-500"
                   />
                   <span className="text-sm font-medium text-gray-700">Include</span>
-                </label>
+                </div>
               </div>
 
               {inputs.includeRailing && (
@@ -559,11 +560,10 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     <input
                       type="number"
                       value={inputs.railingLinearFeet}
-                      onChange={(e) => {
-  setState(e.target.value);
-  setTimeout(() => validate(getValues()), 100);
-}}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      onChange={(e) => handleInputChange('railingLinearFeet', e.target.value)}
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                        inputs.includeRailing && !inputs.railingLinearFeet ? 'border-orange-400' : 'border-gray-300'
+                      }`}
                       min="0"
                     />
                     <div className="mt-1 text-xs text-gray-500">
@@ -577,11 +577,8 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     </label>
                     <select
                       value={inputs.railingStyle}
-                      onChange={(e) => {
-  setState(e.target.value);
-  setTimeout(() => validate(getValues()), 100);
-}}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      onChange={(e) => handleInputChange('railingStyle', e.target.value)}
+                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     >
                       {Object.entries(railingStyles).map(([key, style]) => (
                         <option key={key} value={key}>
@@ -601,11 +598,8 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     <input
                       type="number"
                       value={inputs.railingPanelHeight}
-                      onChange={(e) => {
-  setState(e.target.value);
-  setTimeout(() => validate(getValues()), 100);
-}}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      onChange={(e) => handleInputChange('railingPanelHeight', e.target.value)}
+                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       min="24"
                       max="48"
                     />
@@ -622,18 +616,15 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                 <h2 className="text-xl font-bold text-gray-800">
                   Stairs
                 </h2>
-                <label className="flex items-center gap-2 cursor-pointer">
+                <div className="flex items-center gap-2 p-3 border border-yellow-400 rounded-lg">
                   <input
                     type="checkbox"
                     checked={inputs.includeStairs}
-                    onChange={(e) => {
-  setState(e.target.checked);
-  setTimeout(() => validate(getValues()), 100);
-}}
+                    onChange={(e) => handleInputChange('includeStairs', e.target.checked)}
                     className="w-5 h-5 text-green-600 rounded focus:ring-2 focus:ring-green-500"
                   />
                   <span className="text-sm font-medium text-gray-700">Include</span>
-                </label>
+                </div>
               </div>
 
               {inputs.includeStairs && (
@@ -647,7 +638,9 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                         type="number"
                         value={inputs.numberOfSteps}
                         onChange={(e) => handleInputChange('numberOfSteps', e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                          inputs.includeStairs && !inputs.numberOfSteps ? 'border-orange-400' : 'border-gray-300'
+                        }`}
                         min="0"
                       />
                     </div>
@@ -660,7 +653,9 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                         type="number"
                         value={inputs.stepWidth}
                         onChange={(e) => handleInputChange('stepWidth', e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                          inputs.includeStairs && !inputs.stepWidth ? 'border-orange-400' : 'border-gray-300'
+                        }`}
                         min="24"
                       />
                     </div>
@@ -675,7 +670,9 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                         type="number"
                         value={inputs.treadDepth}
                         onChange={(e) => handleInputChange('treadDepth', e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                          inputs.includeStairs && !inputs.treadDepth ? 'border-orange-400' : 'border-gray-300'
+                        }`}
                         min="9"
                       />
                     </div>
@@ -688,7 +685,9 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                         type="number"
                         value={inputs.riserHeight}
                         onChange={(e) => handleInputChange('riserHeight', e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                          inputs.includeStairs && !inputs.riserHeight ? 'border-orange-400' : 'border-gray-300'
+                        }`}
                         min="4"
                         max="8"
                       />
@@ -703,7 +702,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       type="number"
                       value={inputs.stairRailingLinearFeet}
                       onChange={(e) => handleInputChange('stairRailingLinearFeet', e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       min="0"
                     />
                   </div>
@@ -716,7 +715,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                 <h2 className="text-xl font-bold text-gray-800">
                   Landings
                 </h2>
-                <label className="flex items-center gap-2 cursor-pointer">
+                <div className="flex items-center gap-2 p-3 border border-yellow-400 rounded-lg">
                   <input
                     type="checkbox"
                     checked={inputs.includeLandings}
@@ -724,7 +723,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     className="w-5 h-5 text-yellow-600 rounded focus:ring-2 focus:ring-yellow-500"
                   />
                   <span className="text-sm font-medium text-gray-700">Include</span>
-                </label>
+                </div>
               </div>
 
               {inputs.includeLandings && (
@@ -737,7 +736,9 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       type="number"
                       value={inputs.numberOfLandings}
                       onChange={(e) => handleInputChange('numberOfLandings', e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent ${
+                        inputs.includeLandings && !inputs.numberOfLandings ? 'border-orange-400' : 'border-gray-300'
+                      }`}
                       min="0"
                     />
                   </div>
@@ -751,7 +752,9 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                         type="number"
                         value={inputs.landingLength}
                         onChange={(e) => handleInputChange('landingLength', e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent ${
+                          inputs.includeLandings && !inputs.landingLength ? 'border-orange-400' : 'border-gray-300'
+                        }`}
                         min="1"
                       />
                     </div>
@@ -764,7 +767,9 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                         type="number"
                         value={inputs.landingWidth}
                         onChange={(e) => handleInputChange('landingWidth', e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent ${
+                          inputs.includeLandings && !inputs.landingWidth ? 'border-orange-400' : 'border-gray-300'
+                        }`}
                         min="1"
                       />
                     </div>
@@ -778,7 +783,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                 <h2 className="text-xl font-bold text-gray-800">
                   Support Beams
                 </h2>
-                <label className="flex items-center gap-2 cursor-pointer">
+                <div className="flex items-center gap-2 p-3 border border-yellow-400 rounded-lg">
                   <input
                     type="checkbox"
                     checked={inputs.includeBeams}
@@ -786,7 +791,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     className="w-5 h-5 text-orange-600 rounded focus:ring-2 focus:ring-orange-500"
                   />
                   <span className="text-sm font-medium text-gray-700">Include</span>
-                </label>
+                </div>
               </div>
 
               {inputs.includeBeams && (
@@ -800,7 +805,9 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                         type="number"
                         value={inputs.numberOfBeams}
                         onChange={(e) => handleInputChange('numberOfBeams', e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
+                          inputs.includeBeams && !inputs.numberOfBeams ? 'border-orange-400' : 'border-gray-300'
+                        }`}
                         min="0"
                       />
                     </div>
@@ -813,7 +820,9 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                         type="number"
                         value={inputs.beamLength}
                         onChange={(e) => handleInputChange('beamLength', e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
+                          inputs.includeBeams && !inputs.beamLength ? 'border-orange-400' : 'border-gray-300'
+                        }`}
                         min="1"
                       />
                     </div>
@@ -826,7 +835,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     <select
                       value={inputs.beamSize}
                       onChange={(e) => handleInputChange('beamSize', e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     >
                       {Object.entries(beamSizes).map(([key, size]) => (
                         <option key={key} value={key}>
@@ -847,7 +856,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                 <h2 className="text-xl font-bold text-gray-800">
                   Deck Underside + Structure
                 </h2>
-                <label className="flex items-center gap-2 cursor-pointer">
+                <div className="flex items-center gap-2 p-3 border border-yellow-400 rounded-lg">
                   <input
                     type="checkbox"
                     checked={inputs.includeUnderside}
@@ -855,7 +864,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     className="w-5 h-5 text-red-600 rounded focus:ring-2 focus:ring-red-500"
                   />
                   <span className="text-sm font-medium text-gray-700">Include</span>
-                </label>
+                </div>
               </div>
 
               {inputs.includeUnderside && (
@@ -886,7 +895,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                 <select
                   value={inputs.woodType}
                   onChange={(e) => handleInputChange('woodType', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                 >
                   {Object.entries(woodTypes).map(([key, type]) => (
                     <option key={key} value={key}>
@@ -906,7 +915,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                 <select
                   value={inputs.woodCondition}
                   onChange={(e) => handleInputChange('woodCondition', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                 >
                   {Object.entries(woodConditions).map(([key, condition]) => (
                     <option key={key} value={key}>
@@ -926,7 +935,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                 <select
                   value={inputs.surfaceTexture}
                   onChange={(e) => handleInputChange('surfaceTexture', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                 >
                   {Object.entries(surfaceTextures).map(([key, texture]) => (
                     <option key={key} value={key}>
@@ -946,7 +955,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                 <select
                   value={inputs.stainType}
                   onChange={(e) => handleInputChange('stainType', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                 >
                   {Object.entries(stainTypes).map(([key, type]) => (
                     <option key={key} value={key}>
@@ -966,7 +975,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                 <select
                   value={inputs.applicationMethod}
                   onChange={(e) => handleInputChange('applicationMethod', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                 >
                   {Object.entries(applicationMethods).map(([key, method]) => (
                     <option key={key} value={key}>
@@ -986,7 +995,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                 <select
                   value={inputs.coats}
                   onChange={(e) => handleInputChange('coats', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                 >
                   <option value={1}>1 Coat</option>
                   <option value={2}>2 Coats (Recommended)</option>
@@ -1100,29 +1109,29 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                   <div className="text-xs text-gray-500 mt-1">
                     Base: {results.baseCoverage} sq ft/gal adjusted for wood condition & surface texture
                   </div>
- </div>
+                </div>
 
-      {/* Copy Calculation Button */}
-<div className="bg-white rounded-lg shadow-lg p-6">
-  <div className="flex gap-3">
-    <button 
-      onClick={handleCopyCalculation}
-      className="copy-calc-btn flex-1"
-    >
-      {copyButtonText}
-    </button>
-    
-    {/* ADD THIS PRINT BUTTON */}
-    <button 
-      onClick={() => printCalculation('Deck Stain Calculator')}
-      className="copy-calc-btn flex-1"
-    >
-      🖨️ Print Results
-    </button>
-  </div>
-</div>
+                {/* Copy Calculation Button */}
+                <div className="bg-white rounded-lg shadow-lg p-6">
+                  <div className="flex gap-3">
+                    <button 
+                      onClick={handleCopyCalculation}
+                      className="copy-calc-btn flex-1"
+                    >
+                      {copyButtonText}
+                    </button>
+                    
+                    {/* ADD THIS PRINT BUTTON */}
+                    <button 
+                      onClick={() => printCalculation('Deck Stain Calculator')}
+                      className="copy-calc-btn flex-1"
+                    >
+                      🖨️ Print Results
+                    </button>
+                  </div>
+                </div>
 
-      <div className="mt-8 bg-gray-50 rounded-lg p-6">
+                <div className="mt-8 bg-gray-50 rounded-lg p-6">
                   <div className="flex justify-between items-center text-sm text-gray-600">
                     <span>Raw calculation ({inputs.coats} coat{inputs.coats > 1 ? 's' : ''}):</span>
                     <span>{results.totalGallonsRaw} gal</span>

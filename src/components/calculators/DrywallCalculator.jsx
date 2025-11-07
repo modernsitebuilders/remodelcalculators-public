@@ -322,7 +322,9 @@ export default function DrywallCalculator() {
                     onChange={(e) => { updateRoom(index, 'length', e.target.value); setTimeout(() => validate(getValues()), 100); }}
                     step="0.5"
                     min="1"
-                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-cyan-500 focus:outline-none text-lg"
+                    className={`w-full px-4 py-3 border-2 rounded-lg focus:border-cyan-500 focus:outline-none text-lg ${
+                      !room.length ? 'border-orange-400' : 'border-gray-300'
+                    }`}
                   />
                 </div>
 
@@ -337,7 +339,9 @@ export default function DrywallCalculator() {
                     onChange={(e) => { updateRoom(index, 'width', e.target.value); setTimeout(() => validate(getValues()), 100); }}
                     step="0.5"
                     min="1"
-                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-cyan-500 focus:outline-none text-lg"
+                    className={`w-full px-4 py-3 border-2 rounded-lg focus:border-cyan-500 focus:outline-none text-lg ${
+                      !room.width ? 'border-orange-400' : 'border-gray-300'
+                    }`}
                   />
                 </div>
 
@@ -353,13 +357,15 @@ export default function DrywallCalculator() {
                     step="0.5"
                     min="7"
                     max="20"
-                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-cyan-500 focus:outline-none text-lg"
+                    className={`w-full px-4 py-3 border-2 rounded-lg focus:border-cyan-500 focus:outline-none text-lg ${
+                      !room.height ? 'border-orange-400' : 'border-gray-300'
+                    }`}
                   />
                 </div>
               </div>
 
               {/* Include Ceiling */}
-              <div className="flex items-center gap-3 p-3 bg-white rounded-lg">
+              <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-yellow-400">
                 <input
                   type="checkbox"
                   id={`includeCeiling-${index}`}
@@ -384,7 +390,7 @@ export default function DrywallCalculator() {
                   onChange={(e) => { updateRoom(index, 'deductions', e.target.value); setTimeout(() => validate(getValues()), 100); }}
                   step="1"
                   min="0"
-                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-cyan-500 focus:outline-none text-lg"
+                  className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:border-cyan-500 focus:outline-none text-lg"
                 />
                 <p className="text-sm text-gray-600 mt-1">
                   <Info className="w-4 h-4 inline" /> Typical door: 20 sq ft | Standard window: 15 sq ft
@@ -413,7 +419,7 @@ export default function DrywallCalculator() {
                 className={`p-4 rounded-lg border-2 transition ${
                   sheetSize === key
                     ? 'border-cyan-500 bg-cyan-50 text-cyan-900'
-                    : 'border-gray-300 hover:border-gray-400'
+                    : 'border-yellow-400 hover:border-gray-400'
                 }`}
               >
                 <div className="font-semibold text-sm">{size.name}</div>
@@ -436,7 +442,7 @@ export default function DrywallCalculator() {
                 className={`p-4 rounded-lg border-2 transition ${
                   thickness === key
                     ? 'border-cyan-500 bg-cyan-50 text-cyan-900'
-                    : 'border-gray-300 hover:border-gray-400'
+                    : 'border-yellow-400 hover:border-gray-400'
                 }`}
               >
                 <div className="font-semibold">{spec.name}</div>

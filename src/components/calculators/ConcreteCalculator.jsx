@@ -71,7 +71,6 @@ const ConcreteCalculator = () => {
     '5000': 'Warehouses, factory floors, parking structures'
   };
 
-  // ADD THIS ENTIRE SECTION HERE (line 73)
   // Validation rules for concrete calculator
   const validationRules = {
     slabLength: [
@@ -600,10 +599,12 @@ if (region === 'freezethaw') {
                       type="number"
                       value={slabLength}
                       onChange={(e) => {
-  setSlabLength(e.target.value);
-  setTimeout(() => validate(getValues()), 100);
-}}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        setSlabLength(e.target.value);
+                        setTimeout(() => validate(getValues()), 100);
+                      }}
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                        !slabLength ? 'border-orange-400' : 'border-gray-300'
+                      }`}
                       placeholder="Enter length"
                       step="0.1"
                     />
@@ -619,7 +620,9 @@ if (region === 'freezethaw') {
                         setSlabWidth(e.target.value);
                         setTimeout(() => validate(getValues()), 100);
                       }}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                        !slabWidth ? 'border-orange-400' : 'border-gray-300'
+                      }`}
                       placeholder="Enter width"
                       step="0.1"
                     />
@@ -634,7 +637,7 @@ if (region === 'freezethaw') {
                         setSlabThickness(e.target.value);
                         setTimeout(() => validate(getValues()), 100);
                       }}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="3.5">3.5" - Minimum IRC</option>
                       <option value="4">4" - Standard residential</option>
@@ -656,10 +659,12 @@ if (region === 'freezethaw') {
                       type="number"
                       value={footingLength}
                       onChange={(e) => {
-  setFootingLength(e.target.value);
-  setTimeout(() => validate(getValues()), 100);
-}}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        setFootingLength(e.target.value);
+                        setTimeout(() => validate(getValues()), 100);
+                      }}
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                        !footingLength ? 'border-orange-400' : 'border-gray-300'
+                      }`}
                       placeholder="Enter length"
                       step="0.1"
                     />
@@ -674,7 +679,7 @@ if (region === 'freezethaw') {
                         setFootingWidth(e.target.value);
                         setTimeout(() => validate(getValues()), 100);
                       }}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="12">12" - IRC minimum</option>
                       <option value="16">16" - 1-story standard</option>
@@ -692,7 +697,7 @@ if (region === 'freezethaw') {
                         setFootingDepth(e.target.value);
                         setTimeout(() => validate(getValues()), 100);
                       }}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="12">12" - IRC minimum</option>
                       <option value="6">6" - 1-story thickness</option>
@@ -715,7 +720,7 @@ if (region === 'freezethaw') {
                         setPostDiameter(e.target.value);
                         setTimeout(() => validate(getValues()), 100);
                       }}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="8">8" - Small posts</option>
                       <option value="10">10" - Standard 4x4</option>
@@ -735,7 +740,7 @@ if (region === 'freezethaw') {
                         setPostDepth(e.target.value);
                         setTimeout(() => validate(getValues()), 100);
                       }}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="24">24" - 6' fence (1/3 rule)</option>
                       <option value="30">30" - Standard deck</option>
@@ -755,7 +760,9 @@ if (region === 'freezethaw') {
                         setPostCount(e.target.value);
                         setTimeout(() => validate(getValues()), 100);
                       }}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                        !postCount ? 'border-orange-400' : 'border-gray-300'
+                      }`}
                       placeholder="Enter count"
                       min="1"
                     />
@@ -776,7 +783,9 @@ if (region === 'freezethaw') {
                         setStairWidth(e.target.value);
                         setTimeout(() => validate(getValues()), 100);
                       }}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                        !stairWidth ? 'border-orange-400' : 'border-gray-300'
+                      }`}
                       placeholder="Enter width"
                     />
                   </div>
@@ -791,7 +800,9 @@ if (region === 'freezethaw') {
                         setNumberOfSteps(e.target.value);
                         setTimeout(() => validate(getValues()), 100);
                       }}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                        !numberOfSteps ? 'border-orange-400' : 'border-gray-300'
+                      }`}
                       placeholder="Enter count"
                       min="1"
                     />
@@ -806,7 +817,7 @@ if (region === 'freezethaw') {
                         setRiserHeight(e.target.value);
                         setTimeout(() => validate(getValues()), 100);
                       }}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="6">6" - Low rise</option>
                       <option value="7">7" - Standard residential</option>
@@ -824,7 +835,7 @@ if (region === 'freezethaw') {
                         setTreadDepth(e.target.value);
                         setTimeout(() => validate(getValues()), 100);
                       }}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="10">10" - IRC minimum</option>
                       <option value="11">11" - Standard</option>
@@ -848,7 +859,9 @@ if (region === 'freezethaw') {
                         setWallLength(e.target.value);
                         setTimeout(() => validate(getValues()), 100);
                       }}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                        !wallLength ? 'border-orange-400' : 'border-gray-300'
+                      }`}
                       placeholder="Enter length"
                       step="0.1"
                     />
@@ -863,7 +876,7 @@ if (region === 'freezethaw') {
                         setWallHeight(e.target.value);
                         setTimeout(() => validate(getValues()), 100);
                       }}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="48">48" - 4' retaining</option>
                       <option value="96">96" - 8' foundation</option>
@@ -881,7 +894,7 @@ if (region === 'freezethaw') {
                         setWallThickness(e.target.value);
                         setTimeout(() => validate(getValues()), 100);
                       }}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="6">6" - Minimum/short walls</option>
                       <option value="8">8" - Standard foundation</option>
@@ -904,7 +917,7 @@ if (region === 'freezethaw') {
                         setColumnDiameter(e.target.value);
                         setTimeout(() => validate(getValues()), 100);
                       }}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="8">8" - Small column</option>
                       <option value="10">10" - Standard sono-tube</option>
@@ -925,7 +938,9 @@ if (region === 'freezethaw') {
                         setColumnHeight(e.target.value);
                         setTimeout(() => validate(getValues()), 100);
                       }}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                        !columnHeight ? 'border-orange-400' : 'border-gray-300'
+                      }`}
                       placeholder="Enter height"
                     />
                   </div>
@@ -940,7 +955,9 @@ if (region === 'freezethaw') {
                         setColumnCount(e.target.value);
                         setTimeout(() => validate(getValues()), 100);
                       }}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                        !columnCount ? 'border-orange-400' : 'border-gray-300'
+                      }`}
                       placeholder="Enter count"
                       min="1"
                     />
@@ -961,7 +978,7 @@ if (region === 'freezethaw') {
                   <select
                     value={psiRating}
                     onChange={(e) => setPsiRating(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                     <option value="2500">2,500 PSI - Sidewalks, paths</option>
                     <option value="3000">3,000 PSI - Residential standard</option>
@@ -980,7 +997,7 @@ if (region === 'freezethaw') {
                   <select
                     value={region}
                     onChange={(e) => setRegion(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                     <option value="standard">Standard conditions</option>
                     <option value="freezethaw">Freeze-thaw zone</option>
@@ -1008,7 +1025,7 @@ if (region === 'freezethaw') {
                       type="number"
                       value={customWasteFactor}
                       onChange={(e) => setCustomWasteFactor(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder={`Auto: ${getWasteFactor()}%`}
                       step="0.5"
                       min="0"
@@ -1068,23 +1085,25 @@ if (region === 'freezethaw') {
                     </div>
                   </div>
                 </div>
-{/* Reinforcement Disclaimer */}
-<div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
-  <div className="flex">
-    <div className="flex-shrink-0">
-      <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-      </svg>
-    </div>
-    <div className="ml-3">
-      <p className="text-sm text-yellow-700">
-        <strong>Note:</strong> This materials list does not account for reinforcement needs (rebar, wire mesh, etc.). 
-        Reinforcement may be required depending on your project type, local building codes, soil conditions, and structural requirements. 
-        Consult local building codes and a structural engineer for reinforcement specifications.
-      </p>
-    </div>
-  </div>
-</div>
+
+                {/* Reinforcement Disclaimer */}
+                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm text-yellow-700">
+                        <strong>Note:</strong> This materials list does not account for reinforcement needs (rebar, wire mesh, etc.). 
+                        Reinforcement may be required depending on your project type, local building codes, soil conditions, and structural requirements. 
+                        Consult local building codes and a structural engineer for reinforcement specifications.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Material Options */}
                 <div className="bg-white rounded-lg shadow-lg p-6">
                   <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
@@ -1135,23 +1154,23 @@ if (region === 'freezethaw') {
                  </div>
                 </div>
 
-              {/* 6. Action Buttons - AT THE BOTTOM */}
-  <div className="bg-white rounded-lg shadow-lg p-4">
-    <div className="flex gap-3">
-      <button 
-        onClick={handleCopyCalculation} 
-        className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center gap-2"
-      >
-        📋 Copy Calculation
-      </button>
-      <button 
-        onClick={() => printCalculation('Concrete Calculator')} 
-        className="flex-1 bg-gray-700 text-white py-3 px-4 rounded-lg font-semibold hover:bg-gray-800 transition-colors duration-200 flex items-center justify-center gap-2"
-      >
-        🖨️ Print Results
-      </button>
-    </div>
-  </div>
+                {/* Action Buttons */}
+                <div className="bg-white rounded-lg shadow-lg p-4">
+                  <div className="flex gap-3">
+                    <button 
+                      onClick={handleCopyCalculation} 
+                      className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center gap-2"
+                    >
+                      📋 Copy Calculation
+                    </button>
+                    <button 
+                      onClick={() => printCalculation('Concrete Calculator')} 
+                      className="flex-1 bg-gray-700 text-white py-3 px-4 rounded-lg font-semibold hover:bg-gray-800 transition-colors duration-200 flex items-center justify-center gap-2"
+                    >
+                      🖨️ Print Results
+                    </button>
+                  </div>
+                </div>
 
                 {/* Additional Materials Toggle */}
                 {projectType === 'slab' && results.squareFeet > 0 && (

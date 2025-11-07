@@ -3,7 +3,11 @@ export default function robots() {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/api/', '/_next/'], // Prevent crawling of API routes and Next.js internals
+      disallow: [
+        '/api/',           // Block API routes (good)
+        '/_next/data/',    // Block Next.js data files (optional)
+      ],
+      // DO NOT block /_next/static/ - Google needs this
     },
     sitemap: 'https://jobcalculators.com/sitemap.xml',
   };
