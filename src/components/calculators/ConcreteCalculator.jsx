@@ -1138,10 +1138,16 @@ if (region === 'freezethaw') {
               {/* 6. Action Buttons - AT THE BOTTOM */}
   <div className="bg-white rounded-lg shadow-lg p-4">
     <div className="flex gap-3">
-      <button onClick={handleCopyCalculation} className="flex-1">
+      <button 
+        onClick={handleCopyCalculation} 
+        className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center gap-2"
+      >
         📋 Copy Calculation
       </button>
-      <button onClick={() => printCalculation('Concrete Calculator')} className="flex-1">
+      <button 
+        onClick={() => printCalculation('Concrete Calculator')} 
+        className="flex-1 bg-gray-700 text-white py-3 px-4 rounded-lg font-semibold hover:bg-gray-800 transition-colors duration-200 flex items-center justify-center gap-2"
+      >
         🖨️ Print Results
       </button>
     </div>
