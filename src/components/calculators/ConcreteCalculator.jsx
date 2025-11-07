@@ -373,15 +373,20 @@ const ConcreteCalculator = () => {
       regionalNotes.push('Footings must extend below frost line (48-60"+)');
     }
     if (region === 'seismic') {
-      regionalNotes.push('Increased reinforcement required (SDC C/D)');
-      regionalNotes.push('Post-tensioned slabs recommended for residential');
-      regionalNotes.push('Special moment frame detailing for structures');
-    }
-    if (region === 'expansive') {
-      regionalNotes.push('Post-tensioned slab foundation recommended');
-      regionalNotes.push('Grade beams at 12-16\' spacing with 30" depth');
-      regionalNotes.push('Pier and beam systems for severe conditions');
-    }
+  regionalNotes.push('Seismic zone requirements apply - consult structural engineer');
+  regionalNotes.push('Special reinforcement and design per local codes required');
+}
+
+if (region === 'expansive') {
+  regionalNotes.push('Expansive soil conditions require engineered foundation design');
+  regionalNotes.push('Consult structural engineer and geotechnical report');
+}
+
+if (region === 'freezethaw') {
+  regionalNotes.push('Air entrainment required (6% by volume)');
+  regionalNotes.push('Minimum 4,500 PSI strength recommended for freeze-thaw resistance');
+  regionalNotes.push('Footings must extend below local frost line depth');
+}
 
     // PSI recommendations
     if (projectType === 'slab' && psiRating < 3000) {
@@ -434,10 +439,7 @@ const ConcreteCalculator = () => {
       methodRecommendation,
       // Additional materials
       squareFeet: squareFeet.toFixed(0),
-      rebarPieces20ft,
-      rebarLengthFeet: rebarLengthFeet.toFixed(0),
       gravelCubicYards: gravelCubicYards.toFixed(2),
-      wireMeshRolls,
       baseThickness
     });
   
@@ -1133,25 +1135,17 @@ const ConcreteCalculator = () => {
                  </div>
                 </div>
 
-                {/* Copy Calculation Button */}
-<div className="bg-white rounded-lg shadow-lg p-6">
-  <div className="flex gap-3">
-    <button 
-      onClick={handleCopyCalculation}
-      className="copy-calc-btn flex-1"
-    >
-      {copyButtonText}
-    </button>
-    
-    {/* ADD THIS PRINT BUTTON */}
-    <button 
-      onClick={() => printCalculation('Concrete Calculator')}
-      className="copy-calc-btn flex-1"
-    >
-      🖨️ Print Results
-    </button>
+              {/* 6. Action Buttons - AT THE BOTTOM */}
+  <div className="bg-white rounded-lg shadow-lg p-4">
+    <div className="flex gap-3">
+      <button onClick={handleCopyCalculation} className="flex-1">
+        📋 Copy Calculation
+      </button>
+      <button onClick={() => printCalculation('Concrete Calculator')} className="flex-1">
+        🖨️ Print Results
+      </button>
+    </div>
   </div>
-</div>
 
                 {/* Additional Materials Toggle */}
                 {projectType === 'slab' && results.squareFeet > 0 && (
@@ -1177,9 +1171,6 @@ const ConcreteCalculator = () => {
                         <div className="flex justify-between py-2 border-b">
                           <span className="text-gray-600">Gravel Base ({results.baseThickness}"):</span>
                           <span className="font-semibold">{results.gravelCubicYards} yd³</span>
-                        </div>
-                        <div className="pt-2 text-xs text-gray-500">
-                          Based on ACI 318 and IRC R506 standards
                         </div>
                       </div>
                     )}
