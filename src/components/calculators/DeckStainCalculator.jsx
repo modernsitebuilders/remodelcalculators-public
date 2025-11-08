@@ -503,7 +503,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     value={inputs.deckLength}
                     onChange={(e) => handleInputChange('deckLength', e.target.value)}
                     className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      !inputs.deckLength ? 'border-orange-400' : 'border-gray-300'
+                      !inputs.deckLength ? 'border-red-500' : 'border-gray-300'
                     }`}
                     placeholder="Enter length"
                     min="1"
@@ -519,7 +519,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     value={inputs.deckWidth}
                     onChange={(e) => handleInputChange('deckWidth', e.target.value)}
                     className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      !inputs.deckWidth ? 'border-orange-400' : 'border-gray-300'
+                      !inputs.deckWidth ? 'border-red-500' : 'border-gray-300'
                     }`}
                     placeholder="Enter width"
                     min="1"
@@ -562,7 +562,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       value={inputs.railingLinearFeet}
                       onChange={(e) => handleInputChange('railingLinearFeet', e.target.value)}
                       className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
-                        inputs.includeRailing && !inputs.railingLinearFeet ? 'border-orange-400' : 'border-gray-300'
+                        inputs.includeRailing && !inputs.railingLinearFeet ? 'border-red-500' : 'border-gray-300'
                       }`}
                       min="0"
                     />
@@ -639,7 +639,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                         value={inputs.numberOfSteps}
                         onChange={(e) => handleInputChange('numberOfSteps', e.target.value)}
                         className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                          inputs.includeStairs && !inputs.numberOfSteps ? 'border-orange-400' : 'border-gray-300'
+                          inputs.includeStairs && !inputs.numberOfSteps ? 'border-red-500' : 'border-gray-300'
                         }`}
                         min="0"
                       />
@@ -654,7 +654,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                         value={inputs.stepWidth}
                         onChange={(e) => handleInputChange('stepWidth', e.target.value)}
                         className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                          inputs.includeStairs && !inputs.stepWidth ? 'border-orange-400' : 'border-gray-300'
+                          inputs.includeStairs && !inputs.stepWidth ? 'border-red-500' : 'border-gray-300'
                         }`}
                         min="24"
                       />
@@ -671,7 +671,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                         value={inputs.treadDepth}
                         onChange={(e) => handleInputChange('treadDepth', e.target.value)}
                         className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                          inputs.includeStairs && !inputs.treadDepth ? 'border-orange-400' : 'border-gray-300'
+                          inputs.includeStairs && !inputs.treadDepth ? 'border-red-500' : 'border-gray-300'
                         }`}
                         min="9"
                       />
@@ -686,7 +686,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                         value={inputs.riserHeight}
                         onChange={(e) => handleInputChange('riserHeight', e.target.value)}
                         className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                          inputs.includeStairs && !inputs.riserHeight ? 'border-orange-400' : 'border-gray-300'
+                          inputs.includeStairs && !inputs.riserHeight ? 'border-red-500' : 'border-gray-300'
                         }`}
                         min="4"
                         max="8"
@@ -737,7 +737,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       value={inputs.numberOfLandings}
                       onChange={(e) => handleInputChange('numberOfLandings', e.target.value)}
                       className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent ${
-                        inputs.includeLandings && !inputs.numberOfLandings ? 'border-orange-400' : 'border-gray-300'
+                        inputs.includeLandings && !inputs.numberOfLandings ? 'border-red-500' : 'border-gray-300'
                       }`}
                       min="0"
                     />
@@ -753,7 +753,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                         value={inputs.landingLength}
                         onChange={(e) => handleInputChange('landingLength', e.target.value)}
                         className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent ${
-                          inputs.includeLandings && !inputs.landingLength ? 'border-orange-400' : 'border-gray-300'
+                          inputs.includeLandings && !inputs.landingLength ? 'border-red-500' : 'border-gray-300'
                         }`}
                         min="1"
                       />
@@ -768,7 +768,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                         value={inputs.landingWidth}
                         onChange={(e) => handleInputChange('landingWidth', e.target.value)}
                         className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent ${
-                          inputs.includeLandings && !inputs.landingWidth ? 'border-orange-400' : 'border-gray-300'
+                          inputs.includeLandings && !inputs.landingWidth ? 'border-red-500' : 'border-gray-300'
                         }`}
                         min="1"
                       />
@@ -806,7 +806,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                         value={inputs.numberOfBeams}
                         onChange={(e) => handleInputChange('numberOfBeams', e.target.value)}
                         className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
-                          inputs.includeBeams && !inputs.numberOfBeams ? 'border-orange-400' : 'border-gray-300'
+                          inputs.includeBeams && !inputs.numberOfBeams ? 'border-red-500' : 'border-gray-300'
                         }`}
                         min="0"
                       />
@@ -821,7 +821,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                         value={inputs.beamLength}
                         onChange={(e) => handleInputChange('beamLength', e.target.value)}
                         className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
-                          inputs.includeBeams && !inputs.beamLength ? 'border-orange-400' : 'border-gray-300'
+                          inputs.includeBeams && !inputs.beamLength ? 'border-red-500' : 'border-gray-300'
                         }`}
                         min="1"
                       />
