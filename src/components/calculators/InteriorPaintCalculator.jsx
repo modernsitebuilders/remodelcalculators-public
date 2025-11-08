@@ -12,9 +12,9 @@ import { FAQSection } from '@/components/FAQSection';
 export default function PaintCalculator() {
   const [rooms, setRooms] = useState([{ 
     id: 1, 
-    length: '12', 
-    width: '10', 
-    height: '8', 
+    length: '', 
+    width: '', 
+    height: '', 
     doors: [{ id: 1, size: 'standard' }], // Array of individual doors
     windows: [{ id: 1, size: 'standard' }, { id: 2, size: 'standard' }], // Array of individual windows
     customDoorArea: '', // optional override for all doors

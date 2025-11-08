@@ -11,7 +11,7 @@ import { FAQSection } from '@/components/FAQSection';
 
 const ExteriorPaintCalculator = () => {
   const [inputs, setInputs] = useState({
-    squareFeet: 2000,
+    squareFeet: '',
     surfaceType: 'vinyl',
     surfaceCondition: 'good',
     applicationMethod: 'roll',
