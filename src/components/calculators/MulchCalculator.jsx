@@ -300,7 +300,9 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     type="number"
                     value={length}
                     onChange={(e) => { setLength(e.target.value); setTimeout(() => validate(getValues()), 100); }}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                      !length ? 'border-orange-400' : 'border-gray-300'
+                    }`}
                     placeholder="0"
                     min="0"
                     step="0.1"
@@ -312,7 +314,9 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     type="number"
                     value={width}
                     onChange={(e) => { setWidth(e.target.value); setTimeout(() => validate(getValues()), 100); }}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                      !width ? 'border-orange-400' : 'border-gray-300'
+                    }`}
                     placeholder="0"
                     min="0"
                     step="0.1"
@@ -326,7 +330,9 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                   type="number"
                   value={diameter}
                   onChange={(e) => { setDiameter(e.target.value); setTimeout(() => validate(getValues()), 100); }}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                    !diameter ? 'border-orange-400' : 'border-gray-300'
+                  }`}
                   placeholder="0"
                   min="0"
                   step="0.1"
@@ -340,7 +346,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
               <select
                 value={depth}
                 onChange={(e) => { setDepth(e.target.value); setTimeout(() => validate(getValues()), 100); }}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full p-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
               >
                 {depthPresets.map((preset) => (
                   <option key={preset.value} value={preset.value}>
@@ -353,7 +359,9 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                   type="number"
                   value={customDepth}
                   onChange={(e) => { setCustomDepth(e.target.value); setTimeout(() => validate(getValues()), 100); }}
-                  className="w-full p-3 border border-gray-300 rounded-lg mt-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className={`w-full p-3 border-2 rounded-lg mt-2 focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                    !customDepth ? 'border-orange-400' : 'border-gray-300'
+                  }`}
                   placeholder="Enter depth in inches"
                   min="0.5"
                   max="12"
@@ -368,7 +376,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
               <select
                 value={materialType}
                 onChange={(e) => setMaterialType(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full p-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
               >
                 <optgroup label="Organic Mulch">
                   <option value="wood-chips">Wood Chips (600 lbs/yard)</option>
@@ -421,7 +429,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                 <select
                   value={bagSize}
                   onChange={(e) => setBagSize(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full p-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 >
                   <option value="2">2 cu ft (13.5 bags per yard)</option>
                   <option value="3">3 cu ft (9 bags per yard)</option>
@@ -431,7 +439,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
             )}
 
             {/* Include Waste Factor */}
-            <div className="flex items-center gap-2 mb-6">
+            <div className="flex items-center gap-2 p-3 border-2 border-yellow-400 rounded-lg mb-6">
               <input
                 type="checkbox"
                 id="waste"

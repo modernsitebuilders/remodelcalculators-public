@@ -780,11 +780,21 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
               <div className="form-grid form-grid-2">
                 <div className="form-group">
                   <label className="form-label">Length (ft)</label>
-                  <input type="number" className="form-input" value={roomLength} onChange={(e) => { setRoomLength(e.target.value); setTimeout(() => validate(getValues()), 100); }} />
+                  <input 
+                    type="number" 
+                    className={`form-input ${!roomLength ? 'border-orange-400' : 'border-gray-300'}`}
+                    value={roomLength} 
+                    onChange={(e) => { setRoomLength(e.target.value); setTimeout(() => validate(getValues()), 100); }} 
+                  />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Width (ft)</label>
-                  <input type="number" className="form-input" value={roomWidth} onChange={(e) => { setRoomWidth(e.target.value); setTimeout(() => validate(getValues()), 100); }} />
+                  <input 
+                    type="number" 
+                    className={`form-input ${!roomWidth ? 'border-orange-400' : 'border-gray-300'}`}
+                    value={roomWidth} 
+                    onChange={(e) => { setRoomWidth(e.target.value); setTimeout(() => validate(getValues()), 100); }} 
+                  />
                 </div>
               </div>
             </div>
@@ -798,7 +808,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
               <div className="form-grid form-grid-3">
                 <div className="form-group">
                   <label className="form-label">Layout pattern</label>
-                  <select className="form-select" value={layoutPattern} onChange={(e) => setLayoutPattern(e.target.value)}>
+                  <select className="form-select border-yellow-400" value={layoutPattern} onChange={(e) => setLayoutPattern(e.target.value)}>
                     <option value="straight">Straight</option>
                     <option value="diagonal">Diagonal</option>
                     <option value="herringbone">Herringbone</option>
@@ -807,7 +817,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                 </div>
                 <div className="form-group">
                   <label className="form-label">Room complexity</label>
-                  <select className="form-select" value={roomComplexity} onChange={(e) => setRoomComplexity(e.target.value)}>
+                  <select className="form-select border-yellow-400" value={roomComplexity} onChange={(e) => setRoomComplexity(e.target.value)}>
                     <option value="simple">Simple</option>
                     <option value="moderate">Moderate</option>
                     <option value="complex">Complex</option>
@@ -816,7 +826,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                 </div>
                 <div className="form-group">
                   <label className="form-label">Experience level</label>
-                  <select className="form-select" value={installerExp} onChange={(e) => setInstallerExp(e.target.value)}>
+                  <select className="form-select border-yellow-400" value={installerExp} onChange={(e) => setInstallerExp(e.target.value)}>
                     <option value="professional">Professional</option>
                     <option value="diy">DIY</option>
                   </select>
@@ -829,7 +839,12 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                 <div style={{ marginTop: '20px' }}>
                   <div className="form-group">
                     <label className="form-label">Plank width (inches)</label>
-                    <select className="form-select" style={{ maxWidth: '280px' }} value={plankWidth} onChange={(e) => { setPlankWidth(e.target.value); setTimeout(() => validate(getValues()), 100); }}>
+                    <select 
+                      className="form-select border-yellow-400" 
+                      style={{ maxWidth: '280px' }} 
+                      value={plankWidth} 
+                      onChange={(e) => { setPlankWidth(e.target.value); setTimeout(() => validate(getValues()), 100); }}
+                    >
                       <option value="1.5">1.5" - Narrow strip</option>
                       <option value="2.25">2.25" - Standard strip</option>
                       <option value="3">3" - Wide strip</option>
@@ -846,7 +861,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       <div className="custom-width-input">
                         <input
                           type="number"
-                          className="form-input"
+                          className={`form-input ${!customPlankWidth ? 'border-orange-400' : 'border-gray-300'}`}
                           placeholder="Enter width in inches"
                           step="0.25"
                           min="1"
@@ -867,7 +882,11 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                   <div className="form-grid form-grid-3">
                     <div className="form-group">
                       <label className="form-label">Tile width (inches)</label>
-                      <select className="form-select" value={tileWidth} onChange={(e) => { setTileWidth(e.target.value); setTimeout(() => validate(getValues()), 100); }}>
+                      <select 
+                        className="form-select border-yellow-400" 
+                        value={tileWidth} 
+                        onChange={(e) => { setTileWidth(e.target.value); setTimeout(() => validate(getValues()), 100); }}
+                      >
                         <option value="4">4"</option>
                         <option value="6">6"</option>
                         <option value="8">8"</option>
@@ -884,7 +903,11 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     </div>
                     <div className="form-group">
                       <label className="form-label">Tile length (inches)</label>
-                      <select className="form-select" value={tileLength} onChange={(e) => { setTileLength(e.target.value); setTimeout(() => validate(getValues()), 100); }}>
+                      <select 
+                        className="form-select border-yellow-400" 
+                        value={tileLength} 
+                        onChange={(e) => { setTileLength(e.target.value); setTimeout(() => validate(getValues()), 100); }}
+                      >
                         <option value="4">4"</option>
                         <option value="6">6"</option>
                         <option value="8">8"</option>
@@ -901,7 +924,11 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     </div>
                     <div className="form-group">
                       <label className="form-label">Grout width</label>
-                      <select className="form-select" value={groutWidth} onChange={(e) => setGroutWidth(e.target.value)}>
+                      <select 
+                        className="form-select border-yellow-400" 
+                        value={groutWidth} 
+                        onChange={(e) => setGroutWidth(e.target.value)}
+                      >
                         <option value="1/16">1/16"</option>
                         <option value="1/8">1/8"</option>
                         <option value="3/16">3/16"</option>
@@ -917,7 +944,11 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                   <div className="form-grid form-grid-2">
                     <div className="form-group">
                       <label className="form-label">Carpet width (feet)</label>
-                      <select className="form-select" value={carpetWidth} onChange={(e) => setCarpetWidth(e.target.value)}>
+                      <select 
+                        className="form-select border-yellow-400" 
+                        value={carpetWidth} 
+                        onChange={(e) => setCarpetWidth(e.target.value)}
+                      >
                         <option value="12">12 ft (standard)</option>
                         <option value="15">15 ft</option>
                         <option value="13.5">13.5 ft</option>
@@ -927,7 +958,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       <label className="form-label" style={{ opacity: 0 }}>
                         Checkbox
                       </label>
-                      <div className="checkbox-group">
+                      <div className="checkbox-group border-yellow-400">
                         <input type="checkbox" id="pattern-match" checked={patternMatch} onChange={(e) => setPatternMatch(e.target.checked)} />
                         <label htmlFor="pattern-match">Pattern match required</label>
                       </div>

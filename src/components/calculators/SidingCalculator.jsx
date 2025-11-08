@@ -623,7 +623,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                 <select
                   value={projectData.climate}
                   onChange={(e) => updateProjectData('climate', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-indigo-500"
                 >
                   <option value="normal">Normal (Above 40°F installation)</option>
                   <option value="cold">Cold Climate (Below 40°F installation)</option>
@@ -662,7 +662,9 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                         value={wall.width || ''}
                         onChange={(e) => { updateWall(index, 'width', e.target.value); setTimeout(() => validate(getValues()), 100); }}
                         onWheel={preventScrollChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                        className={`w-full px-3 py-2 border rounded-lg ${
+                          !wall.width ? 'border-orange-400' : 'border-gray-300'
+                        }`}
                         placeholder="0"
                       />
                     </div>
@@ -676,7 +678,9 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                         value={wall.height || ''}
                         onChange={(e) => { updateWall(index, 'height', e.target.value); setTimeout(() => validate(getValues()), 100); }}
                         onWheel={preventScrollChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                        className={`w-full px-3 py-2 border rounded-lg ${
+                          !wall.height ? 'border-orange-400' : 'border-gray-300'
+                        }`}
                         placeholder="0"
                       />
                     </div>
@@ -704,15 +708,17 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
 
               {/* Gables */}
               <div>
-                <label className="flex items-center space-x-2 cursor-pointer mb-3">
+                <div className="flex items-center gap-2 p-3 border border-yellow-400 rounded-lg mb-3">
                   <input
                     type="checkbox"
                     checked={projectData.includeGables}
                     onChange={(e) => { updateProjectData('includeGables', e.target.checked); setTimeout(() => validate(getValues()), 100); }}
                     className="w-4 h-4 text-indigo-600 rounded cursor-pointer"
                   />
-                  <span className="text-lg font-semibold text-gray-800">Gable Ends</span>
-                </label>
+                  <label className="text-lg font-semibold text-gray-800 cursor-pointer">
+                    Gable Ends
+                  </label>
+                </div>
                 {projectData.includeGables && (
                   <>
                     <p className="text-sm text-gray-600 mb-2">Gables automatically receive 30% waste factor due to angled cuts</p>
@@ -733,7 +739,9 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                             value={gable.width || ''}
                             onChange={(e) => { updateGable(index, 'width', e.target.value); setTimeout(() => validate(getValues()), 100); }}
                             onWheel={preventScrollChange}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                            className={`w-full px-3 py-2 border rounded-lg ${
+                              !gable.width ? 'border-orange-400' : 'border-gray-300'
+                            }`}
                             placeholder="0"
                           />
                         </div>
@@ -747,7 +755,9 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                             value={gable.height || ''}
                             onChange={(e) => { updateGable(index, 'height', e.target.value); setTimeout(() => validate(getValues()), 100); }}
                             onWheel={preventScrollChange}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                            className={`w-full px-3 py-2 border rounded-lg ${
+                              !gable.height ? 'border-orange-400' : 'border-gray-300'
+                            }`}
                             placeholder="0"
                           />
                           <p className="text-xs text-gray-500 mt-1">Top of wall to peak</p>
@@ -788,7 +798,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       value={projectData.windows || ''}
                       onChange={(e) => updateProjectData('windows', parseInt(e.target.value) || 0)}
                       onWheel={preventScrollChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                      className="w-full px-3 py-2 border border-yellow-400 rounded-lg"
                       placeholder="0"
                     />
                     <p className="text-xs text-gray-500 mt-1">Not deducted from area</p>
@@ -802,7 +812,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       value={projectData.doors || ''}
                       onChange={(e) => updateProjectData('doors', parseInt(e.target.value) || 0)}
                       onWheel={preventScrollChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                      className="w-full px-3 py-2 border border-yellow-400 rounded-lg"
                       placeholder="0"
                     />
                     <p className="text-xs text-gray-500 mt-1">Not deducted from area</p>
@@ -816,7 +826,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       value={projectData.garageDoors || ''}
                       onChange={(e) => updateProjectData('garageDoors', parseInt(e.target.value) || 0)}
                       onWheel={preventScrollChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                      className="w-full px-3 py-2 border border-yellow-400 rounded-lg"
                       placeholder="0"
                     />
                     <p className="text-xs text-gray-500 mt-1">Will be deducted (over 25 sq ft)</p>
@@ -868,7 +878,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                   <select
                     value={projectData.vinylProfile}
                     onChange={(e) => updateProjectData('vinylProfile', e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-indigo-500"
                   >
                     {Object.entries(sidingSpecs.vinyl).map(([key, spec]) => (
                       <option key={key} value={key}>
@@ -887,7 +897,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                   <select
                     value={projectData.fiberCementWidth}
                     onChange={(e) => updateProjectData('fiberCementWidth', e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-indigo-500"
                   >
                     {Object.entries(sidingSpecs.fiberCement).map(([key, spec]) => (
                       <option key={key} value={key}>
@@ -909,7 +919,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                   <select
                     value={projectData.woodType}
                     onChange={(e) => updateProjectData('woodType', e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-indigo-500"
                   >
                     {Object.entries(sidingSpecs.wood).map(([key, spec]) => (
                       <option key={key} value={key}>
@@ -920,27 +930,27 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                 </div>
               )}
 
-              <div>
-                <label className="flex items-center space-x-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={projectData.includeUnderlayment}
-                    onChange={(e) => updateProjectData('includeUnderlayment', e.target.checked)}
-                    className="w-4 h-4 text-indigo-600 rounded cursor-pointer"
-                  />
-                  <span className="text-sm font-medium text-gray-700">Include house wrap/underlayment</span>
+              <div className="flex items-center gap-2 p-3 border border-yellow-400 rounded-lg">
+                <input
+                  type="checkbox"
+                  checked={projectData.includeUnderlayment}
+                  onChange={(e) => updateProjectData('includeUnderlayment', e.target.checked)}
+                  className="w-4 h-4 text-indigo-600 rounded cursor-pointer"
+                />
+                <label className="text-sm font-medium text-gray-700 cursor-pointer">
+                  Include house wrap/underlayment
                 </label>
-                {projectData.includeUnderlayment && (
-                  <select
-                    value={projectData.underlaymentType}
-                    onChange={(e) => updateProjectData('underlaymentType', e.target.value)}
-                    className="mt-2 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                  >
-                    <option value="tyvek">Tyvek House Wrap (9' x 100' rolls)</option>
-                    <option value="felt">15# Felt Paper (36" x 144' rolls)</option>
-                  </select>
-                )}
               </div>
+              {projectData.includeUnderlayment && (
+                <select
+                  value={projectData.underlaymentType}
+                  onChange={(e) => updateProjectData('underlaymentType', e.target.value)}
+                  className="mt-2 w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                >
+                  <option value="tyvek">Tyvek House Wrap (9' x 100' rolls)</option>
+                  <option value="felt">15# Felt Paper (36" x 144' rolls)</option>
+                </select>
+              )}
             </div>
           )}
 
@@ -953,15 +963,17 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
               </h2>
 
               <div>
-                <label className="flex items-center space-x-2 cursor-pointer mb-3">
+                <div className="flex items-center gap-2 p-3 border border-yellow-400 rounded-lg mb-3">
                   <input
                     type="checkbox"
                     checked={projectData.includeCorners}
                     onChange={(e) => updateProjectData('includeCorners', e.target.checked)}
                     className="w-4 h-4 text-indigo-600 rounded cursor-pointer"
                   />
-                  <span className="text-lg font-semibold text-gray-800">Corner Posts</span>
-                </label>
+                  <label className="text-lg font-semibold text-gray-800 cursor-pointer">
+                    Corner Posts
+                  </label>
+                </div>
                 {projectData.includeCorners && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -973,7 +985,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                         value={projectData.corners.inside || ''}
                         onChange={(e) => updateProjectData('corners', { ...projectData.corners, inside: parseInt(e.target.value) || 0 })}
                         onWheel={preventScrollChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                        className="w-full px-3 py-2 border border-yellow-400 rounded-lg"
                         placeholder="0"
                       />
                       <p className="text-xs text-gray-500 mt-1">10-foot posts, 10 per carton</p>
@@ -987,7 +999,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                         value={projectData.corners.outside || ''}
                         onChange={(e) => updateProjectData('corners', { ...projectData.corners, outside: parseInt(e.target.value) || 0 })}
                         onWheel={preventScrollChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                        className="w-full px-3 py-2 border border-yellow-400 rounded-lg"
                         placeholder="0"
                       />
                       <p className="text-xs text-gray-500 mt-1">10-foot posts, 10 per carton</p>
@@ -997,15 +1009,17 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
               </div>
 
               <div>
-                <label className="flex items-center space-x-2 cursor-pointer mb-3">
+                <div className="flex items-center gap-2 p-3 border border-yellow-400 rounded-lg mb-3">
                   <input
                     type="checkbox"
                     checked={projectData.includeSoffit}
                     onChange={(e) => updateProjectData('includeSoffit', e.target.checked)}
                     className="w-4 h-4 text-indigo-600 rounded cursor-pointer"
                   />
-                  <span className="text-lg font-semibold text-gray-800">Soffit</span>
-                </label>
+                  <label className="text-lg font-semibold text-gray-800 cursor-pointer">
+                    Soffit
+                  </label>
+                </div>
                 {projectData.includeSoffit && (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
@@ -1018,7 +1032,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                         value={projectData.soffit.length || ''}
                         onChange={(e) => updateProjectData('soffit', { ...projectData.soffit, length: parseFloat(e.target.value) || 0 })}
                         onWheel={preventScrollChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                        className="w-full px-3 py-2 border border-yellow-400 rounded-lg"
                         placeholder="0"
                       />
                     </div>
@@ -1029,7 +1043,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       <select
                         value={projectData.soffit.depth}
                         onChange={(e) => updateProjectData('soffit', { ...projectData.soffit, depth: parseInt(e.target.value) })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                        className="w-full px-3 py-2 border border-yellow-400 rounded-lg"
                       >
                         <option value="12">12"</option>
                         <option value="16">16"</option>
@@ -1044,7 +1058,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       <select
                         value={projectData.soffit.type}
                         onChange={(e) => updateProjectData('soffit', { ...projectData.soffit, type: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                        className="w-full px-3 py-2 border border-yellow-400 rounded-lg"
                       >
                         <option value="triple4">Triple 4" (12" wide)</option>
                         <option value="double5">Double 5" (16" wide)</option>
@@ -1055,15 +1069,17 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
               </div>
 
               <div>
-                <label className="flex items-center space-x-2 cursor-pointer mb-3">
+                <div className="flex items-center gap-2 p-3 border border-yellow-400 rounded-lg mb-3">
                   <input
                     type="checkbox"
                     checked={projectData.includeFascia}
                     onChange={(e) => updateProjectData('includeFascia', e.target.checked)}
                     className="w-4 h-4 text-indigo-600 rounded cursor-pointer"
                   />
-                  <span className="text-lg font-semibold text-gray-800">Fascia</span>
-                </label>
+                  <label className="text-lg font-semibold text-gray-800 cursor-pointer">
+                    Fascia
+                  </label>
+                </div>
                 {projectData.includeFascia && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -1076,7 +1092,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                         value={projectData.fascia.length || ''}
                         onChange={(e) => updateProjectData('fascia', { ...projectData.fascia, length: parseFloat(e.target.value) || 0 })}
                         onWheel={preventScrollChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                        className="w-full px-3 py-2 border border-yellow-400 rounded-lg"
                         placeholder="0"
                       />
                     </div>
@@ -1087,7 +1103,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       <select
                         value={projectData.fascia.width}
                         onChange={(e) => updateProjectData('fascia', { ...projectData.fascia, width: parseInt(e.target.value) })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                        className="w-full px-3 py-2 border border-yellow-400 rounded-lg"
                       >
                         <option value="6">6"</option>
                         <option value="8">8"</option>

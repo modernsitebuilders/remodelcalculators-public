@@ -336,7 +336,9 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                           setAtticArea(newFootprint);
                         }
                       }}
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                        !roofLength ? 'border-orange-400' : 'border-gray-300'
+                      }`}
                     />
                   </div>
 
@@ -357,7 +359,9 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                           setAtticArea(newFootprint);
                         }
                       }}
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                        !roofWidth ? 'border-orange-400' : 'border-gray-300'
+                      }`}
                     />
                   </div>
 
@@ -368,7 +372,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     <select
                       value={roofPitch}
                       onChange={(e) => { setRoofPitch(Number(e.target.value)); setTimeout(() => validate(getValues()), 100); }}
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       {Object.keys(pitchMultipliers).map(pitch => (
                         <option key={pitch} value={pitch}>{pitch}/12 (Multiplier: {pitchMultipliers[pitch]})</option>
@@ -394,7 +398,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                           setValleyLength(0);
                         }
                       }}
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="simple">Simple Gable (10% waste)</option>
                       <option value="gable">Standard Gable with Valleys (10% waste)</option>
@@ -420,7 +424,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     <select
                       value={shingleType}
                       onChange={(e) => setShingleType(e.target.value)}
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="3-tab">3-Tab Shingles (3 bundles/sq)</option>
                       <option value="architectural">Architectural Shingles (3 bundles/sq)</option>
@@ -436,7 +440,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     <select
                       value={underlaymentType}
                       onChange={(e) => setUnderlaymentType(e.target.value)}
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="felt15">#15 Felt (400 sq ft/roll)</option>
                       <option value="felt30">#30 Felt (200 sq ft/roll)</option>
@@ -451,38 +455,34 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     <select
                       value={windZone}
                       onChange={(e) => setWindZone(e.target.value)}
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="standard">Standard (&lt;110 mph) - 4 nails/shingle</option>
                       <option value="high">High Wind (≥110 mph) - 6 nails/shingle</option>
                     </select>
                   </div>
 
-                  <div>
-                    <label className="flex items-center space-x-3 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={coldClimate}
-                        onChange={(e) => setColdClimate(e.target.checked)}
-                        className="w-5 h-5 text-blue-600 border-slate-300 rounded focus:ring-2 focus:ring-blue-500"
-                      />
-                      <span className="text-sm font-semibold text-slate-700">
-                        Cold Climate (Ice & Water Shield Required)
-                      </span>
+                  <div className="flex items-center gap-2 p-3 border border-yellow-400 rounded-lg">
+                    <input
+                      type="checkbox"
+                      checked={coldClimate}
+                      onChange={(e) => setColdClimate(e.target.checked)}
+                      className="w-5 h-5 text-blue-600 border-slate-300 rounded focus:ring-2 focus:ring-blue-500"
+                    />
+                    <label className="text-sm font-semibold text-slate-700 cursor-pointer">
+                      Cold Climate (Ice & Water Shield Required)
                     </label>
                   </div>
 
-                  <div>
-                    <label className="flex items-center space-x-3 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={includeRakeStarter}
-                        onChange={(e) => setIncludeRakeStarter(e.target.checked)}
-                        className="w-5 h-5 text-blue-600 border-slate-300 rounded focus:ring-2 focus:ring-blue-500"
-                      />
-                      <span className="text-sm font-semibold text-slate-700">
-                        Include Starter Strip at Rakes
-                      </span>
+                  <div className="flex items-center gap-2 p-3 border border-yellow-400 rounded-lg">
+                    <input
+                      type="checkbox"
+                      checked={includeRakeStarter}
+                      onChange={(e) => setIncludeRakeStarter(e.target.checked)}
+                      className="w-5 h-5 text-blue-600 border-slate-300 rounded focus:ring-2 focus:ring-blue-500"
+                    />
+                    <label className="text-sm font-semibold text-slate-700 cursor-pointer">
+                      Include Starter Strip at Rakes
                     </label>
                   </div>
                 </div>
@@ -503,7 +503,9 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       type="number"
                       value={atticArea}
                       onChange={(e) => { setAtticArea(Number(e.target.value)); setTimeout(() => validate(getValues()), 100); }}
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                        !atticArea ? 'border-orange-400' : 'border-gray-300'
+                      }`}
                     />
                     <p className="text-xs text-slate-500 mt-1">Required for IRC ventilation compliance. Typically equals footprint (length × width).</p>
                   </div>
@@ -525,7 +527,9 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       type="number"
                       value={ridgeLength}
                       onChange={(e) => { setRidgeLength(Number(e.target.value)); setTimeout(() => validate(getValues()), 100); }}
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                        !ridgeLength ? 'border-orange-400' : 'border-gray-300'
+                      }`}
                     />
                     <p className="text-xs text-slate-500 mt-1">All roofs have a ridge. For simple gable roofs, typically equals roof length.</p>
                   </div>
@@ -540,7 +544,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                         type="number"
                         value={hipLength}
                         onChange={(e) => setHipLength(Number(e.target.value))}
-                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                       <p className="text-xs text-slate-500 mt-1">For hip roofs - enter total length of all hips</p>
                     </div>
@@ -556,7 +560,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                         type="number"
                         value={valleyLength}
                         onChange={(e) => setValleyLength(Number(e.target.value))}
-                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                       <p className="text-xs text-slate-500 mt-1">Enter total length of all valleys on your roof</p>
                     </div>

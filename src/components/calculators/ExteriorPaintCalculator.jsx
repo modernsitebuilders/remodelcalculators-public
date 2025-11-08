@@ -273,7 +273,9 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
   setTimeout(() => validate(getValues()), 100);
 }}
                 onFocus={(e) => e.target.select()}
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-lg"
+                className={`w-full px-4 py-3 border-2 rounded-lg focus:border-blue-500 focus:outline-none text-lg ${
+                  !inputs.squareFeet ? 'border-orange-400' : 'border-gray-300'
+                }`}
                 min="100"
                 step="100"
               />
@@ -290,7 +292,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
               <select
                 value={inputs.surfaceType}
                 onChange={(e) => setInputs({...inputs, surfaceType: e.target.value})}
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-lg"
+                className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:border-blue-500 focus:outline-none text-lg"
               >
                 {Object.entries(surfaceTypes).map(([key, surface]) => (
                   <option key={key} value={key}>
@@ -312,7 +314,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                 <select
                   value={inputs.surfaceCondition}
                   onChange={(e) => setInputs({...inputs, surfaceCondition: e.target.value})}
-                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-lg"
+                  className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:border-blue-500 focus:outline-none text-lg"
                 >
                   <option value="excellent">Mostly Sealed - minimal bare spots exposed</option>
                   <option value="good">Mostly Sealed - some bare spots (+10% paint)</option>
@@ -334,7 +336,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
               <select
                 value={inputs.applicationMethod}
                 onChange={(e) => setInputs({...inputs, applicationMethod: e.target.value})}
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-lg"
+                className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:border-blue-500 focus:outline-none text-lg"
               >
                 <option value="roll">Brush/Roller (10% waste)</option>
                 <option value="spray_hvlp">HVLP Spray (25% waste, 50% faster)</option>
@@ -358,7 +360,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
               <select
                 value={inputs.coats}
                 onChange={(e) => setInputs({...inputs, coats: Number(e.target.value)})}
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-lg"
+                className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:border-blue-500 focus:outline-none text-lg"
               >
                 <option value={2}>2 Coats (Recommended for exterior)</option>
                 <option value={3}>3 Coats</option>
@@ -369,23 +371,21 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
             </div>
 
             {/* Primer */}
-            <div>
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={inputs.needsPrimer}
-                  onChange={(e) => setInputs({...inputs, needsPrimer: e.target.checked})}
-                  className="w-5 h-5 text-blue-600"
-                />
-                <span className="text-sm font-semibold text-gray-700">
-                  Needs Primer (200-300 sq ft/gallon coverage)
-                </span>
-              </label>
-              <p className="text-xs text-gray-500 mt-2 ml-8">
-                Always required for bare wood, masonry, and metal. Can be skipped on previously 
-                painted surfaces in good condition with same/darker colors.
-              </p>
+            <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-yellow-400">
+              <input
+                type="checkbox"
+                checked={inputs.needsPrimer}
+                onChange={(e) => setInputs({...inputs, needsPrimer: e.target.checked})}
+                className="w-5 h-5 text-blue-600"
+              />
+              <span className="text-sm font-semibold text-gray-700">
+                Needs Primer (200-300 sq ft/gallon coverage)
+              </span>
             </div>
+            <p className="text-xs text-gray-500 mt-2 ml-3">
+              Always required for bare wood, masonry, and metal. Can be skipped on previously 
+              painted surfaces in good condition with same/darker colors.
+            </p>
 <ValidationDisplay />
             {/* Calculate Button */}
             <div className="pt-4">

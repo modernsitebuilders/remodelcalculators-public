@@ -445,7 +445,9 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                            setTimeout(() => validate(getValues()), 100);
                          }} 
                          onWheel={(e) => e.target.blur()} 
-                         className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" 
+                         className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                           !linearFeet ? 'border-orange-400' : 'border-gray-300'
+                         }`}
                          min="1" 
                          placeholder="Enter linear feet (e.g., 150)" />
                 </div>
@@ -455,7 +457,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                   <select value={height} onChange={(e) => {
                     setHeight(parseInt(e.target.value));
                     setTimeout(() => validate(getValues()), 100);
-                  }} className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                  }} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                     <option value="3">3 feet</option>
                     <option value="4">4 feet</option>
                     <option value="5">5 feet</option>
@@ -470,12 +472,14 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                   <input type="number" value={corners} onChange={(e) => {
                     setCorners(e.target.value);
                     setTimeout(() => validate(getValues()), 100);
-                  }} onWheel={(e) => e.target.blur()} className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" min="0" placeholder="Enter number of corners (e.g., 4)" />
+                  }} onWheel={(e) => e.target.blur()} className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                    !corners ? 'border-orange-400' : 'border-gray-300'
+                  }`} min="0" placeholder="Enter number of corners (e.g., 4)" />
                 </div>
                 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Fence Layout</label>
-                  <select value={fenceLayout} onChange={(e) => setFenceLayout(e.target.value)} className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                  <select value={fenceLayout} onChange={(e) => setFenceLayout(e.target.value)} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                     <option value="continuous">Continuous Loop (returns to starting point)</option>
                     <option value="open">Open-Ended (has terminal posts)</option>
                   </select>
@@ -490,7 +494,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Fence Style</label>
-                  <select value={fenceType} onChange={(e) => setFenceType(e.target.value)} className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                  <select value={fenceType} onChange={(e) => setFenceType(e.target.value)} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                     {Object.entries(fenceTypes).map(([key, config]) => (
                       <option key={key} value={key}>{config.name}</option>
                     ))}
@@ -506,7 +510,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                 {(fenceType === 'split-rail' || fenceType === 'split-rail-chain') && (
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">Rail Length</label>
-                    <select value={railLength} onChange={(e) => setRailLength(parseFloat(e.target.value))} className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                    <select value={railLength} onChange={(e) => setRailLength(parseFloat(e.target.value))} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                       <option value="8">8 feet</option>
                       <option value="8.5">8.5 feet</option>
                       <option value="11">11 feet - Most Common</option>
@@ -521,7 +525,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     <select value={boardWidth} onChange={(e) => { 
   setBoardWidth(parseFloat(e.target.value)); 
   setTimeout(() => validate(getValues()), 100);
-}} className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+}} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                         <option value="3.5">1×4 (3.5" actual)</option>
                         <option value="5.5">1×6 (5.5" actual)</option>
                         <option value="7.25">1×8 (7.25" actual)</option>
@@ -530,7 +534,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">Board Spacing (inches)</label>
-                      <input type="number" value={boardSpacing} onChange={(e) => setBoardSpacing(parseFloat(e.target.value) || 0)} onWheel={(e) => e.target.blur()} className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" min="0" max="4" step="0.25" />
+                      <input type="number" value={boardSpacing} onChange={(e) => setBoardSpacing(parseFloat(e.target.value) || 0)} onWheel={(e) => e.target.blur()} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" min="0" max="4" step="0.25" />
                     </div>
                   </>
                 )}
@@ -543,27 +547,27 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">3-foot Gates</label>
-                    <input type="number" value={gates3ft} onChange={(e) => setGates3ft(parseInt(e.target.value) || 0)} onWheel={(e) => e.target.blur()} className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" min="0" />
+                    <input type="number" value={gates3ft} onChange={(e) => setGates3ft(parseInt(e.target.value) || 0)} onWheel={(e) => e.target.blur()} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" min="0" />
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">4-foot Gates</label>
-                    <input type="number" value={gates4ft} onChange={(e) => setGates4ft(parseInt(e.target.value) || 0)} onWheel={(e) => e.target.blur()} className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" min="0" />
+                    <input type="number" value={gates4ft} onChange={(e) => setGates4ft(parseInt(e.target.value) || 0)} onWheel={(e) => e.target.blur()} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" min="0" />
                   </div>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">6-foot Gates</label>
-                  <input type="number" value={gates6ft} onChange={(e) => setGates6ft(parseInt(e.target.value) || 0)} onWheel={(e) => e.target.blur()} className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" min="0" />
+                  <input type="number" value={gates6ft} onChange={(e) => setGates6ft(parseInt(e.target.value) || 0)} onWheel={(e) => e.target.blur()} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" min="0" />
                 </div>
                 <div className="border-t pt-4">
                   <h3 className="font-semibold text-gray-700 mb-3">Double Driveway Gates</h3>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">10-foot Double</label>
-                      <input type="number" value={gates10ft} onChange={(e) => setGates10ft(parseInt(e.target.value) || 0)} onWheel={(e) => e.target.blur()} className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" min="0" />
+                      <input type="number" value={gates10ft} onChange={(e) => setGates10ft(parseInt(e.target.value) || 0)} onWheel={(e) => e.target.blur()} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" min="0" />
                     </div>
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">12-foot Double</label>
-                      <input type="number" value={gates12ft} onChange={(e) => setGates12ft(parseInt(e.target.value) || 0)} onWheel={(e) => e.target.blur()} className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" min="0" />
+                      <input type="number" value={gates12ft} onChange={(e) => setGates12ft(parseInt(e.target.value) || 0)} onWheel={(e) => e.target.blur()} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" min="0" />
                     </div>
                   </div>
                 </div>
@@ -575,7 +579,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Terrain Type</label>
-                  <select value={terrain} onChange={(e) => setTerrain(e.target.value)} className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                  <select value={terrain} onChange={(e) => setTerrain(e.target.value)} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                     <option value="flat">Flat terrain</option>
                     <option value="slight-slope">Slight slope</option>
                     <option value="moderate-slope">Moderate slope</option>
@@ -586,7 +590,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Frost Depth (inches)</label>
-                  <select value={frostDepth} onChange={(e) => { setFrostDepth(parseInt(e.target.value)); setTimeout(() => validate(getValues()), 100); }} className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                  <select value={frostDepth} onChange={(e) => { setFrostDepth(parseInt(e.target.value)); setTimeout(() => validate(getValues()), 100); }} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                     <option value="0">No frost</option>
                     <option value="24">24"</option>
                     <option value="36">36"</option>

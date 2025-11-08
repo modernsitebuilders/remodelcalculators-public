@@ -414,7 +414,9 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       type="number"
                       value={room.length}
                       onChange={(e) => { updateRoom(room.id, 'length', e.target.value); setTimeout(() => validate(getValues()), 100); }}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className={`w-full px-3 py-2 border-2 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
+                        !room.length ? 'border-orange-400' : 'border-gray-300'
+                      }`}
                       min="0"
                       step="0.5"
                     />
@@ -425,7 +427,9 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       type="number"
                       value={room.width}
                       onChange={(e) => { updateRoom(room.id, 'width', e.target.value); setTimeout(() => validate(getValues()), 100); }}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className={`w-full px-3 py-2 border-2 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
+                        !room.width ? 'border-orange-400' : 'border-gray-300'
+                      }`}
                       min="0"
                       step="0.5"
                     />
@@ -436,7 +440,9 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       type="number"
                       value={room.height}
                       onChange={(e) => updateRoom(room.id, 'height', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className={`w-full px-3 py-2 border-2 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
+                        !room.height ? 'border-orange-400' : 'border-gray-300'
+                      }`}
                       min="0"
                       step="0.5"
                     />
@@ -448,15 +454,15 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                   <div className="flex justify-between items-center mb-3">
                     <div className="flex items-center gap-2">
                       <label className="text-sm font-semibold text-gray-700">Doors</label>
-                      <label className="flex items-center cursor-pointer text-xs">
+                      <div className="flex items-center gap-2 p-2 border-2 border-yellow-400 rounded-lg">
                         <input
                           type="checkbox"
                           checked={room.useCustomDoorSizes}
                           onChange={(e) => { updateRoom(room.id, 'useCustomDoorSizes', e.target.checked); setTimeout(() => validate(getValues()), 100); }}
-                          className="w-3 h-3 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 mr-1"
+                          className="w-3 h-3 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
                         />
-                        <span className="text-gray-600">Use custom size</span>
-                      </label>
+                        <label className="text-xs text-gray-600 cursor-pointer">Use custom size</label>
+                      </div>
                     </div>
                     {!room.useCustomDoorSizes && (
                       <button
@@ -476,7 +482,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                           <select
                             value={door.size}
                             onChange={(e) => updateDoor(room.id, door.id, e.target.value)}
-                            className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            className="flex-1 px-3 py-2 text-sm border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                           >
                             <option value="small">Small/Closet - 15 sq ft</option>
                             <option value="standard">Standard - 20 sq ft</option>
@@ -502,7 +508,9 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                         type="number"
                         value={room.customDoorArea}
                         onChange={(e) => { updateRoom(room.id, 'customDoorArea', e.target.value); setTimeout(() => validate(getValues()), 100); }}
-                        className="w-full px-3 py-2 border-2 border-indigo-400 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        className={`w-full px-3 py-2 border-2 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
+                          !room.customDoorArea ? 'border-orange-400' : 'border-gray-300'
+                        }`}
                         placeholder="e.g., 45"
                         min="0"
                         step="0.5"
@@ -517,15 +525,15 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                   <div className="flex justify-between items-center mb-3">
                     <div className="flex items-center gap-2">
                       <label className="text-sm font-semibold text-gray-700">Windows</label>
-                      <label className="flex items-center cursor-pointer text-xs">
+                      <div className="flex items-center gap-2 p-2 border-2 border-yellow-400 rounded-lg">
                         <input
                           type="checkbox"
                           checked={room.useCustomWindowSizes}
                           onChange={(e) => { updateRoom(room.id, 'useCustomWindowSizes', e.target.checked); setTimeout(() => validate(getValues()), 100); }}
-                          className="w-3 h-3 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 mr-1"
+                          className="w-3 h-3 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
                         />
-                        <span className="text-gray-600">Use custom size</span>
-                      </label>
+                        <label className="text-xs text-gray-600 cursor-pointer">Use custom size</label>
+                      </div>
                     </div>
                     {!room.useCustomWindowSizes && (
                       <button
@@ -545,7 +553,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                           <select
                             value={window.size}
                             onChange={(e) => updateWindow(room.id, window.id, e.target.value)}
-                            className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            className="flex-1 px-3 py-2 text-sm border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                           >
                             <option value="small">Small - 10 sq ft</option>
                             <option value="standard">Standard - 15 sq ft</option>
@@ -572,7 +580,9 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                         type="number"
                         value={room.customWindowArea}
                         onChange={(e) => { updateRoom(room.id, 'customWindowArea', e.target.value); setTimeout(() => validate(getValues()), 100); }}
-                        className="w-full px-3 py-2 border-2 border-indigo-400 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        className={`w-full px-3 py-2 border-2 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
+                          !room.customWindowArea ? 'border-orange-400' : 'border-gray-300'
+                        }`}
                         placeholder="e.g., 60"
                         min="0"
                         step="0.5"
@@ -600,15 +610,15 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
             <div className="border-2 border-gray-200 rounded-lg p-4">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-800">Wall Paint</h3>
-                <label className="flex items-center cursor-pointer">
+                <div className="flex items-center gap-2 p-3 border-2 border-yellow-400 rounded-lg">
                   <input
                     type="checkbox"
                     checked={paintWalls}
                     onChange={(e) => setPaintWalls(e.target.checked)}
                     className="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
                   />
-                  <span className="ml-2 text-sm font-medium text-gray-700">Include walls</span>
-                </label>
+                  <label className="text-sm font-medium text-gray-700 cursor-pointer">Include walls</label>
+                </div>
               </div>
               
               {paintWalls && (
@@ -625,7 +635,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     <select
                       value={wallCoats}
                       onChange={(e) => setWallCoats(parseInt(e.target.value))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     >
                       <option value="1">1 Coat</option>
                       <option value="2">2 Coats (Recommended)</option>
@@ -638,7 +648,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     <select
                       value={wallPaintType}
                       onChange={(e) => setWallPaintType(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     >
                       <option value="economy">Economy (350 sq ft/gal)</option>
                       <option value="standard">Standard (375 sq ft/gal)</option>
@@ -651,7 +661,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     <select
                       value={wallSurfaceTexture}
                       onChange={(e) => setWallSurfaceTexture(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     >
                       <option value="smooth">Smooth (Standard)</option>
                       <option value="light">Light Texture (-15%)</option>
@@ -670,7 +680,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     <select
                       value={wallSurfaceCondition}
                       onChange={(e) => setWallSurfaceCondition(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     >
                       <option value="painted">Previously Painted (no primer)</option>
                       <option value="unpainted">Unpainted/New Drywall (needs primer)</option>
@@ -682,7 +692,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     <select
                       value={wallApplicationMethod}
                       onChange={(e) => setWallApplicationMethod(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     >
                       <option value="roller">Roller (Standard)</option>
                       <option value="spray">Spray (+33% paint)</option>
@@ -697,15 +707,15 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
             <div className="border-2 border-gray-200 rounded-lg p-4 bg-gray-50">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-800">Ceiling Paint</h3>
-                <label className="flex items-center cursor-pointer">
+                <div className="flex items-center gap-2 p-3 border-2 border-yellow-400 rounded-lg">
                   <input
                     type="checkbox"
                     checked={paintCeiling}
                     onChange={(e) => setPaintCeiling(e.target.checked)}
                     className="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
                   />
-                  <span className="ml-2 text-sm font-medium text-gray-700">Include ceilings</span>
-                </label>
+                  <label className="text-sm font-medium text-gray-700 cursor-pointer">Include ceilings</label>
+                </div>
               </div>
               
               {paintCeiling && (
@@ -722,7 +732,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     <select
                       value={ceilingCoats}
                       onChange={(e) => setCeilingCoats(parseInt(e.target.value))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     >
                       <option value="1">1 Coat</option>
                       <option value="2">2 Coats (Recommended)</option>
@@ -735,7 +745,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     <select
                       value={ceilingPaintType}
                       onChange={(e) => setCeilingPaintType(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     >
                       <option value="economy">Economy (350 sq ft/gal)</option>
                       <option value="standard">Standard (375 sq ft/gal)</option>
@@ -753,7 +763,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     <select
                       value={ceilingSurfaceCondition}
                       onChange={(e) => setCeilingSurfaceCondition(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     >
                       <option value="painted">Previously Painted (no primer)</option>
                       <option value="unpainted">Unpainted/New Drywall (needs primer)</option>
@@ -765,7 +775,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     <select
                       value={ceilingApplicationMethod}
                       onChange={(e) => setCeilingApplicationMethod(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     >
                       <option value="roller">Roller (Standard)</option>
                       <option value="spray">Spray (+33% paint)</option>
