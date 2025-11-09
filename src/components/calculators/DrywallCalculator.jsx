@@ -168,7 +168,6 @@ export default function DrywallCalculator() {
     
     // Drywall tape calculation - Industry standard: 1 roll (500 ft) per 100 sq ft
     // Alternative method: sheet perimeter × number of sheets
-    const tapeFeetByArea = (totalArea / 100) * 500;
     const tapeFeetByPerimeter = sheetsNeeded * sheetPerimeter;
     // Use the higher estimate for safety
     const totalTapeFeet = Math.ceil(Math.max(tapeFeetByArea, tapeFeetByPerimeter));
