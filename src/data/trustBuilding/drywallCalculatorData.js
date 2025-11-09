@@ -143,7 +143,7 @@ export const drywallStandards = {
       name: "ASTM C36 - Gypsum Wallboard Specifications",
       code: "ASTM C36",
       description: "Material specifications for gypsum wallboard including core composition, paper facing, edge treatment, and dimensional tolerances. Ensures consistent product quality.",
-      url: "https://www.astm.org/c0036_c0036m-19.html",
+      url: "https://store.astm.org/c0036_c0036m-01.html",
       requirements: [
         "Core: Gypsum plaster with paper facing both sides",
         "Tapered edges: Long edges for tape and compound joint finishing",
@@ -169,7 +169,7 @@ export const drywallStandards = {
       name: "International Residential Code (IRC) R702 - Interior Covering",
       code: "IRC 2021 Section R702",
       description: "Building code requirements for interior wall and ceiling coverings including drywall thickness, attachment methods, and fire-resistance requirements for specific locations.",
-      url: "https://codes.iccsafe.org/content/IRC2021P3",
+      url: "https://codes.iccsafe.org/s/IRC2021P3/chapter-7-wall-covering/IRC2021P3-Pt03-Ch07-SecR702.1",
       requirements: [
         "Minimum thickness: 1/2 inch for 16-inch framing, 5/8 inch for 24-inch",
         "Garage ceiling: 5/8-inch Type X fire-rated drywall required",
@@ -183,7 +183,7 @@ export const drywallStandards = {
       name: "GA-214 - Finishing Levels",
       code: "Gypsum Association GA-214",
       description: "Defines five levels of drywall finish from Level 0 (no finish) to Level 5 (highest quality). Specifies appropriate level for different lighting conditions and final finishes.",
-      url: "https://www.gypsum.org/wp-content/uploads/2020/10/GA-214-2020.pdf",
+      url: "https://www.americangypsum.com/sites/default/files/2022-05/ga-214-2021_17.pdf",
       requirements: [
         "Level 0: No taping, finishing, or accessories (temporary construction)",
         "Level 1: Tape embedded, no joint compound beyond tape (not for living spaces)",

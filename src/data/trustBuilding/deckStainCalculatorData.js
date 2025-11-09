@@ -107,7 +107,7 @@ export const deckStainStandards = {
       name: "ASTM D1413 - Testing Wood Preservatives by Lab Soil-Block",
       code: "ASTM D1413",
       description: "Test method for evaluating effectiveness of wood preservatives against decay fungi. Helps determine appropriate treatment for different exposure conditions.",
-      url: "https://www.astm.org/d1413-21.html",
+      url: "https://store.astm.org/d1413-07.html",
       requirements: [
         "Ground contact: ACQ, CA, or MCQ pressure-treated wood required",
         "Above ground: Lesser treatments acceptable (.40 retention vs .60 for ground)",
@@ -120,7 +120,7 @@ export const deckStainStandards = {
       name: "Western Red Cedar Lumber Association (WRCLA) Finishing Guidelines",
       code: "WRCLA Standards",
       description: "Best practices for finishing cedar decking and outdoor structures. Cedar's natural oils affect stain absorption and require specific preparation methods.",
-      url: "https://www.realcedar.com/maintenance/",
+      url: "https://www.realcedar.com/static/2d35a974acbf517df55a40d13ed6d7a4/How-to-Finish.pdf",
       requirements: [
         "New cedar: Allow 2-4 weeks weathering before staining (natural oils prevent absorption)",
         "Mill glaze removal: Lightly sand or power wash before staining new cedar",

@@ -88,7 +88,7 @@ export const exteriorPaintStandards = {
       name: "ASTM D3276 - Standard Guide for Painting Inspectors",
       code: "ASTM D3276-15",
       description: "Comprehensive guide for exterior paint inspection covering surface preparation, application methods, film thickness, and quality control for masonry, wood, and metal substrates.",
-      url: "https://www.astm.org/d3276-15r21.html",
+      url: "https://store.astm.org/d6237-19.html",
       requirements: [
         "Surface prep: Clean, dry, and stable before painting (moisture ≤15%)",
         "Primer required: New wood, repairs, masonry, or substrate changes",
@@ -102,7 +102,7 @@ export const exteriorPaintStandards = {
       name: "ASTM D6864 - Standard Practice for Exterior Wood Coating",
       code: "ASTM D6864",
       description: "Requirements for painting exterior wood siding including moisture content limits, surface preparation standards, primer selection, and application specifications.",
-      url: "https://www.astm.org/d6864-04r20.html",
+      url: "https://store.astm.org/d6763-16.html",
       requirements: [
         "Wood moisture content: Maximum 15% before painting (12% preferred)",
         "Surface preparation: Sand smooth, remove loose wood, set nail heads",
@@ -130,7 +130,7 @@ export const exteriorPaintStandards = {
       name: "PDCA - Painting & Decorating Contractors of America Standards",
       code: "PDCA P1-P20",
       description: "Professional painting standards for residential and commercial exteriors. Covers surface preparation levels, application methods, coating specifications, and quality benchmarks.",
-      url: "https://www.pdca.org/resources/standards/",
+      url: "https://www.pdcarva.org/pdca-industry-standards/",
       requirements: [
         "Surface prep levels: P1 (minimal) to P5 (maximum) based on condition",
         "Two-coat minimum: Primer + finish or two finish coats",
