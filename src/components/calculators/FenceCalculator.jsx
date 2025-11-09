@@ -307,6 +307,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
       chainLink: { rolls: chainLinkRolls, fabric: meshFabric }
     };
     
+
     setMaterials(materialsData);
     setHasCalculated(true);
     
@@ -409,6 +410,11 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
       alert('Unable to copy. Please copy results manually.');
     }
   };
+
+      // Prevent scroll from changing number inputs
+const preventScrollChange = (e) => {
+  e.target.blur();
+};
   
   return (  
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 p-4 md:p-8">
@@ -440,11 +446,12 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Linear Feet of Fencing</label>
                   <input type="number"
                          value={linearFeet}
+                         
                          onChange={(e) => {
                            setLinearFeet(e.target.value);
                            setTimeout(() => validate(getValues()), 100);
                          }} 
-                         onWheel={(e) => e.target.blur()} 
+                         onWheel={preventScrollChange}
                          className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
                            !linearFeet ? 'border-orange-400' : 'border-gray-300'
                          }`}
@@ -472,7 +479,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                   <input type="number" value={corners} onChange={(e) => {
                     setCorners(e.target.value);
                     setTimeout(() => validate(getValues()), 100);
-                  }} onWheel={(e) => e.target.blur()} className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                  }} onWheel={preventScrollChange} className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
                     !corners ? 'border-orange-400' : 'border-gray-300'
                   }`} min="0" placeholder="Enter number of corners (e.g., 4)" />
                 </div>
@@ -534,7 +541,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">Board Spacing (inches)</label>
-                      <input type="number" value={boardSpacing} onChange={(e) => setBoardSpacing(parseFloat(e.target.value) || 0)} onWheel={(e) => e.target.blur()} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" min="0" max="4" step="0.25" />
+                      <input type="number" value={boardSpacing} onChange={(e) => setBoardSpacing(parseFloat(e.target.value) || 0)} onWheel={preventScrollChange} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" min="0" max="4" step="0.25" />
                     </div>
                   </>
                 )}
@@ -547,27 +554,27 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">3-foot Gates</label>
-                    <input type="number" value={gates3ft} onChange={(e) => setGates3ft(parseInt(e.target.value) || 0)} onWheel={(e) => e.target.blur()} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" min="0" />
+                    <input type="number" value={gates3ft} onChange={(e) => setGates3ft(parseInt(e.target.value) || 0)} onWheel={preventScrollChange} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" min="0" />
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">4-foot Gates</label>
-                    <input type="number" value={gates4ft} onChange={(e) => setGates4ft(parseInt(e.target.value) || 0)} onWheel={(e) => e.target.blur()} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" min="0" />
+                    <input type="number" value={gates4ft} onChange={(e) => setGates4ft(parseInt(e.target.value) || 0)} onWheel={preventScrollChange} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" min="0" />
                   </div>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">6-foot Gates</label>
-                  <input type="number" value={gates6ft} onChange={(e) => setGates6ft(parseInt(e.target.value) || 0)} onWheel={(e) => e.target.blur()} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" min="0" />
+                  <input type="number" value={gates6ft} onChange={(e) => setGates6ft(parseInt(e.target.value) || 0)} onWheel={preventScrollChange} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" min="0" />
                 </div>
                 <div className="border-t pt-4">
                   <h3 className="font-semibold text-gray-700 mb-3">Double Driveway Gates</h3>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">10-foot Double</label>
-                      <input type="number" value={gates10ft} onChange={(e) => setGates10ft(parseInt(e.target.value) || 0)} onWheel={(e) => e.target.blur()} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" min="0" />
+                      <input type="number" value={gates10ft} onChange={(e) => setGates10ft(parseInt(e.target.value) || 0)} onWheel={preventScrollChange} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" min="0" />
                     </div>
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">12-foot Double</label>
-                      <input type="number" value={gates12ft} onChange={(e) => setGates12ft(parseInt(e.target.value) || 0)} onWheel={(e) => e.target.blur()} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" min="0" />
+                      <input type="number" value={gates12ft} onChange={(e) => setGates12ft(parseInt(e.target.value) || 0)} onWheel={preventScrollChange} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" min="0" />
                     </div>
                   </div>
                 </div>

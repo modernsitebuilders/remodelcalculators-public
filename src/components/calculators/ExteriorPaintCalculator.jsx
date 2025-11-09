@@ -149,6 +149,11 @@ const ExteriorPaintCalculator = () => {
     };
   }, [inputs]);
 
+  // Prevent scroll from changing number inputs
+const preventScrollChange = (e) => {
+  e.target.blur();
+};
+
   const handleCalculate = () => {
     setShowResults(true);
     
@@ -268,6 +273,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
               <input
                 type="number"
                 value={inputs.squareFeet}
+                onWheel={preventScrollChange}
                 onChange={(e) => {
   setInputs({...inputs, squareFeet: Number(e.target.value)});
   setTimeout(() => validate(getValues()), 100);

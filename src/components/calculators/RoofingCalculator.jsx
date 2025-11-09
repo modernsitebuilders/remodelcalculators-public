@@ -203,6 +203,12 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
     highly_complex: 0.20
   };
 
+
+  // Prevent scroll from changing number inputs
+const preventScrollChange = (e) => {
+  e.target.blur();
+};
+
   // Calculate roof area
   const footprint = roofLength * roofWidth;
   const pitchMultiplier = pitchMultipliers[roofPitch] || 1.118;
@@ -322,6 +328,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     <input
                       type="number"
                       value={roofLength}
+                      onWheel={preventScrollChange}
                       onChange={(e) => {
                         const newLength = Number(e.target.value);
                         setRoofLength(newLength);
@@ -349,6 +356,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     <input
                       type="number"
                       value={roofWidth}
+                      onWheel={preventScrollChange}
                       onChange={(e) => {
                         const newWidth = Number(e.target.value);
                         setRoofWidth(newWidth);
@@ -502,6 +510,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     <input
                       type="number"
                       value={atticArea}
+                      onWheel={preventScrollChange}
                       onChange={(e) => { setAtticArea(Number(e.target.value)); setTimeout(() => validate(getValues()), 100); }}
                       className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                         !atticArea ? 'border-orange-400' : 'border-gray-300'
@@ -526,6 +535,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     <input
                       type="number"
                       value={ridgeLength}
+                      onWheel={preventScrollChange}
                       onChange={(e) => { setRidgeLength(Number(e.target.value)); setTimeout(() => validate(getValues()), 100); }}
                       className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                         !ridgeLength ? 'border-orange-400' : 'border-gray-300'
@@ -544,6 +554,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                         type="number"
                         value={hipLength}
                         onChange={(e) => setHipLength(Number(e.target.value))}
+                        onWheel={preventScrollChange}
                         className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                       <p className="text-xs text-slate-500 mt-1">For hip roofs - enter total length of all hips</p>
@@ -560,6 +571,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                         type="number"
                         value={valleyLength}
                         onChange={(e) => setValleyLength(Number(e.target.value))}
+                        onWheel={preventScrollChange}
                         className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                       <p className="text-xs text-slate-500 mt-1">Enter total length of all valleys on your roof</p>

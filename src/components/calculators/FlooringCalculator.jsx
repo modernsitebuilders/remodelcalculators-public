@@ -210,6 +210,11 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
         break;
     }
 
+    // Prevent scroll from changing number inputs
+const preventScrollChange = (e) => {
+  e.target.blur();
+};
+
     setResults({
       area: Math.round(areaSquareFeet),
       waste: baseFactor.toFixed(1),
@@ -785,6 +790,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     className={`form-input ${!roomLength ? 'border-orange-400' : 'border-gray-300'}`}
                     value={roomLength} 
                     onChange={(e) => { setRoomLength(e.target.value); setTimeout(() => validate(getValues()), 100); }} 
+                    onWheel={preventScrollChange}
                   />
                 </div>
                 <div className="form-group">
@@ -794,6 +800,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     className={`form-input ${!roomWidth ? 'border-orange-400' : 'border-gray-300'}`}
                     value={roomWidth} 
                     onChange={(e) => { setRoomWidth(e.target.value); setTimeout(() => validate(getValues()), 100); }} 
+                    onWheel={preventScrollChange}
                   />
                 </div>
               </div>
@@ -868,6 +875,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                           max="20"
                           style={{ maxWidth: '280px' }}
                           value={customPlankWidth}
+                          onWheel={preventScrollChange}
                           onChange={(e) => { setCustomPlankWidth(e.target.value); setTimeout(() => validate(getValues()), 100); }}
                         />
                       </div>

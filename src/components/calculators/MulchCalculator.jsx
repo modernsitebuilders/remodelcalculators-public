@@ -187,6 +187,11 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
     }
   };
 
+  // Prevent scroll from changing number inputs
+const preventScrollChange = (e) => {
+  e.target.blur();
+};
+
   const handleReset = () => {
     setLength('');
     setWidth('');
@@ -299,6 +304,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                   <input
                     type="number"
                     value={length}
+                    onWheel={preventScrollChange}
                     onChange={(e) => { setLength(e.target.value); setTimeout(() => validate(getValues()), 100); }}
                     className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
                       !length ? 'border-orange-400' : 'border-gray-300'
@@ -313,6 +319,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                   <input
                     type="number"
                     value={width}
+                    onWheel={preventScrollChange}
                     onChange={(e) => { setWidth(e.target.value); setTimeout(() => validate(getValues()), 100); }}
                     className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
                       !width ? 'border-orange-400' : 'border-gray-300'
@@ -329,6 +336,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                 <input
                   type="number"
                   value={diameter}
+                  onWheel={preventScrollChange}
                   onChange={(e) => { setDiameter(e.target.value); setTimeout(() => validate(getValues()), 100); }}
                   className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
                     !diameter ? 'border-orange-400' : 'border-gray-300'
@@ -358,6 +366,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                 <input
                   type="number"
                   value={customDepth}
+                  onWheel={preventScrollChange}
                   onChange={(e) => { setCustomDepth(e.target.value); setTimeout(() => validate(getValues()), 100); }}
                   className={`w-full p-3 border-2 rounded-lg mt-2 focus:ring-2 focus:ring-green-500 focus:border-transparent ${
                     !customDepth ? 'border-orange-400' : 'border-gray-300'

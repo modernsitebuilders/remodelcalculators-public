@@ -231,6 +231,11 @@ const DeckStainCalculator = () => {
     '8x8': { width: 7.25, height: 7.25, name: '8×8 (7.25" × 7.25")' }
   };
 
+  // Prevent scroll from changing number inputs
+const preventScrollChange = (e) => {
+  e.target.blur();
+};
+
   const validationRules = {
   deckLength: [
     CommonRules.unrealistic(5, 100, 'Deck length')
@@ -532,9 +537,9 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                   </label>
                   <input
                     type="number"
-                        value={inputs.deckLength}
+                    value={inputs.deckLength}
                     onChange={(e) => handleInputChange('deckLength', e.target.value)}
-                    onWheel={(e) => e.target.blur()}
+                    onWheel={preventScrollChange}
                     disabled={showResults}
                     className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                       showResults ? 'bg-gray-100 cursor-not-allowed' : ''
@@ -554,7 +559,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     type="number"
                         value={inputs.deckWidth}
                     onChange={(e) => handleInputChange('deckWidth', e.target.value)}
-                    onWheel={(e) => e.target.blur()}
+                    onWheel={preventScrollChange}
                     disabled={showResults}
                     className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                       showResults ? 'bg-gray-100 cursor-not-allowed' : ''
@@ -602,7 +607,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       disabled={showResults}
                       value={inputs.railingLinearFeet}
                       onChange={(e) => handleInputChange('railingLinearFeet', e.target.value)}
-                    onWheel={(e) => e.target.blur()}
+                    onWheel={preventScrollChange}
                       className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
                         inputs.includeRailing && !inputs.railingLinearFeet ? 'border-red-500' : 'border-gray-300'
                       } ${showResults ? "bg-gray-100 cursor-not-allowed" : ""}`}
@@ -642,7 +647,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       disabled={showResults}
                       value={inputs.railingPanelHeight}
                       onChange={(e) => handleInputChange('railingPanelHeight', e.target.value)}
-                    onWheel={(e) => e.target.blur()}
+                    onWheel={preventScrollChange}
                       className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
                         inputs.includeRailing && !inputs.railingPanelHeight ? 'border-red-500' : 'border-gray-300'
                       } ${showResults ? "bg-gray-100 cursor-not-allowed" : ""}`}
@@ -705,7 +710,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       disabled={showResults}
                       value={inputs.numberOfSteps}
                         onChange={(e) => handleInputChange('numberOfSteps', e.target.value)}
-                    onWheel={(e) => e.target.blur()}
+                    onWheel={preventScrollChange}
                         className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
                           inputs.includeStairs && !inputs.numberOfSteps ? 'border-red-500' : 'border-gray-300'
                         } ${showResults ? "bg-gray-100 cursor-not-allowed" : ""}`}
@@ -722,7 +727,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       disabled={showResults}
                       value={inputs.stepWidth}
                         onChange={(e) => handleInputChange('stepWidth', e.target.value)}
-                    onWheel={(e) => e.target.blur()}
+                    onWheel={preventScrollChange}
                         className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
                           inputs.includeStairs && !inputs.stepWidth ? 'border-red-500' : 'border-gray-300'
                         } ${showResults ? "bg-gray-100 cursor-not-allowed" : ""}`}
@@ -741,7 +746,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       disabled={showResults}
                       value={inputs.treadDepth}
                         onChange={(e) => handleInputChange('treadDepth', e.target.value)}
-                    onWheel={(e) => e.target.blur()}
+                    onWheel={preventScrollChange}
                         className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
                           inputs.includeStairs && !inputs.treadDepth ? 'border-red-500' : 'border-gray-300'
                         } ${showResults ? "bg-gray-100 cursor-not-allowed" : ""}`}
@@ -758,7 +763,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       disabled={showResults}
                       value={inputs.riserHeight}
                         onChange={(e) => handleInputChange('riserHeight', e.target.value)}
-                    onWheel={(e) => e.target.blur()}
+                    onWheel={preventScrollChange}
                         className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
                           inputs.includeStairs && !inputs.riserHeight ? 'border-red-500' : 'border-gray-300'
                         } ${showResults ? "bg-gray-100 cursor-not-allowed" : ""}`}
@@ -777,7 +782,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       disabled={showResults}
                       value={inputs.stairRailingLinearFeet}
                       onChange={(e) => handleInputChange('stairRailingLinearFeet', e.target.value)}
-                    onWheel={(e) => e.target.blur()}
+                    onWheel={preventScrollChange}
                       className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       min="0"
                     />
@@ -813,7 +818,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       disabled={showResults}
                       value={inputs.numberOfLandings}
                       onChange={(e) => handleInputChange('numberOfLandings', e.target.value)}
-                    onWheel={(e) => e.target.blur()}
+                    onWheel={preventScrollChange}
                       className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent ${
                         inputs.includeLandings && !inputs.numberOfLandings ? 'border-red-500' : 'border-gray-300'
                       } ${showResults ? "bg-gray-100 cursor-not-allowed" : ""}`}
@@ -831,7 +836,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       disabled={showResults}
                       value={inputs.landingLength}
                         onChange={(e) => handleInputChange('landingLength', e.target.value)}
-                    onWheel={(e) => e.target.blur()}
+                    onWheel={preventScrollChange}
                         className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent ${
                           inputs.includeLandings && !inputs.landingLength ? 'border-red-500' : 'border-gray-300'
                         } ${showResults ? "bg-gray-100 cursor-not-allowed" : ""}`}
@@ -848,7 +853,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       disabled={showResults}
                       value={inputs.landingWidth}
                         onChange={(e) => handleInputChange('landingWidth', e.target.value)}
-                    onWheel={(e) => e.target.blur()}
+                    onWheel={preventScrollChange}
                         className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent ${
                           inputs.includeLandings && !inputs.landingWidth ? 'border-red-500' : 'border-gray-300'
                         } ${showResults ? "bg-gray-100 cursor-not-allowed" : ""}`}
@@ -888,7 +893,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       disabled={showResults}
                       value={inputs.numberOfBeams}
                         onChange={(e) => handleInputChange('numberOfBeams', e.target.value)}
-                    onWheel={(e) => e.target.blur()}
+                    onWheel={preventScrollChange}
                         className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
                           inputs.includeBeams && !inputs.numberOfBeams ? 'border-red-500' : 'border-gray-300'
                         } ${showResults ? "bg-gray-100 cursor-not-allowed" : ""}`}
@@ -905,7 +910,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       disabled={showResults}
                       value={inputs.beamLength}
                         onChange={(e) => handleInputChange('beamLength', e.target.value)}
-                    onWheel={(e) => e.target.blur()}
+                    onWheel={preventScrollChange}
                         className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
                           inputs.includeBeams && !inputs.beamLength ? 'border-red-500' : 'border-gray-300'
                         } ${showResults ? "bg-gray-100 cursor-not-allowed" : ""}`}

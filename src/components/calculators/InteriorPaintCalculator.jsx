@@ -303,6 +303,12 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
     };
 };  
 
+// Prevent scroll from changing number inputs
+const preventScrollChange = (e) => {
+  e.target.blur();
+};
+
+
   const handleCopyCalculation = async () => {
     if (!showResults || !results) return;
     
@@ -413,6 +419,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     <input
                       type="number"
                       value={room.length}
+                      onWheel={preventScrollChange}
                       onChange={(e) => { updateRoom(room.id, 'length', e.target.value); setTimeout(() => validate(getValues()), 100); }}
                       className={`w-full px-3 py-2 border-2 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
                         !room.length ? 'border-orange-400' : 'border-gray-300'
@@ -426,6 +433,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     <input
                       type="number"
                       value={room.width}
+                      onWheel={preventScrollChange}
                       onChange={(e) => { updateRoom(room.id, 'width', e.target.value); setTimeout(() => validate(getValues()), 100); }}
                       className={`w-full px-3 py-2 border-2 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
                         !room.width ? 'border-orange-400' : 'border-gray-300'
@@ -439,6 +447,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     <input
                       type="number"
                       value={room.height}
+                      onWheel={preventScrollChange}
                       onChange={(e) => updateRoom(room.id, 'height', e.target.value)}
                       className={`w-full px-3 py-2 border-2 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
                         !room.height ? 'border-orange-400' : 'border-gray-300'
@@ -507,6 +516,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       <input
                         type="number"
                         value={room.customDoorArea}
+                        onWheel={preventScrollChange}
                         onChange={(e) => { updateRoom(room.id, 'customDoorArea', e.target.value); setTimeout(() => validate(getValues()), 100); }}
                         className={`w-full px-3 py-2 border-2 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
                           !room.customDoorArea ? 'border-orange-400' : 'border-gray-300'
@@ -579,6 +589,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       <input
                         type="number"
                         value={room.customWindowArea}
+                        onWheel={preventScrollChange}
                         onChange={(e) => { updateRoom(room.id, 'customWindowArea', e.target.value); setTimeout(() => validate(getValues()), 100); }}
                         className={`w-full px-3 py-2 border-2 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
                           !room.customWindowArea ? 'border-orange-400' : 'border-gray-300'

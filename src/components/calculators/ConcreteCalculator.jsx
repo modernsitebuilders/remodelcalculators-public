@@ -71,6 +71,11 @@ const ConcreteCalculator = () => {
     '5000': 'Warehouses, factory floors, parking structures'
   };
 
+// Prevent scroll from changing number inputs
+const preventScrollChange = (e) => {
+  e.target.blur();
+};
+
   // Validation rules for concrete calculator
   const validationRules = {
     slabLength: [
@@ -598,6 +603,7 @@ if (region === 'freezethaw') {
                     <input
                       type="number"
                       value={slabLength}
+                      onWheel={preventScrollChange}
                       onChange={(e) => {
                         setSlabLength(e.target.value);
                         setTimeout(() => validate(getValues()), 100);
@@ -616,6 +622,7 @@ if (region === 'freezethaw') {
                     <input
                       type="number"
                       value={slabWidth}
+                      onWheel={preventScrollChange}
                       onChange={(e) => {
                         setSlabWidth(e.target.value);
                         setTimeout(() => validate(getValues()), 100);
@@ -658,6 +665,7 @@ if (region === 'freezethaw') {
                     <input
                       type="number"
                       value={footingLength}
+                      onWheel={preventScrollChange}
                       onChange={(e) => {
                         setFootingLength(e.target.value);
                         setTimeout(() => validate(getValues()), 100);
@@ -756,6 +764,7 @@ if (region === 'freezethaw') {
                     <input
                       type="number"
                       value={postCount}
+                      onWheel={preventScrollChange}
                       onChange={(e) => {
                         setPostCount(e.target.value);
                         setTimeout(() => validate(getValues()), 100);
@@ -779,6 +788,7 @@ if (region === 'freezethaw') {
                     <input
                       type="number"
                       value={stairWidth}
+                      onWheel={preventScrollChange}
                       onChange={(e) => {
                         setStairWidth(e.target.value);
                         setTimeout(() => validate(getValues()), 100);
@@ -796,6 +806,7 @@ if (region === 'freezethaw') {
                     <input
                       type="number"
                       value={numberOfSteps}
+                      onWheel={preventScrollChange}
                       onChange={(e) => {
                         setNumberOfSteps(e.target.value);
                         setTimeout(() => validate(getValues()), 100);
@@ -855,6 +866,7 @@ if (region === 'freezethaw') {
                     <input
                       type="number"
                       value={wallLength}
+                      onWheel={preventScrollChange}
                       onChange={(e) => {
                         setWallLength(e.target.value);
                         setTimeout(() => validate(getValues()), 100);
@@ -934,6 +946,7 @@ if (region === 'freezethaw') {
                     <input
                       type="number"
                       value={columnHeight}
+                      onWheel={preventScrollChange}
                       onChange={(e) => {
                         setColumnHeight(e.target.value);
                         setTimeout(() => validate(getValues()), 100);
@@ -951,6 +964,7 @@ if (region === 'freezethaw') {
                     <input
                       type="number"
                       value={columnCount}
+                      onWheel={preventScrollChange}
                       onChange={(e) => {
                         setColumnCount(e.target.value);
                         setTimeout(() => validate(getValues()), 100);
@@ -1024,6 +1038,7 @@ if (region === 'freezethaw') {
                     <input
                       type="number"
                       value={customWasteFactor}
+                      onWheel={preventScrollChange}
                       onChange={(e) => setCustomWasteFactor(e.target.value)}
                       className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder={`Auto: ${getWasteFactor()}%`}

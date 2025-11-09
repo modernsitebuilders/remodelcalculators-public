@@ -40,6 +40,10 @@ const THICKNESS_SPECS = {
     application: 'Fire-rated, ceilings, commercial'
   }
 };
+// Prevent scroll from changing number inputs
+const preventScrollChange = (e) => {
+  e.target.blur();
+};
 
 export default function DrywallCalculator() {
   const [rooms, setRooms] = useState([
@@ -319,6 +323,7 @@ export default function DrywallCalculator() {
                   <input
                     type="number"
                     value={room.length}
+                    onWheel={preventScrollChange}
                     onChange={(e) => { updateRoom(index, 'length', e.target.value); setTimeout(() => validate(getValues()), 100); }}
                     step="0.5"
                     min="1"
@@ -336,6 +341,7 @@ export default function DrywallCalculator() {
                   <input
                     type="number"
                     value={room.width}
+                    onWheel={preventScrollChange}
                     onChange={(e) => { updateRoom(index, 'width', e.target.value); setTimeout(() => validate(getValues()), 100); }}
                     step="0.5"
                     min="1"
@@ -353,6 +359,7 @@ export default function DrywallCalculator() {
                   <input
                     type="number"
                     value={room.height}
+                    onWheel={preventScrollChange}
                     onChange={(e) => { updateRoom(index, 'height', e.target.value); setTimeout(() => validate(getValues()), 100); }}
                     step="0.5"
                     min="7"
@@ -387,6 +394,7 @@ export default function DrywallCalculator() {
                 <input
                   type="number"
                   value={room.deductions}
+                  onWheel={preventScrollChange}
                   onChange={(e) => { updateRoom(index, 'deductions', e.target.value); setTimeout(() => validate(getValues()), 100); }}
                   step="1"
                   min="0"
