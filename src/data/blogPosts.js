@@ -130,7 +130,7 @@ export const blogPosts = [
 },
 {
   slug: 'when-you-need-primer',
-  title: 'When You Actually Need Primer',
+  title: 'When You Need Primer: Drywall, Wood & Bare Surface Guide',
   description: 'Industry guidelines on primer requirements with no marketing BS.',
   date: '2025-11-05',
   author: 'Job Calculators',
@@ -157,7 +157,7 @@ export const blogPosts = [
 },
 {
   slug: 'textured-wall-painting',
-  title: 'Textured Wall Painting Tips',
+  title: 'Textured Wall Painting: Coverage Rates for Stucco & Popcorn',
   description: 'Professional techniques for painting knockdown, orange peel, and popcorn textures.',
   date: '2025-11-05',
   author: 'Job Calculators',
