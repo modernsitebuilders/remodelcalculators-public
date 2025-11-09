@@ -59,11 +59,3 @@ body {
 details summary::-webkit-details-marker {
   display: none;
 }
-
-details[open] summary span {
-  transform: rotate(90deg);
-}
-
-details summary span {
-  transition: transform 0.2s ease;
-}
