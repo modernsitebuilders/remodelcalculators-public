@@ -64,6 +64,10 @@ const getValues = () => ({
 
 const { validate, ValidationDisplay } = useValidation(validationRules);
 
+const preventScrollChange = (e) => {
+  e.target.blur();
+};
+
   const calculateMaterials = () => {
     const length = parseFloat(roomLength);
     const width = parseFloat(roomWidth);
@@ -210,10 +214,6 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
         break;
     }
 
-    // Prevent scroll from changing number inputs
-const preventScrollChange = (e) => {
-  e.target.blur();
-};
 
     setResults({
       area: Math.round(areaSquareFeet),
