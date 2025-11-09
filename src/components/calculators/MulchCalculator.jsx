@@ -26,16 +26,16 @@ const MulchCalculator = () => {
 
   // Material weights (lbs per cubic yard)
   const materialWeights = {
-    'wood-chips': 600,
-    'shredded-bark': 506,
+    'wood-chips': 700,
+    'shredded-bark': 700,
     'bark-nuggets': 700,
     'pine-needles': 1375,
-    'straw': 600,
+    'straw': 750,
     'compost': 1300,
     'rubber-mulch': 1250,
     'pea-gravel': 2700,
-    'river-rock': 1250,
-    'lava-rock': 800
+    'river-rock': 2100,
+    'lava-rock': 650
   };
 
   const validationRules = {
