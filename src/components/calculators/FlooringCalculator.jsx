@@ -454,7 +454,8 @@ const preventScrollChange = (e) => {
         .form-input,
         .form-select {
           background: white;
-          border: 1.5px solid #e5e5e5;
+          border-width: 2px;
+          border-style: solid;
           border-radius: 10px;
           padding: 12px 14px;
           font-size: 15px;
