@@ -94,7 +94,7 @@ export default function Contact() {
               <div>
                 <h3 className="font-semibold text-gray-900 mb-2">Do you save my data?</h3>
                 <p className="text-gray-700 text-sm">
-                  No, all calculations are done in your browser. We don't store your project data.
+               We log calculator inputs and results for improvement purposes, but we don't collect names, emails, or IP addresses. Your calculations aren't linked to you personally.
                 </p>
               </div>
             </div>
