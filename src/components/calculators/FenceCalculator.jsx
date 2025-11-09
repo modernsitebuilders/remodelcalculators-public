@@ -86,14 +86,17 @@ const validationRules = {
   corners: [
     CommonRules.unrealistic(0, 20, 'Number of corners'),
     {
-      condition: (val, allVals) => {
-        const num = parseFloat(val);
-        const linear = parseFloat(allVals.linearFeet);
-        return num > 0 && num > linear / 20;
-      },
-      message: 'High number of corners for fence length - please verify',
-      type: ValidationTypes.WARNING
-    }
+  condition: (val, allVals) => {
+    const num = parseFloat(val);
+    const linear = parseFloat(allVals.linearFeet);
+    // Only validate if both values are valid numbers
+    if (!num || !linear || num === 0 || linear === 0) return false;
+    // Warn if more than 1 corner per 15 feet
+    return num > linear / 15;
+  },
+  message: 'High number of corners for fence length - please verify',
+  type: ValidationTypes.WARNING
+}
   ]
 };
 
@@ -306,6 +309,10 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
       panels: panels,
       chainLink: { rolls: chainLinkRolls, fabric: meshFabric }
     };
+
+    setTimeout(() => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}, 100);
     
 
     setMaterials(materialsData);
