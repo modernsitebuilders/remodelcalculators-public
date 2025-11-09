@@ -3,7 +3,7 @@ import DumpsterCalculatorPromo from '@/components/DumpsterCalculatorPromo';
 import PopularGuidesSection from '@/components/home/PopularGuidesSection';
 
 export const metadata = {
-  title: "Job Calculators - Professional Construction Material Calculators",
+  title: "Job Calculators - Construction Material Estimate Tools",
   description: "Free construction calculators for accurate material estimation. Industry-standard formulas for concrete, paint, drywall, roofing, flooring, and more.",
   alternates: { canonical: 'https://jobcalculators.com' },
 };
