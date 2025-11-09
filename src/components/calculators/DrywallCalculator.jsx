@@ -520,14 +520,15 @@ export default function DrywallCalculator() {
                 </div>
 
                 {/* Joint Compound */}
-                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                  <div>
-                    <div className="font-bold text-gray-900">Joint Compound (All-Purpose)</div>
-                    <div className="text-sm text-gray-600">USG spec: 280 sq ft/gallon per coat</div>
-                    <div className="text-xs text-gray-500 mt-1">Level 4 finish (3 coats)</div>
-                  </div>
-                  <div className="text-3xl font-bold text-blue-600">{results.mudGallons} gal</div>
-                </div>
+<div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+  <div>
+    <div className="font-bold text-gray-900">Joint Compound (All-Purpose)</div>
+    <div className="text-sm text-gray-600">USG spec: 280 sq ft/gallon per coat</div>
+    <div className="text-xs text-gray-500 mt-1">Level 4 finish (3 coats)</div>
+    <div className="text-xs text-gray-500 mt-1">Professionals use less; DIY should plan full amount</div>
+  </div>
+  <div className="text-3xl font-bold text-blue-600">{results.mudGallons} gal</div>
+</div>
 
                 {/* Drywall Tape */}
                 <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">

@@ -42,11 +42,11 @@ export const drywallMethodology = {
       example: "19 sheets × 1.10 (10% waste) = 20.9 → round up to 21 sheets"
     },
     {
-      name: "Joint Compound Required",
-      formula: "Compound (lbs) = Total Area × 0.05",
-      explanation: "Approximately 0.05 pounds per square foot for 3-coat system (tape, fill, finish).",
-      example: "582 sq ft × 0.05 = 29 lbs compound → buy 30-35 lb bucket"
-    },
+  name: "Joint Compound Required",
+  formula: "Gallons = (Total Area ÷ 280) × 3 coats",
+  explanation: "USG specification: 280 sq ft per gallon per coat. Three-coat Level 4 finish (tape, fill, finish). Professional installers achieve better coverage; DIY should add 10-20%.",
+  example: "582 sq ft ÷ 280 = 2.08 gal/coat × 3 = 6.2 → buy 7 gallons (6 for pros)"
+},
     {
       name: "Drywall Screws Required",
       formula: "Screws = Sheets × 60",
