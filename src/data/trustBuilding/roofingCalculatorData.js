@@ -105,7 +105,7 @@ export const roofingStandards = {
       name: "National Roofing Contractors Association (NRCA) Standards",
       code: "NRCA Guidelines",
       description: "Comprehensive industry standards for residential and commercial roofing installation, materials, and best practices. Covers shingle application, underlayment requirements, flashing details, and ventilation specifications.",
-      url: "https://www.nrca.net/resources/technical",
+      url: "https://www.nrca.net/roofing-guidelines/codes-standards",
       requirements: [
         "Minimum 4-inch headlap for asphalt shingles (exposure)",
         "Six nails per shingle minimum (four for 3-tab, six for architectural)",
@@ -135,7 +135,7 @@ export const roofingStandards = {
       name: "ASTM D3462 - Asphalt Shingles (Organic Felt)",
       code: "ASTM D3462",
       description: "Material specifications for organic felt-based asphalt shingles including weight, thickness, granule adhesion, and tear resistance standards.",
-      url: "https://www.astm.org/d3462-21.html",
+      url: "https://kelid1.ir/FilesUp/ASTM_STANDARS_971222/D3462.PDF",
       requirements: [
         "Minimum weight standards by shingle type",
         "Granule adhesion requirements for wind resistance",

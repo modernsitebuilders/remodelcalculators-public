@@ -99,7 +99,7 @@ export const flooringStandards = {
       name: "National Wood Flooring Association (NWFA) Installation Guidelines",
       code: "NWFA Guidelines",
       description: "Comprehensive standards for hardwood flooring installation covering acclimation, moisture content, subfloor preparation, fastening methods, expansion gaps, and finishing. The authoritative source for professional wood floor installation.",
-      url: "https://www.nwfa.org/technical-resources/installation-guidelines",
+      url: "https://nwfa.org/technical-guidelines/",
       requirements: [
         "Acclimation: 3-14 days minimum, achieve 6-9% moisture content (within 2% of subfloor)",
         "Subfloor: Must be flat within 3/16 inch over 10 feet, dry, structurally sound",
@@ -113,7 +113,7 @@ export const flooringStandards = {
       name: "Tile Council of North America (TCNA) Handbook",
       code: "TCNA Handbook Methods",
       description: "Industry-standard reference for ceramic and porcelain tile installation. Covers substrate preparation, mortar selection, grout joints, waterproofing, and movement accommodations.",
-      url: "https://www.tcnatile.com/handbook.html",
+      url: "https://tcnatile.com/products/publications/2024-tcna-handbook-for-ceramic-glass-and-stone-tile-installation/",
       requirements: [
         "Substrate deflection: Maximum L/360 (floor), L/720 (countertops) under load",
         "Thin-set coverage: Minimum 80% coverage floors, 95% wet areas",
@@ -167,7 +167,7 @@ export const flooringStandards = {
       name: "ANSI A108 - Ceramic Tile Installation Specifications",
       code: "ANSI A108 Series",
       description: "American National Standards for ceramic tile installation covering materials, methods, and tolerances. Works in conjunction with TCNA Handbook for complete tile installation standards.",
-      url: "https://www.tcnatile.com/ansi-standards.html",
+      url: "https://blog.ansi.org/ansi/ansi-a108-a118-a136-2024-installation-ceramic-tile/",
       requirements: [
         "Lippage: Maximum 1/32 inch for rectified tiles with grout joints <1/4 inch",
         "Bonding: 80% minimum thin-set coverage (95% in wet/exterior areas)",

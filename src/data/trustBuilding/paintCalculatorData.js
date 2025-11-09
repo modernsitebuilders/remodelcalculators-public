@@ -76,7 +76,7 @@ export const paintStandards = {
       name: "PDCA - Painting & Decorating Contractors of America Standards",
       code: "P1-P20 Standards",
       description: "Industry standards for surface preparation, application methods, and quality benchmarks. Defines coverage rates, drying times, and coating specifications for professional painting.",
-      url: "https://www.pdca.org/resources/standards/",
+      url: "https://www.pcapainted.org/wp-content/uploads/2023/10/PCA-Industry-Standards_20230918.pdf",
       requirements: [
         "Surface prep: Walls must be clean, dry, and smooth before painting",
         "Primer required for: New drywall, repairs, dark-to-light color changes, stains",
@@ -89,7 +89,7 @@ export const paintStandards = {
       name: "Master Painters Institute (MPI) Standards",
       code: "MPI Gloss Level Standards",
       description: "Defines paint sheen levels and appropriate applications. Level 1 (Flat) to Level 7 (High Gloss). Higher gloss = more durable but shows imperfections more easily.",
-      url: "https://www.paintinfo.com/",
+      url: "https://www.mpi.net/Listing_testing/Standard.asp",
       requirements: [
         "Level 1-2 (Flat/Matte): Ceilings, low-traffic walls - 400 sq ft/gal",
         "Level 3-4 (Eggshell/Satin): Living areas, bedrooms - 375 sq ft/gal",
@@ -102,7 +102,7 @@ export const paintStandards = {
       name: "ASTM D3276 - Guide for Painting Inspectors",
       code: "ASTM D3276-15",
       description: "Standard for paint inspection and quality control. Covers film thickness measurement, adhesion testing, and defect identification.",
-      url: "https://www.astm.org/d3276-15r21.html",
+      url: "https://www.normservis.cz/download/view/astm-sk/d/3/d3276-21.html",
       requirements: [
         "Wet film thickness: 4-6 mils per coat typical",
         "Dry film thickness: 1.5-2 mils per coat minimum",
@@ -115,7 +115,7 @@ export const paintStandards = {
       name: "Paint Quality Institute (PQI) Guidelines",
       code: "Consumer Education Standards",
       description: "Provides paint quality ratings and application best practices. Premium paints offer better coverage (fewer coats) and durability than economy paints.",
-      url: "https://www.paintquality.com/",
+      url: "https://paintingcontractorusa.com/painting-resources/",
       requirements: [
         "Premium paints: 350-400 sq ft/gal, better hide, one-coat coverage possible",
         "Mid-grade paints: 300-350 sq ft/gal, adequate hide, two coats standard",

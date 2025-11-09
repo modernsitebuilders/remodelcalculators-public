@@ -101,20 +101,6 @@ export const sidingStandards = {
   lastVerified: "November 2025",
   standards: [
     {
-      name: "ASTM D6864 - Practice for Installation of Exterior Wood Siding",
-      code: "ASTM D6864",
-      description: "Standards for wood and wood-composite siding installation including moisture content requirements, nailing specifications, clearances, and finish guidelines.",
-      url: "https://www.astm.org/d6864-04r20.html",
-      requirements: [
-        "Moisture content: Maximum 15% at installation (12% preferred)",
-        "Clearance: 6-inch minimum from grade, 1-2 inches from decks/concrete",
-        "Nailing: Penetrate framing 1-1/2 inches, ring-shank or hot-dip galvanized nails",
-        "End joints: Stagger by minimum 16 inches vertically, caulk all end joints",
-        "Back-priming: All six sides of wood boards before installation (prevents cupping)"
-      ],
-      appliesTo: "Wood lap siding, board-and-batten, and engineered wood products"
-    },
-    {
       name: "ASTM D3679 - Rigid Poly(Vinyl Chloride) (PVC) Siding",
       code: "ASTM D3679",
       description: "Material specifications and installation standards for vinyl siding including impact resistance, wind load ratings, expansion allowances, and fastening methods.",
@@ -132,7 +118,7 @@ export const sidingStandards = {
       name: "ASTM C1186 - Flat Fiber-Cement Siding",
       code: "ASTM C1186",
       description: "Specifications for fiber-cement siding products (HardiePlank, James Hardie) including composition, strength, moisture resistance, and installation requirements.",
-      url: "https://www.astm.org/c1186-16r21.html",
+      url: "https://store.astm.org/c1186-22.html",
       requirements: [
         "Nailing: Face nailing only (no blind nailing), corrosion-resistant nails required",
         "Clearance: Minimum 6 inches from grade, 2 inches from horizontal surfaces",

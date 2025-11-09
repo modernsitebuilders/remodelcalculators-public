@@ -101,7 +101,7 @@ export const fenceStandards = {
       name: "IRC Section P2801 - Swimming Pool Barriers",
       code: "IRC P2801",
       description: "Specific requirements for pool fencing to prevent child access. Mandates height, spacing, gate hardware, and non-climbable zone specifications. Pool fences ALWAYS require permits and inspections.",
-      url: "https://codes.iccsafe.org/content/IRC2021P5",
+      url: "https://codes.iccsafe.org/s/IRC2021P3/part-vii-plumbing/IRC2021P3-Pt07-Ch28-SecP2801.1",
       requirements: [
         "Minimum height: 48 inches measured from grade",
         "Maximum opening: 4 inches (prevents child passage)",
@@ -116,7 +116,7 @@ export const fenceStandards = {
       name: "ASTM F567 - Chain Link Fence Fabric",
       code: "ASTM F567",
       description: "Standards for chain link fence materials including wire gauge, mesh size, coating specifications, and tensile strength. Ensures durability and longevity for residential and commercial installations.",
-      url: "https://www.astm.org/f0567-19.html",
+      url: "https://store.astm.org/f0567-14ar19.html",
       requirements: [
         "Residential grade: 11-gauge wire minimum, 2-inch mesh",
         "Commercial grade: 9-gauge wire, 2-inch mesh",
@@ -129,7 +129,7 @@ export const fenceStandards = {
       name: "ASTM F1083 - Pipe, Steel, Hot-Dipped Zinc-Coated (Galvanized) Welded",
       code: "ASTM F1083",
       description: "Specifications for galvanized steel fence posts and framework. Defines pipe grades, wall thickness, outside diameter, and coating requirements for corrosion resistance.",
-      url: "https://www.astm.org/f1083-17.html",
+      url: "https://store.astm.org/f1083-18.html",
       requirements: [
         "Schedule 40 residential: 16-gauge wall (0.065 inch), 2.0 inch OD line posts",
         "Commercial grade: All posts 2.5-3 inch OD, heavier gauge",

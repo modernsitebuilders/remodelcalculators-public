@@ -99,20 +99,6 @@ export const exteriorPaintStandards = {
       appliesTo: "All exterior paint applications and inspections"
     },
     {
-      name: "ASTM D6864 - Standard Practice for Exterior Wood Coating",
-      code: "ASTM D6864",
-      description: "Requirements for painting exterior wood siding including moisture content limits, surface preparation standards, primer selection, and application specifications.",
-      url: "https://store.astm.org/d6763-16.html",
-      requirements: [
-        "Wood moisture content: Maximum 15% before painting (12% preferred)",
-        "Surface preparation: Sand smooth, remove loose wood, set nail heads",
-        "Primer required: Bare wood, knots, repairs, and end cuts",
-        "Back-priming: Prime all six sides before installation (prevents warping)",
-        "Minimum 2 coats: Primer + 2 topcoats or 3 topcoats if pre-primed"
-      ],
-      appliesTo: "Wood siding, trim, and exterior wood surfaces"
-    },
-    {
       name: "Vinyl Siding Institute (VSI) Paint Guidelines",
       code: "VSI Standards",
       description: "Guidelines for painting vinyl siding to prevent heat warping. Requires specific Light Reflectance Value (LRV) ratings to avoid vinyl distortion from heat absorption.",
