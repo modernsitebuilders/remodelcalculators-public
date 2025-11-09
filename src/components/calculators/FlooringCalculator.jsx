@@ -813,17 +813,20 @@ const preventScrollChange = (e) => {
                 <p>Specify how the flooring will be installed</p>
               </div>
               <div className="form-grid form-grid-3">
-                <div className="form-group">
-                  <label className="form-label">Layout pattern</label>
-                  <select className="form-select border-yellow-400" value={layoutPattern} onChange={(e) => setLayoutPattern(e.target.value)}>
-                    <option value="straight">Straight</option>
-                    <option value="diagonal">Diagonal</option>
-                    <option value="herringbone">Herringbone</option>
-                  </select>
-                  <span className="form-hint">Diagonal and herringbone patterns require significantly more material</span>
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Room complexity</label>
+  {selectedFlooringType !== 'carpet' && (
+    <div className="form-group">
+      <label className="form-label">Layout pattern</label>
+      <select className="form-select border-yellow-400" value={layoutPattern} onChange={(e) => setLayoutPattern(e.target.value)}>
+        <option value="straight">Straight</option>
+        <option value="diagonal">Diagonal</option>
+        <option value="herringbone">Herringbone</option>
+      </select>
+      <span className="form-hint">Diagonal and herringbone patterns require significantly more material</span>
+    </div>
+  )}
+  
+  <div className="form-group">
+    <label className="form-label">Room complexity</label>
                   <select className="form-select border-yellow-400" value={roomComplexity} onChange={(e) => setRoomComplexity(e.target.value)}>
                     <option value="simple">Simple</option>
                     <option value="moderate">Moderate</option>
