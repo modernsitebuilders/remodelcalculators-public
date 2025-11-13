@@ -1,3 +1,4 @@
+import { generateCalculatorMetadata } from '@/utils/generateCalculatorMetadata';
 import { getCalculatorData } from '@/data/calculatorData';
 import FenceCalculator from '@/components/calculators/FenceCalculator';
 import CalculatorBlogLink from '@/components/blog/CalculatorBlogLink';
@@ -17,28 +18,7 @@ import {
 
 export async function generateMetadata() {
   const data = getCalculatorData('fence-calculator');
-  
-  return {
-    title: data.title,
-    description: data.description,
-    keywords: data.keywords,
-    alternates: { canonical: data.canonical },
-    openGraph: {
-      title: data.openGraph.title,
-      description: data.openGraph.description,
-      url: data.openGraph.url,
-      siteName: 'Job Calculators',
-      images: [{ url: data.openGraph.image, width: 1200, height: 630, alt: data.name }],
-      locale: 'en_US',
-      type: 'website',
-    },
-    twitter: {
-      card: data.twitter.card,
-      title: data.twitter.title,
-      description: data.twitter.description,
-      images: [data.twitter.image],
-    },
-  };
+  return generateCalculatorMetadata(data);
 }
 
 export default function FenceCalculatorPage() {

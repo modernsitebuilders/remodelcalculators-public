@@ -1,3 +1,5 @@
+import { SITE_CONFIG } from '@/data/siteConfig';
+
 export const metadata = {
   title: 'Privacy Policy | Job Calculators',
   description: 'Privacy policy for Job Calculators - how we handle user data and protect your privacy.',
@@ -5,13 +7,14 @@ export const metadata = {
 };
 
 export default function PrivacyPolicy() {
-  const lastUpdated = "October 31, 2025";
 
   return (
     <div className="min-h-screen bg-white py-12 px-4">
       <div className="container mx-auto max-w-4xl">
         <h1 className="text-4xl font-bold text-gray-900 mb-4">Privacy Policy</h1>
-        <p className="text-sm text-gray-600 mb-8">Last Updated: {lastUpdated}</p>
+        <p className="text-sm text-gray-600 mb-8">
+  Last Updated: {SITE_CONFIG.legal.privacyPolicyLastUpdated}
+</p>
 
         <div className="prose prose-lg max-w-none">
           {/* Introduction */}

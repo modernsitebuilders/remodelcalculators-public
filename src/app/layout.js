@@ -1,4 +1,5 @@
 import { Geist, Geist_Mono } from "next/font/google";
+import { SITE_CONFIG } from '@/data/siteConfig';
 import "./globals.css";
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -23,7 +24,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}>
-        <GoogleAnalytics measurementId="G-KZBWPC3X69" />
+<GoogleAnalytics measurementId={SITE_CONFIG.analytics.measurementId} />
         <Header />
         <main className="flex-grow">
           {children}

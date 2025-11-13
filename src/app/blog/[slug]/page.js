@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { getBlogPost, blogPosts } from '@/data/blogPosts';
 import Link from 'next/link';
+import { SITE_CONFIG } from '@/data/siteConfig';
 
 // Import all blog post components
 import ConcreteGuide from '@/components/blog/posts/ConcreteGuide';
@@ -59,8 +60,7 @@ export async function generateMetadata({ params }) {
     };
   }
 
-  const baseUrl = 'https://jobcalculators.com';
-  const url = `${baseUrl}/blog/${post.slug}`;
+ const url = `${SITE_CONFIG.baseUrl}/blog/${post.slug}`;
 
   return {
     title: post.title,
@@ -82,7 +82,7 @@ export async function generateMetadata({ params }) {
       authors: [post.author],
       images: [
         {
-          url: `${baseUrl}/og-image-blog.jpg`,
+          url: `${SITE_CONFIG.baseUrl}/og-image-blog.jpg`,
           width: 1200,
           height: 630,
           alt: post.title,
@@ -94,7 +94,7 @@ export async function generateMetadata({ params }) {
       card: 'summary_large_image',
       title: post.title,
       description: post.description,
-      images: [`${baseUrl}/og-image-blog.jpg`],
+      images: [`${SITE_CONFIG.baseUrl}/og-image-blog.jpg`],
     },
   };
 }
@@ -113,8 +113,7 @@ export default async function BlogPost({ params }) {
     notFound();
   }
 
-  const baseUrl = 'https://jobcalculators.com';
-  const url = `${baseUrl}/blog/${post.slug}`;
+const url = `${SITE_CONFIG.baseUrl}/blog/${post.slug}`;
 
   // Article Schema (JSON-LD) for rich results
   const articleSchema = {
@@ -122,21 +121,21 @@ export default async function BlogPost({ params }) {
     '@type': 'Article',
     headline: post.title,
     description: post.description,
-    image: `${baseUrl}/og-image-blog.jpg`,
+    image: `${SITE_CONFIG.baseUrl}/og-image-blog.jpg`,
     datePublished: post.date,
     dateModified: post.date,
     author: {
       '@type': 'Organization',
       name: post.author,
-      url: baseUrl,
+      url: SITE_CONFIG.baseUrl,
     },
     publisher: {
       '@type': 'Organization',
       name: 'Construction Calculators',
-      url: baseUrl,
+      url: SITE_CONFIG.baseUrl,
       logo: {
         '@type': 'ImageObject',
-        url: `${baseUrl}/logo.png`,
+        url: `${SITE_CONFIG.baseUrl}/logo.png`,
       },
     },
     mainEntityOfPage: {
@@ -155,13 +154,13 @@ export default async function BlogPost({ params }) {
         '@type': 'ListItem',
         position: 1,
         name: 'Home',
-        item: baseUrl,
+        item: SITE_CONFIG.baseUrl,
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: 'Guides',
-        item: `${baseUrl}/blog`,
+        item: `${SITE_CONFIG.baseUrl}/blog`,
       },
       {
         '@type': 'ListItem',

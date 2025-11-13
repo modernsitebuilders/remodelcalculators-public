@@ -1,5 +1,7 @@
 // Calculator metadata, SEO content, and configuration
-const BASE_URL = 'https://jobcalculators.com';
+import { SITE_CONFIG } from './siteConfig';
+
+const BASE_URL = SITE_CONFIG.baseUrl;
 
 // Calculator-specific OG images
 const OG_IMAGES = {
