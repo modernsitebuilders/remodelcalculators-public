@@ -1061,9 +1061,9 @@ if (region === 'freezethaw') {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <button
                   onClick={handleCalculate}
-                  className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
+                  className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
                 >
-                  <Calculator className="w-5 h-5" />
+
                   Calculate
                 </button>
                 <button
@@ -1135,7 +1135,7 @@ if (region === 'freezethaw') {
                         <span className="font-bold text-blue-600 text-lg">{results.bags80lb} bags</span>
                       </div>
                       
-                      <div className="flex items-center justify-center py-2">
+                      <div className="py-2">
                         <div className="flex-grow border-t border-gray-300"></div>
                         <span className="px-3 text-sm font-bold text-gray-500">OR</span>
                         <div className="flex-grow border-t border-gray-300"></div>

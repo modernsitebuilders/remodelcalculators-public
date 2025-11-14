@@ -1130,11 +1130,10 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     applicationMethod: applicationMethods[inputs.applicationMethod].name
                   });
                 }}
-                className="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-bold py-4 px-6 rounded-lg shadow-lg transition-colors duration-200 flex items-center justify-center gap-2"
-              >
-                <Calculator className="w-5 h-5" />
-                Calculate Stain Needed
-              </button>
+                className="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-bold py-4 px-6 rounded-lg shadow-lg transition-colors duration-200"
+>
+  Calculate Stain Needed
+</button>
             )}
             
             <button

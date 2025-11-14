@@ -619,10 +619,9 @@ const preventScrollChange = (e) => {
             <ValidationDisplay />
             
             <div className="bg-gradient-to-br from-green-600 to-emerald-700 rounded-xl shadow-2xl p-8 text-center">
-              <button onClick={calculateMaterials} className="w-full bg-white text-green-700 font-bold text-xl py-6 px-8 rounded-xl shadow-lg hover:bg-green-50 hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center justify-center gap-3">
-                <Calculator className="w-8 h-8" />
-                Calculate Materials
-              </button>
+              <button onClick={calculateMaterials} className="w-full bg-white text-green-700 font-bold text-xl py-6 px-8 rounded-xl shadow-lg hover:bg-green-50 hover:shadow-xl transform hover:scale-105 transition-all duration-200">
+  Calculate Materials
+</button>
             </div>
           </div>
           

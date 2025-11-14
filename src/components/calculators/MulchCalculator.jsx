@@ -466,15 +466,14 @@ const preventScrollChange = (e) => {
               <button
                 onClick={handleCalculate}
                 disabled={!hasResults}
-                className={`flex-1 py-3 px-6 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 ${
-                  hasResults
-                    ? 'bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-xl'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }`}
-              >
-                <Calculator className="w-5 h-5" />
-                Calculate
-              </button>
+                className={`flex-1 py-3 px-6 rounded-lg font-semibold transition-all ${
+  hasResults
+    ? 'bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-xl'
+    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+}`}
+>
+  Calculate
+</button>
               <button
                 onClick={handleReset}
                 className="px-6 py-3 rounded-lg font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 transition-all"

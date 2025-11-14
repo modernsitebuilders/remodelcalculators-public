@@ -1401,11 +1401,10 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                 <button
                   onClick={calculateMaterials}
                   disabled={!canCalculate()}
-                  className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 cursor-pointer flex items-center gap-2 disabled:bg-gray-300 disabled:cursor-not-allowed"
-                >
-                  Calculate Materials
-                  <Calculator className="w-4 h-4" />
-                </button>
+                  className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 cursor-pointer disabled:bg-gray-300 disabled:cursor-not-allowed"
+>
+  Calculate Materials
+</button>
               </div>
             )}
             {step === 5 && (
