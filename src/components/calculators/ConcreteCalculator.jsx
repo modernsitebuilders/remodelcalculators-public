@@ -9,6 +9,15 @@ import { printCalculation } from '@/utils/printCalculation';
 import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
 import { FAQSection } from '@/components/FAQSection';
+import { 
+  NumberInput, 
+  SelectInput, 
+  MaterialCard,
+  CalculateButtons,
+  ResultsButtons,
+  SectionCard,
+  InputGrid
+} from '@/components/calculator';
 
 const ConcreteCalculator = () => {
   // Project Type Selection
@@ -27,23 +36,23 @@ const ConcreteCalculator = () => {
   // Post Hole Dimensions
   const [postDiameter, setPostDiameter] = useState('12');
   const [postDepth, setPostDepth] = useState('36');
-  const [postCount, setPostCount] = useState('1');
+  const [postCount, setPostCount] = useState('');
   
   // Stair Dimensions
-  const [stairWidth, setStairWidth] = useState('36');
+  const [stairWidth, setStairWidth] = useState('');
   const [riserHeight, setRiserHeight] = useState('7');
   const [treadDepth, setTreadDepth] = useState('11');
-  const [numberOfSteps, setNumberOfSteps] = useState('3');
+  const [numberOfSteps, setNumberOfSteps] = useState('');
   
   // Wall Dimensions
   const [wallLength, setWallLength] = useState('');
-  const [wallHeight, setWallHeight] = useState('96');
+  const [wallHeight, setWallHeight] = useState('');
   const [wallThickness, setWallThickness] = useState('8');
   
   // Column Dimensions
   const [columnDiameter, setColumnDiameter] = useState('12');
-  const [columnHeight, setColumnHeight] = useState('96');
-  const [columnCount, setColumnCount] = useState('1');
+  const [columnHeight, setColumnHeight] = useState('');
+  const [columnCount, setColumnCount] = useState('');
   
   // Calculation Options
   const [psiRating, setPsiRating] = useState('3000');
@@ -54,7 +63,6 @@ const ConcreteCalculator = () => {
   // Results
   const [results, setResults] = useState(null);
   const [showAdditionalMaterials, setShowAdditionalMaterials] = useState(false);
-
   const [copyButtonText, setCopyButtonText] = useState('📋 Copy Calculation');
 
   // Calculation Constants (from research)
@@ -71,11 +79,6 @@ const ConcreteCalculator = () => {
     '4000': 'Commercial garages, industrial floors, heavy equipment',
     '5000': 'Warehouses, factory floors, parking structures'
   };
-
-// Prevent scroll from changing number inputs
-const preventScrollChange = (e) => {
-  e.target.blur();
-};
 
   // Validation rules for concrete calculator
   const validationRules = {
@@ -129,7 +132,6 @@ const preventScrollChange = (e) => {
     columnHeight: [
       CommonRules.unrealistic(12, 240, 'Column height')
     ],
-    // ADD THESE STAIR VALIDATIONS
     stairWidth: [
       {
         condition: (val) => parseFloat(val) > 0 && parseFloat(val) < 36,
@@ -163,7 +165,7 @@ const preventScrollChange = (e) => {
     ]
   };
 
-   const { validate, ValidationDisplay } = useValidation(validationRules);
+  const { validate, ValidationDisplay } = useValidation(validationRules);
 
   // Helper to get all current values
   const getValues = () => ({
@@ -196,21 +198,21 @@ const preventScrollChange = (e) => {
     
     switch (projectType) {
       case 'slab':
-        return 5; // Simple rectangular pours
+        return 5;
       case 'footing':
-        return 10; // Complex shapes, irregular dimensions
+        return 10;
       case 'posthole':
-        return 7.5; // Standard cylindrical
+        return 7.5;
       case 'stairs':
-        return 10; // Complex forming requirements
+        return 10;
       case 'wall':
-        return 7.5; // Standard vertical pours
+        return 7.5;
       case 'column':
-        return 7.5; // Standard cylindrical
+        return 7.5;
       default:
         return 7.5;
     }
- };
+  };
 
   const calculateConcrete = () => {
     let volumeCubicFeet = 0;
@@ -226,7 +228,6 @@ const preventScrollChange = (e) => {
         volumeCubicFeet = (length * width * (thickness / 12));
         projectDescription = `${length}' × ${width}' × ${thickness}" slab`;
         
-        // Recommendations based on thickness
         if (thickness < 3.5) {
           recommendations.push({
             type: 'warning',
@@ -266,7 +267,7 @@ const preventScrollChange = (e) => {
         const diameter = parseFloat(postDiameter) || 0;
         const depth = parseFloat(postDepth) || 0;
         const count = parseFloat(postCount) || 0;
-        const radius = diameter / 24; // Convert diameter in inches to radius in feet
+        const radius = diameter / 24;
         volumeCubicFeet = (Math.PI * radius * radius * (depth / 12)) * count;
         projectDescription = `${count} post hole(s) - ${diameter}" diameter × ${depth}" deep`;
         
@@ -284,8 +285,7 @@ const preventScrollChange = (e) => {
         const tread = parseFloat(treadDepth) || 0;
         const steps = parseFloat(numberOfSteps) || 0;
         
-        // Approximate volume calculation for stairs
-        const avgHeight = (riser * steps) / 2; // Average height
+        const avgHeight = (riser * steps) / 2;
         const totalLength = tread * steps;
         volumeCubicFeet = (stairW / 12) * (totalLength / 12) * (avgHeight / 12);
         projectDescription = `${steps} steps - ${stairW}" wide with ${riser}" risers and ${tread}" treads`;
@@ -337,40 +337,32 @@ const preventScrollChange = (e) => {
       return;
     }
 
-    // Apply waste factor (automatic based on project type, or custom)
     const wasteFactor = getWasteFactor();
     const waste = wasteFactor / 100;
     const volumeWithWaste = volumeCubicFeet * (1 + waste);
     
-    // Convert to cubic yards
     const cubicYards = volumeWithWaste / CUBIC_FEET_PER_YARD;
     
-    // Calculate both bag sizes
     const bags80lb = Math.ceil(volumeWithWaste / BAG_YIELDS['80']);
     const bags60lb = Math.ceil(volumeWithWaste / BAG_YIELDS['60']);
     
-    // Additional materials calculations
     const squareFeet = projectType === 'slab' 
       ? (parseFloat(slabLength) || 0) * (parseFloat(slabWidth) || 0)
       : 0;
     
-    // Rebar calculation (for slabs): #4 rebar at 18" spacing
-    const rebarSpacing = 18; // inches
+    const rebarSpacing = 18;
     const rebarLengthFeet = projectType === 'slab'
       ? Math.ceil(((parseFloat(slabLength) || 0) / (rebarSpacing / 12)) * (parseFloat(slabWidth) || 0) +
                    ((parseFloat(slabWidth) || 0) / (rebarSpacing / 12)) * (parseFloat(slabLength) || 0))
       : 0;
     const rebarPieces20ft = Math.ceil(rebarLengthFeet / 20);
     
-    // Gravel base calculation: 4" for residential, 6" for commercial
     const baseThickness = psiRating >= 4000 ? 6 : 4;
     const gravelCubicFeet = squareFeet * (baseThickness / 12);
     const gravelCubicYards = gravelCubicFeet / CUBIC_FEET_PER_YARD;
     
-    // Wire mesh calculation (6x6 W1.4xW1.4)
-    const wireMeshRolls = Math.ceil(squareFeet / 150); // Standard 5' x 150' roll
+    const wireMeshRolls = Math.ceil(squareFeet / 150);
     
-    // Regional adjustments
     let regionalNotes = [];
     if (region === 'freezethaw') {
       regionalNotes.push('Air entrainment required (6% by volume)');
@@ -378,22 +370,14 @@ const preventScrollChange = (e) => {
       regionalNotes.push('Footings must extend below frost line (48-60"+)');
     }
     if (region === 'seismic') {
-  regionalNotes.push('Seismic zone requirements apply - consult structural engineer');
-  regionalNotes.push('Special reinforcement and design per local codes required');
-}
+      regionalNotes.push('Seismic zone requirements apply - consult structural engineer');
+      regionalNotes.push('Special reinforcement and design per local codes required');
+    }
+    if (region === 'expansive') {
+      regionalNotes.push('Expansive soil conditions require engineered foundation design');
+      regionalNotes.push('Consult structural engineer and geotechnical report');
+    }
 
-if (region === 'expansive') {
-  regionalNotes.push('Expansive soil conditions require engineered foundation design');
-  regionalNotes.push('Consult structural engineer and geotechnical report');
-}
-
-if (region === 'freezethaw') {
-  regionalNotes.push('Air entrainment required (6% by volume)');
-  regionalNotes.push('Minimum 4,500 PSI strength recommended for freeze-thaw resistance');
-  regionalNotes.push('Footings must extend below local frost line depth');
-}
-
-    // PSI recommendations
     if (projectType === 'slab' && psiRating < 3000) {
       recommendations.push({
         type: 'info',
@@ -407,26 +391,18 @@ if (region === 'freezethaw') {
       });
     }
 
-    // Material method recommendation - considers project type, bag count, and volume
     let methodRecommendation = '';
-    
-    // Projects that require continuous pour
     const requiresContinuousPour = ['stairs', 'wall', 'column'];
     
     if (requiresContinuousPour.includes(projectType) && bags80lb > 15) {
-      // Stairs, walls, columns need continuous pour - 15+ bags is impractical
       methodRecommendation = 'Ready-mix concrete is strongly recommended. This project requires a continuous pour for structural integrity, and mixing ' + bags80lb + ' bags would be impractical and risk cold joints.';
     } else if (bags80lb > 25) {
-      // Any project over 25 bags (~1 cubic yard) is impractical with bags
       methodRecommendation = 'Ready-mix concrete is recommended. Mixing ' + bags80lb + ' bags by hand would take 4+ hours and risks inconsistent quality.';
     } else if (bags80lb > 15 && cubicYards >= 0.75) {
-      // 15-25 bags in the gray zone
       methodRecommendation = 'Consider ready-mix for time savings. While ' + bags80lb + ' bags is manageable, ready-mix ensures consistent quality and saves significant labor.';
     } else if (bags80lb <= 10) {
-      // 10 or fewer bags is practical
       methodRecommendation = 'Bagged concrete is practical for this project size (' + bags80lb + ' bags). Cost-effective for small projects under 0.5 cubic yards.';
     } else {
-      // 10-15 bags - still manageable but approaching the limit
       methodRecommendation = 'Bagged concrete is feasible (' + bags80lb + ' bags), but ready-mix may be more convenient if available in your area.';
     }
 
@@ -442,14 +418,13 @@ if (region === 'freezethaw') {
       recommendations,
       regionalNotes,
       methodRecommendation,
-      // Additional materials
       squareFeet: squareFeet.toFixed(0),
       gravelCubicYards: gravelCubicYards.toFixed(2),
-      baseThickness
+      baseThickness,
+      rebarPieces20ft,
+      wireMeshRolls
     });
 
-  
-  // Track calculation to GA4 and Google Sheets
     trackCalculation('concrete', {
       projectType,
       psiRating,
@@ -473,16 +448,15 @@ if (region === 'freezethaw') {
       bags60lb
     });
     
-    // Track Calculate button click
     trackCalculatorInteraction.calculate('concrete', true);
   };
+
   const handleCalculate = () => {
     calculateConcrete();
   };
 
   const handleReset = () => {
     trackCalculatorInteraction.startOver('concrete');
-    // Reset all inputs
     setSlabLength('');
     setSlabWidth('');
     setSlabThickness('4');
@@ -511,51 +485,47 @@ if (region === 'freezethaw') {
   };
 
   const handleCopyCalculation = async () => {
-  if (!results) return;
+    if (!results) return;
 
-  trackCalculatorInteraction.copyResults('concrete');
-  
-  // Prepare inputs object
-  const inputs = {
-    'Project type': projectType,
-    ...(projectType === 'slab' && {
-      'Length': `${slabLength} feet`,
-      'Width': `${slabWidth} feet`,
-      'Thickness': `${slabThickness} inches`
-    }),
-    ...(projectType === 'footing' && {
-      'Length': `${footingLength} feet`,
-      'Width': `${footingWidth} inches`,
-      'Depth': `${footingDepth} inches`
-    }),
-    ...(projectType === 'post' && {
-      'Post diameter': `${postDiameter} inches`,
-      'Post depth': `${postDepth} inches`,
-      'Number of posts': postCount
-    }),
-    'PSI rating': psiRating
+    trackCalculatorInteraction.copyResults('concrete');
+    
+    const inputs = {
+      'Project type': projectType,
+      ...(projectType === 'slab' && {
+        'Length': `${slabLength} feet`,
+        'Width': `${slabWidth} feet`,
+        'Thickness': `${slabThickness} inches`
+      }),
+      ...(projectType === 'footing' && {
+        'Length': `${footingLength} feet`,
+        'Width': `${footingWidth} inches`,
+        'Depth': `${footingDepth} inches`
+      }),
+      ...(projectType === 'post' && {
+        'Post diameter': `${postDiameter} inches`,
+        'Post depth': `${postDepth} inches`,
+        'Number of posts': postCount
+      }),
+      'PSI rating': psiRating
+    };
+    
+    const outputs = {
+      'Concrete needed': `${results.cubicYards} cubic yards`,
+      '80lb bags': `${results.bags80lb} bags`,
+      '60lb bags': `${results.bags60lb} bags`
+    };
+    
+    const note = `Includes ${results.wasteFactorApplied}% waste factor. Always verify measurements on site.`;
+    
+    const success = await copyCalculation('Concrete Calculator', inputs, outputs, note);
+    
+    if (success) {
+      setCopyButtonText('✓ Copied!');
+      setTimeout(() => setCopyButtonText('📋 Copy Calculation'), 2000);
+    } else {
+      alert('Unable to copy. Please copy results manually.');
+    }
   };
-  
-  // Prepare outputs object
-  const outputs = {
-    'Concrete needed': `${results.cubicYards} cubic yards`,
-    '80lb bags': `${results.bags80lb} bags`,
-    '60lb bags': `${results.bags60lb} bags`
-  };
-  
-  // Note text
-  const note = `Includes ${results.wasteFactorApplied}% waste factor. Always verify measurements on site.`;
-  
-  // Call the copy function
-  const success = await copyCalculation('Concrete Calculator', inputs, outputs, note);
-  
-  if (success) {
-    setCopyButtonText('✓ Copied!');
-    setTimeout(() => setCopyButtonText('📋 Copy Calculation'), 2000);
-  } else {
-    alert('Unable to copy. Please copy results manually.');
-  }
-};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4">
@@ -575,12 +545,7 @@ if (region === 'freezethaw') {
           {/* Input Section */}
           <div className="lg:col-span-2 space-y-6">
             {/* Project Type Selection */}
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <Ruler className="w-5 h-5 text-blue-600" />
-                Project Type
-              </h2>
-              
+            <SectionCard title="Project Type" icon={Ruler}>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {[
                   { value: 'slab', label: 'Slab/Patio', desc: 'Driveways, patios, floors' },
@@ -604,438 +569,322 @@ if (region === 'freezethaw') {
                   </button>
                 ))}
               </div>
-            </div>
+            </SectionCard>
 
             {/* Dimensions Input */}
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <h2 className="text-xl font-bold text-gray-800 mb-4">Dimensions</h2>
+            {projectType === 'slab' && (
+              <SectionCard title="Dimensions" icon={Ruler}>
+                <InputGrid columns={3}>
+                  <NumberInput 
+                    label="Length" 
+                    value={slabLength}
+                    onChange={(val) => { 
+                      setSlabLength(val); 
+                      setTimeout(() => validate(getValues()), 100); 
+                    }}
+                    unit="feet" 
+                    placeholder="Enter length"
+                    required={true}
+                  />
+                  <NumberInput 
+                    label="Width" 
+                    value={slabWidth}
+                    onChange={(val) => { 
+                      setSlabWidth(val); 
+                      setTimeout(() => validate(getValues()), 100); 
+                    }}
+                    unit="feet" 
+                    placeholder="Enter width"
+                    required={true}
+                  />
+                  <SelectInput 
+                    label="Thickness" 
+                    value={slabThickness}
+                    onChange={(val) => { 
+                      setSlabThickness(val); 
+                      setTimeout(() => validate(getValues()), 100); 
+                    }}
+                    options={[
+                      { value: '3.5', label: '3.5" - Minimum IRC' },
+                      { value: '4', label: '4" - Standard residential' },
+                      { value: '5', label: '5" - Heavy duty' },
+                      { value: '6', label: '6" - RV/DOT driveway' },
+                      { value: '8', label: '8" - Commercial heavy' }
+                    ]}
+                  />
+                </InputGrid>
+              </SectionCard>
+            )}
 
-              {projectType === 'slab' && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Length (feet)
-                    </label>
-                    <input
-                      type="number"
-                      value={slabLength}
-                      onWheel={preventScrollChange}
-                      onChange={(e) => {
-                        setSlabLength(e.target.value);
-                        setTimeout(() => validate(getValues()), 100);
-                      }}
-                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                        !slabLength ? 'border-orange-400' : 'border-gray-300'
-                      }`}
-                      placeholder="Enter length"
-                      step="0.1"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Width (feet)
-                    </label>
-                    <input
-                      type="number"
-                      value={slabWidth}
-                      onWheel={preventScrollChange}
-                      onChange={(e) => {
-                        setSlabWidth(e.target.value);
-                        setTimeout(() => validate(getValues()), 100);
-                      }}
-                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                        !slabWidth ? 'border-orange-400' : 'border-gray-300'
-                      }`}
-                      placeholder="Enter width"
-                      step="0.1"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Thickness (inches)
-                    </label>
-                    <select
-                      value={slabThickness}
-                      onChange={(e) => {
-                        setSlabThickness(e.target.value);
-                        setTimeout(() => validate(getValues()), 100);
-                      }}
-                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="3.5">3.5" - Minimum IRC</option>
-                      <option value="4">4" - Standard residential</option>
-                      <option value="5">5" - Heavy duty</option>
-                      <option value="6">6" - RV/DOT driveway</option>
-                      <option value="8">8" - Commercial heavy</option>
-                    </select>
-                  </div>
-                </div>
-              )}
+            {projectType === 'footing' && (
+  <SectionCard title="Dimensions" icon={Ruler}>
+    <InputGrid columns={3}>
+      <NumberInput 
+        label="Length" 
+        value={footingLength}
+        onChange={(val) => { 
+          setFootingLength(val); 
+          setTimeout(() => validate(getValues()), 100); 
+        }}
+        unit="feet" 
+        placeholder="Enter length"
+        required={true}
+      />
+      <SelectInput 
+        label="Width" 
+        value={footingWidth}
+        onChange={(val) => { 
+          setFootingWidth(val); 
+          setTimeout(() => validate(getValues()), 100); 
+        }}
+        options={[
+          { value: '12', label: '12" - IRC min' },
+          { value: '16', label: '16" - 1-story' },
+          { value: '20', label: '20" - 2-story' },
+          { value: '24', label: '24" - 3-story' }
+        ]}
+      />
+      <SelectInput 
+        label="Thickness" 
+        value={footingDepth}
+        onChange={(val) => { 
+          setFootingDepth(val); 
+          setTimeout(() => validate(getValues()), 100); 
+        }}
+        options={[
+          { value: '6', label: '6" - 1-story' },
+          { value: '7', label: '7" - 2-story' },
+          { value: '8', label: '8" - 3-story' },
+          { value: '12', label: '12" - Heavy' }
+        ]}
+      />
+    </InputGrid>
+  </SectionCard>
+)}
 
-              {projectType === 'footing' && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Length (feet)
-                    </label>
-                    <input
-                      type="number"
-                      value={footingLength}
-                      onWheel={preventScrollChange}
-                      onChange={(e) => {
-                        setFootingLength(e.target.value);
-                        setTimeout(() => validate(getValues()), 100);
-                      }}
-                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                        !footingLength ? 'border-orange-400' : 'border-gray-300'
-                      }`}
-                      placeholder="Enter length"
-                      step="0.1"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Width (inches)
-                    </label>
-                    <select
-                      value={footingWidth}
-                      onChange={(e) => {
-                        setFootingWidth(e.target.value);
-                        setTimeout(() => validate(getValues()), 100);
-                      }}
-                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="12">12" - IRC minimum</option>
-                      <option value="16">16" - 1-story standard</option>
-                      <option value="20">20" - 2-story</option>
-                      <option value="24">24" - 3-story</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Depth (inches)
-                    </label>
-                    <select
-                      value={footingDepth}
-                      onChange={(e) => {
-                        setFootingDepth(e.target.value);
-                        setTimeout(() => validate(getValues()), 100);
-                      }}
-                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="12">12" - IRC minimum</option>
-                      <option value="6">6" - 1-story thickness</option>
-                      <option value="7">7" - 2-story thickness</option>
-                      <option value="8">8" - 3-story thickness</option>
-                    </select>
-                  </div>
-                </div>
-              )}
+            {projectType === 'posthole' && (
+              <SectionCard title="Dimensions" icon={Ruler}>
+                <InputGrid columns={3}>
+                  <SelectInput 
+  label="Hole Diameter" 
+  value={postDiameter}
+  onChange={(val) => { 
+    setPostDiameter(val); 
+    setTimeout(() => validate(getValues()), 100); 
+  }}
+  options={[
+    { value: '8', label: '8"' },
+    { value: '10', label: '10"' },
+    { value: '12', label: '12"' },
+    { value: '16', label: '16"' },
+    { value: '20', label: '20"' },
+    { value: '24', label: '24"' }
+  ]}
+/>
+                  <SelectInput 
+  label="Hole Depth" 
+  value={postDepth}
+  onChange={(val) => { 
+    setPostDepth(val); 
+    setTimeout(() => validate(getValues()), 100); 
+  }}
+  options={[
+    { value: '24', label: '24"' },
+    { value: '30', label: '30"' },
+    { value: '36', label: '36"' },
+    { value: '42', label: '42"' },
+    { value: '48', label: '48"' }
+  ]}
+/>
+                  <NumberInput 
+                    label="Number of Posts" 
+                    value={postCount}
+                    onChange={(val) => { 
+                      setPostCount(val); 
+                      setTimeout(() => validate(getValues()), 100);
+                    }}
+                    placeholder="Enter count"
+                    min="1"
+                    required={true}
+                  />
+                </InputGrid>
+              </SectionCard>
+            )}
 
-              {projectType === 'posthole' && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Hole Diameter (inches)
-                    </label>
-                    <select
-                      value={postDiameter}
-                      onChange={(e) => {
-                        setPostDiameter(e.target.value);
-                        setTimeout(() => validate(getValues()), 100);
-                      }}
-                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="8">8" - Small posts</option>
-                      <option value="10">10" - Standard 4x4</option>
-                      <option value="12">12" - 4x4 posts</option>
-                      <option value="16">16" - 6x6 posts</option>
-                      <option value="20">20" - Large deck posts</option>
-                      <option value="24">24" - Heavy-duty</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Hole Depth (inches)
-                    </label>
-                    <select
-                      value={postDepth}
-                      onChange={(e) => {
-                        setPostDepth(e.target.value);
-                        setTimeout(() => validate(getValues()), 100);
-                      }}
-                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="24">24" - 6' fence (1/3 rule)</option>
-                      <option value="30">30" - Standard deck</option>
-                      <option value="36">36" - 8-10' fence</option>
-                      <option value="42">42" - Frost protection</option>
-                      <option value="48">48" - Deep frost zone</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Number of Posts
-                    </label>
-                    <input
-                      type="number"
-                      value={postCount}
-                      onWheel={preventScrollChange}
-                      onChange={(e) => {
-                        setPostCount(e.target.value);
-                        setTimeout(() => validate(getValues()), 100);
-                      }}
-                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                        !postCount ? 'border-orange-400' : 'border-gray-300'
-                      }`}
-                      placeholder="Enter count"
-                      min="1"
-                    />
-                  </div>
-                </div>
-              )}
+            {projectType === 'stairs' && (
+              <SectionCard title="Dimensions" icon={Ruler}>
+                <InputGrid columns={2}>
+                  <NumberInput 
+                    label="Stair Width" 
+                    value={stairWidth}
+                    onChange={(val) => { 
+                      setStairWidth(val); 
+                      setTimeout(() => validate(getValues()), 100); 
+                    }}
+                    unit="inches" 
+                    placeholder="Enter width"
+                    required={true}
+                  />
+                  <NumberInput 
+                    label="Number of Steps" 
+                    value={numberOfSteps}
+                    onChange={(val) => { 
+                      setNumberOfSteps(val); 
+                      setTimeout(() => validate(getValues()), 100); 
+                    }}
+                    placeholder="Enter count"
+                    min="1"
+                    required={true}
+                  />
+                  <SelectInput 
+                    label="Riser Height" 
+                    value={riserHeight}
+                    onChange={(val) => { 
+                      setRiserHeight(val); 
+                      setTimeout(() => validate(getValues()), 100);
+                    }}
+                    required={true}
+                    options={[
+                      { value: '6', label: '6" - Low rise' },
+                      { value: '7', label: '7" - Standard residential' },
+                      { value: '7.5', label: '7.5" - IRC maximum' },
+                      { value: '7.75', label: '7.75" - Absolute IRC max' }
+                    ]}
+                  />
+                  <SelectInput 
+                    label="Tread Depth" 
+                    value={treadDepth}
+                    onChange={(val) => { 
+                      setTreadDepth(val); 
+                      setTimeout(() => validate(getValues()), 100); 
+                    }}
+                    required={true}
+                    options={[
+                      { value: '10', label: '10" - IRC minimum' },
+                      { value: '11', label: '11" - Standard' },
+                      { value: '12', label: '12" - Comfortable' },
+                      { value: '14', label: '14" - Wide tread' }
+                    ]}
+                  />
+                </InputGrid>
+              </SectionCard>
+            )}
 
-              {projectType === 'stairs' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Stair Width (inches)
-                    </label>
-                    <input
-                      type="number"
-                      value={stairWidth}
-                      onWheel={preventScrollChange}
-                      onChange={(e) => {
-                        setStairWidth(e.target.value);
-                        setTimeout(() => validate(getValues()), 100);
-                      }}
-                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                        !stairWidth ? 'border-orange-400' : 'border-gray-300'
-                      }`}
-                      placeholder="Enter width"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Number of Steps
-                    </label>
-                    <input
-                      type="number"
-                      value={numberOfSteps}
-                      onWheel={preventScrollChange}
-                      onChange={(e) => {
-                        setNumberOfSteps(e.target.value);
-                        setTimeout(() => validate(getValues()), 100);
-                      }}
-                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                        !numberOfSteps ? 'border-orange-400' : 'border-gray-300'
-                      }`}
-                      placeholder="Enter count"
-                      min="1"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Riser Height (inches)
-                    </label>
-                    <select
-                      value={riserHeight}
-                      onChange={(e) => {
-                        setRiserHeight(e.target.value);
-                        setTimeout(() => validate(getValues()), 100);
-                      }}
-                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="6">6" - Low rise</option>
-                      <option value="7">7" - Standard residential</option>
-                      <option value="7.5">7.5" - IRC maximum</option>
-                      <option value="7.75">7.75" - Absolute IRC max</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Tread Depth (inches)
-                    </label>
-                    <select
-                      value={treadDepth}
-                      onChange={(e) => {
-                        setTreadDepth(e.target.value);
-                        setTimeout(() => validate(getValues()), 100);
-                      }}
-                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="10">10" - IRC minimum</option>
-                      <option value="11">11" - Standard</option>
-                      <option value="12">12" - Comfortable</option>
-                      <option value="14">14" - Wide tread</option>
-                    </select>
-                  </div>
-                </div>
-              )}
+            {projectType === 'wall' && (
+              <SectionCard title="Dimensions" icon={Ruler}>
+                <InputGrid columns={3}>
+                  <NumberInput 
+                    label="Length" 
+                    value={wallLength}
+                    onChange={(val) => { 
+                      setWallLength(val); 
+                      setTimeout(() => validate(getValues()), 100); 
+                    }}
+                    unit="feet" 
+                    placeholder="Enter length"
+                    required={true}
+                  />
+                  <NumberInput 
+                    label="Height" 
+                    value={wallHeight}
+                    onChange={(val) => { 
+                      setWallHeight(val); 
+                      setTimeout(() => validate(getValues()), 100); 
+                    }}
+                    unit="feet" 
+                    placeholder="Enter height"
+                    required={true}
+                  />
+                  <SelectInput 
+                    label="Thickness" 
+                    value={wallThickness}
+                    onChange={(val) => { 
+                      setWallThickness(val); 
+                      setTimeout(() => validate(getValues()), 100); 
+                    }}
+                    options={[
+                      { value: '6', label: '6" - Minimum/short walls' },
+                      { value: '8', label: '8" - Standard foundation' },
+                      { value: '10', label: '10" - Heavy-duty' },
+                      { value: '12', label: '12" - Tall walls' }
+                    ]}
+                  />
+                </InputGrid>
+              </SectionCard>
+            )}
 
-              {projectType === 'wall' && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Length (feet)
-                    </label>
-                    <input
-                      type="number"
-                      value={wallLength}
-                      onWheel={preventScrollChange}
-                      onChange={(e) => {
-                        setWallLength(e.target.value);
-                        setTimeout(() => validate(getValues()), 100);
-                      }}
-                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                        !wallLength ? 'border-orange-400' : 'border-gray-300'
-                      }`}
-                      placeholder="Enter length"
-                      step="0.1"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Height (inches)
-                    </label>
-                    <select
-                      value={wallHeight}
-                      onChange={(e) => {
-                        setWallHeight(e.target.value);
-                        setTimeout(() => validate(getValues()), 100);
-                      }}
-                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="48">48" - 4' retaining</option>
-                      <option value="96">96" - 8' foundation</option>
-                      <option value="108">108" - 9' basement</option>
-                      <option value="120">120" - 10' wall</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Thickness (inches)
-                    </label>
-                    <select
-                      value={wallThickness}
-                      onChange={(e) => {
-                        setWallThickness(e.target.value);
-                        setTimeout(() => validate(getValues()), 100);
-                      }}
-                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="6">6" - Minimum/short walls</option>
-                      <option value="8">8" - Standard foundation</option>
-                      <option value="10">10" - Heavy-duty</option>
-                      <option value="12">12" - Tall walls</option>
-                    </select>
-                  </div>
-                </div>
-              )}
-
-              {projectType === 'column' && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Diameter (inches)
-                    </label>
-                    <select
-                      value={columnDiameter}
-                      onChange={(e) => {
-                        setColumnDiameter(e.target.value);
-                        setTimeout(() => validate(getValues()), 100);
-                      }}
-                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="8">8" - Small column</option>
-                      <option value="10">10" - Standard sono-tube</option>
-                      <option value="12">12" - Common column</option>
-                      <option value="16">16" - Heavy support</option>
-                      <option value="20">20" - Large column</option>
-                      <option value="24">24" - Major support</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Height (inches)
-                    </label>
-                    <input
-                      type="number"
-                      value={columnHeight}
-                      onWheel={preventScrollChange}
-                      onChange={(e) => {
-                        setColumnHeight(e.target.value);
-                        setTimeout(() => validate(getValues()), 100);
-                      }}
-                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                        !columnHeight ? 'border-orange-400' : 'border-gray-300'
-                      }`}
-                      placeholder="Enter height"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Number of Columns
-                    </label>
-                    <input
-                      type="number"
-                      value={columnCount}
-                      onWheel={preventScrollChange}
-                      onChange={(e) => {
-                        setColumnCount(e.target.value);
-                        setTimeout(() => validate(getValues()), 100);
-                      }}
-                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                        !columnCount ? 'border-orange-400' : 'border-gray-300'
-                      }`}
-                      placeholder="Enter count"
-                      min="1"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
+            {projectType === 'column' && (
+              <SectionCard title="Dimensions" icon={Ruler}>
+                <InputGrid columns={3}>
+                  <SelectInput 
+                    label="Diameter" 
+                    value={columnDiameter}
+                    onChange={(val) => { 
+                      setColumnDiameter(val); 
+                      setTimeout(() => validate(getValues()), 100); 
+                    }}
+                    options={[
+  { value: '8', label: '8"' },
+  { value: '10', label: '10"' },
+  { value: '12', label: '12"' },
+  { value: '16', label: '16"' },
+  { value: '20', label: '20"' },
+  { value: '24', label: '24"' }
+]}
+                  />
+                  <NumberInput 
+                    label="Height" 
+                    value={columnHeight}
+                    onChange={(val) => { 
+                      setColumnHeight(val); 
+                      setTimeout(() => validate(getValues()), 100); 
+                    }}
+                    unit="feet" 
+                    placeholder="Enter height"
+                    required={true}
+                  />
+                  <NumberInput 
+                    label="Number of Columns" 
+                    value={columnCount}
+                    onChange={(val) => { 
+                      setColumnCount(val); 
+                      setTimeout(() => validate(getValues()), 100); 
+                    }}
+                    placeholder="Enter count"
+                    min="1"
+                    required={true}
+                  />
+                </InputGrid>
+              </SectionCard>
+            )}
 
             {/* Specifications */}
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <h2 className="text-xl font-bold text-gray-800 mb-4">Specifications</h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    PSI Strength Rating
-                  </label>
-                  <select
-                    value={psiRating}
-                    onChange={(e) => setPsiRating(e.target.value)}
-                    className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="2500">2,500 PSI - Sidewalks, paths</option>
-                    <option value="3000">3,000 PSI - Residential standard</option>
-                    <option value="4000">4,000 PSI - Commercial/heavy duty</option>
-                    <option value="5000">5,000 PSI - Structural/warehouse</option>
-                  </select>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {PSI_APPLICATIONS[psiRating]}
-                  </p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Regional Conditions
-                  </label>
-                  <select
-                    value={region}
-                    onChange={(e) => setRegion(e.target.value)}
-                    className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="standard">Standard conditions</option>
-                    <option value="freezethaw">Freeze-thaw zone</option>
-                    <option value="seismic">Seismic zone (SDC C/D)</option>
-                    <option value="expansive">Expansive clay soil</option>
-                  </select>
-                </div>
-              </div>
+            <SectionCard title="Specifications" icon={Package}>
+              <InputGrid columns={2}>
+                <SelectInput 
+                  label="PSI Strength Rating" 
+                  value={psiRating} 
+                  onChange={setPsiRating}
+                  options={[
+                    { value: '2500', label: '2,500 PSI - Sidewalks, paths' },
+                    { value: '3000', label: '3,000 PSI - Residential standard' },
+                    { value: '4000', label: '4,000 PSI - Commercial/heavy duty' },
+                    { value: '5000', label: '5,000 PSI - Structural/warehouse' }
+                  ]}
+                  helpText={PSI_APPLICATIONS[psiRating]}
+                />
+                <SelectInput 
+                  label="Regional Conditions" 
+                  value={region} 
+                  onChange={setRegion}
+                  options={[
+                    { value: 'standard', label: 'Standard conditions' },
+                    { value: 'freezethaw', label: 'Freeze-thaw zone' },
+                    { value: 'seismic', label: 'Seismic zone (SDC C/D)' },
+                    { value: 'expansive', label: 'Expansive clay soil' }
+                  ]}
+                />
+              </InputGrid>
 
               {/* Advanced Options */}
               <div className="mt-4">
@@ -1048,15 +897,11 @@ if (region === 'freezethaw') {
                 
                 {showAdvanced && (
                   <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Custom Waste Factor (%)
-                    </label>
-                    <input
-                      type="number"
+                    <NumberInput 
+                      label="Custom Waste Factor" 
                       value={customWasteFactor}
-                      onWheel={preventScrollChange}
-                      onChange={(e) => setCustomWasteFactor(e.target.value)}
-                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      onChange={setCustomWasteFactor}
+                      unit="%"
                       placeholder={`Auto: ${getWasteFactor()}%`}
                       step="0.5"
                       min="0"
@@ -1069,27 +914,19 @@ if (region === 'freezethaw') {
                   </div>
                 )}
               </div>
-            </div>
+            </SectionCard>
 
             {/* Action Buttons */}
-            <div className="bg-white rounded-lg shadow-lg p-6">
-             <ValidationDisplay />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <button
-                  onClick={handleCalculate}
-                  className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
-                >
-
-                  Calculate
-                </button>
-                <button
-                  onClick={handleReset}
-                  className="w-full px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg transition-colors"
-                >
-                  Start Over
-                </button>
-              </div>
-            </div>
+            <SectionCard>
+              <ValidationDisplay />
+              <CalculateButtons
+                onCalculate={handleCalculate}
+                onStartOver={handleReset}
+                showStartOver={true}
+                calculateText="Calculate"
+                startOverText="Start Over"
+              />
+            </SectionCard>
           </div>
 
           {/* Results Section */}
@@ -1136,112 +973,74 @@ if (region === 'freezethaw') {
                 </div>
 
                 {/* Material Options */}
-                <div className="bg-white rounded-lg shadow-lg p-6">
-                  <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                    <Package className="w-5 h-5 text-blue-600" />
-                    Material Needed
-                  </h3>
-
-                  {/* Bagged Concrete */}
-                  <div className="mb-4 p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
-                    <div className="font-semibold text-gray-800 mb-3">Bagged Concrete</div>
-                    <div className="space-y-3">
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-600">80 lb bags:</span>
-                        <span className="font-bold text-blue-600 text-lg">{results.bags80lb} bags</span>
-                      </div>
-                      
-                      <div className="py-2">
-                        <div className="flex-grow border-t border-gray-300"></div>
-                        <span className="px-3 text-sm font-bold text-gray-500">OR</span>
-                        <div className="flex-grow border-t border-gray-300"></div>
-                      </div>
-                      
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-600">60 lb bags:</span>
-                        <span className="font-bold text-blue-600 text-lg">{results.bags60lb} bags</span>
-                      </div>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-3 italic">
-                      Choose one bag size - you don't need both
-                    </p>
-                  </div>
-
-                  {/* Ready-Mix Concrete */}
-                  <div className="p-4 bg-green-50 rounded-lg border-2 border-green-200">
-                    <div className="font-semibold text-gray-800 mb-2">Ready-Mix Concrete</div>
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Volume Needed:</span>
-                        <span className="font-bold text-green-600">{results.cubicYards} yd³</span>
+                <SectionCard title="Material Needed" icon={Package}>
+                  <div className="space-y-4">
+                    <MaterialCard
+                      title="Bagged Concrete (80 lb)"
+                      value={results.bags80lb}
+                      unit=" bags"
+                      subtitle={`OR 60 lb bags: ${results.bags60lb} bags`}
+                      note="Choose one bag size - you don't need both"
+                      color="blue"
+                      highlight={true}
+                    />
+                    
+                    <MaterialCard
+                      title="Ready-Mix Concrete"
+                      value={results.cubicYards}
+                      unit=" yd³"
+                      subtitle="Volume Needed"
+                      color="green"
+                    />
+                    
+                    <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                      <div className="text-sm text-gray-700">
+                        <strong>💡 Recommendation:</strong> {results.methodRecommendation}
                       </div>
                     </div>
                   </div>
-
-                  <div className="mt-4 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                    <div className="text-sm text-gray-700">
-                      <strong>💡 Recommendation:</strong> {results.methodRecommendation}
-                    </div>
-                 </div>
-                </div>
+                </SectionCard>
 
                 {/* Action Buttons */}
-                <div className="bg-white rounded-lg shadow-lg p-4">
-                  <div className="flex gap-3">
-                    <button 
-                      onClick={handleCopyCalculation} 
-                      className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center gap-2"
-                    >
-                      📋 Copy Calculation
-                    </button>
-                    <button 
-                      onClick={() => printCalculation('Concrete Calculator')} 
-                      className="flex-1 bg-gray-700 text-white py-3 px-4 rounded-lg font-semibold hover:bg-gray-800 transition-colors duration-200 flex items-center justify-center gap-2"
-                    >
-                      🖨️ Print Results
-                    </button>
-                  </div>
-                </div>
+                <ResultsButtons
+                  onCopy={handleCopyCalculation}
+                  onPrint={() => printCalculation('Concrete Calculator')}
+                  copyButtonText={copyButtonText}
+                />
 
                 {/* Additional Materials Toggle */}
                 {projectType === 'slab' && results.squareFeet > 0 && (
-                  <div className="bg-white rounded-lg shadow-lg p-6">
-                    <button
-                      onClick={() => setShowAdditionalMaterials(!showAdditionalMaterials)}
-                      className="w-full flex items-center justify-between text-left font-bold text-gray-800 mb-3"
-                    >
-                      <span>Additional Materials</span>
-                      <span className="text-2xl">{showAdditionalMaterials ? '−' : '+'}</span>
-                    </button>
-
-                    {showAdditionalMaterials && (
-                      <div className="space-y-3 text-sm">
-                        <div className="flex justify-between py-2 border-b">
-                          <span className="text-gray-600">Rebar (#4 @ 18" o.c.):</span>
-                          <span className="font-semibold">{results.rebarPieces20ft} × 20' pieces</span>
-                        </div>
-                        <div className="flex justify-between py-2 border-b">
-                          <span className="text-gray-600">Wire Mesh (6×6 W1.4):</span>
-                          <span className="font-semibold">{results.wireMeshRolls} rolls</span>
-                        </div>
-                        <div className="flex justify-between py-2 border-b">
-                          <span className="text-gray-600">Gravel Base ({results.baseThickness}"):</span>
-                          <span className="font-semibold">{results.gravelCubicYards} yd³</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+<SectionCard 
+  title="Additional Materials" 
+  collapsible={true} 
+  defaultExpanded={false}
+>
+                    <div className="space-y-3">
+                      <MaterialCard 
+  title='Rebar (#4 @ 18" o.c.)' 
+  value={results.rebarPieces20ft} 
+  subtitle="20' pieces" 
+  color="orange" 
+/>
+                      <MaterialCard 
+                        title="Wire Mesh (6×6 W1.4)" 
+                        value={results.wireMeshRolls} 
+                        unit=" rolls" 
+                        color="cyan" 
+                      />
+                      <MaterialCard 
+  title={`Gravel Base (${results.baseThickness}")`} 
+  value={results.gravelCubicYards} 
+  unit=" yd³" 
+  color="gray" 
+/>
+                    </div>
+                  </SectionCard>
                 )}
-                
 
                 {/* Recommendations */}
                 {(results.recommendations.length > 0 || results.regionalNotes.length > 0) && (
-                  <div className="bg-white rounded-lg shadow-lg p-6">
-                    <h3 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
-                      <Info className="w-5 h-5 text-blue-600" />
-                      Important Notes
-                    </h3>
-
+                  <SectionCard title="Important Notes" icon={Info}>
                     <div className="space-y-2">
                       {results.recommendations.map((rec, index) => (
                         <div
@@ -1271,7 +1070,7 @@ if (region === 'freezethaw') {
                         </div>
                       ))}
                     </div>
-                  </div>
+                  </SectionCard>
                 )}
               </div>
             ) : (
