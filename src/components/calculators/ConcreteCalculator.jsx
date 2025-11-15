@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Calculator, Info, Package, Ruler, AlertCircle } from 'lucide-react';
 import { trackCalculation } from '@/utils/tracking';
 import { trackCalculatorInteraction } from '@/utils/buttonTracking';
@@ -19,7 +19,9 @@ import {
   InputGrid
 } from '@/components/calculator';
 
+
 const ConcreteCalculator = () => {
+  const resultsRef = useRef(null);
   // Project Type Selection
   const [projectType, setProjectType] = useState('slab');
   
@@ -62,9 +64,7 @@ const ConcreteCalculator = () => {
   
   // Results
   const [results, setResults] = useState(null);
-  const [showAdditionalMaterials, setShowAdditionalMaterials] = useState(false);
   const [copyButtonText, setCopyButtonText] = useState('📋 Copy Calculation');
-
   // Calculation Constants (from research)
   const BAG_YIELDS = {
     '60': 0.45, // cubic feet
@@ -350,19 +350,6 @@ const ConcreteCalculator = () => {
       ? (parseFloat(slabLength) || 0) * (parseFloat(slabWidth) || 0)
       : 0;
     
-    const rebarSpacing = 18;
-    const rebarLengthFeet = projectType === 'slab'
-      ? Math.ceil(((parseFloat(slabLength) || 0) / (rebarSpacing / 12)) * (parseFloat(slabWidth) || 0) +
-                   ((parseFloat(slabWidth) || 0) / (rebarSpacing / 12)) * (parseFloat(slabLength) || 0))
-      : 0;
-    const rebarPieces20ft = Math.ceil(rebarLengthFeet / 20);
-    
-    const baseThickness = psiRating >= 4000 ? 6 : 4;
-    const gravelCubicFeet = squareFeet * (baseThickness / 12);
-    const gravelCubicYards = gravelCubicFeet / CUBIC_FEET_PER_YARD;
-    
-    const wireMeshRolls = Math.ceil(squareFeet / 150);
-    
     let regionalNotes = [];
     if (region === 'freezethaw') {
       regionalNotes.push('Air entrainment required (6% by volume)');
@@ -419,10 +406,6 @@ const ConcreteCalculator = () => {
       regionalNotes,
       methodRecommendation,
       squareFeet: squareFeet.toFixed(0),
-      gravelCubicYards: gravelCubicYards.toFixed(2),
-      baseThickness,
-      rebarPieces20ft,
-      wireMeshRolls
     });
 
     trackCalculation('concrete', {
@@ -452,8 +435,17 @@ const ConcreteCalculator = () => {
   };
 
   const handleCalculate = () => {
-    calculateConcrete();
-  };
+  calculateConcrete();
+  // Auto-scroll to results
+  setTimeout(() => {
+    if (resultsRef.current) {
+      resultsRef.current.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+      });
+    }
+  }, 100);
+};
 
   const handleReset = () => {
     trackCalculatorInteraction.startOver('concrete');
@@ -481,7 +473,6 @@ const ConcreteCalculator = () => {
     setShowAdvanced(false);
     setCustomWasteFactor('');
     setResults(null);
-    setShowAdditionalMaterials(false);
   };
 
   const handleCopyCalculation = async () => {
@@ -541,9 +532,8 @@ const ConcreteCalculator = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Input Section */}
-          <div className="lg:col-span-2 space-y-6">
+        <div className="space-y-6">
+  <div className="space-y-6">
             {/* Project Type Selection */}
             <SectionCard title="Project Type" icon={Ruler}>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -862,17 +852,17 @@ const ConcreteCalculator = () => {
             <SectionCard title="Specifications" icon={Package}>
               <InputGrid columns={2}>
                 <SelectInput 
-                  label="PSI Strength Rating" 
-                  value={psiRating} 
-                  onChange={setPsiRating}
-                  options={[
-                    { value: '2500', label: '2,500 PSI - Sidewalks, paths' },
-                    { value: '3000', label: '3,000 PSI - Residential standard' },
-                    { value: '4000', label: '4,000 PSI - Commercial/heavy duty' },
-                    { value: '5000', label: '5,000 PSI - Structural/warehouse' }
-                  ]}
-                  helpText={PSI_APPLICATIONS[psiRating]}
-                />
+  label="PSI Strength Rating" 
+  value={psiRating} 
+  onChange={setPsiRating}
+  options={[
+    { value: '2500', label: '2,500 PSI' },
+    { value: '3000', label: '3,000 PSI' },
+    { value: '4000', label: '4,000 PSI' },
+    { value: '5000', label: '5,000 PSI' }
+  ]}
+  helpText={PSI_APPLICATIONS[psiRating]}
+/>
                 <SelectInput 
                   label="Regional Conditions" 
                   value={region} 
@@ -929,52 +919,37 @@ const ConcreteCalculator = () => {
             </SectionCard>
           </div>
 
-          {/* Results Section */}
-          <div className="lg:col-span-1">
-            {results ? (
-              <div className="space-y-4 sticky top-4">
+                {/* Results Section - Compact Desktop View */}
+        {results && (
+          <div ref={resultsRef} className="space-y-4 scroll-mt-6">
+            {/* Main Results - 2 Column Grid on Desktop */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Left Column */}
+              <div className="space-y-4">
                 {/* Project Summary */}
-                <div className="bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-lg shadow-lg p-6">
-                  <h2 className="text-xl font-bold mb-4">Project Summary</h2>
-                  <div className="space-y-3">
-                    <div className="pb-3 border-b border-blue-400">
-                      <div className="text-sm opacity-90">Project Type</div>
-                      <div className="font-semibold text-lg">{results.projectDescription}</div>
+                <div className="bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-lg shadow-lg p-4">
+                  <h2 className="text-lg font-bold mb-2">Project Summary</h2>
+                  <div className="space-y-2">
+                    <div className="pb-2 border-b border-blue-400">
+                      <div className="text-xs opacity-90">Project Type</div>
+                      <div className="font-semibold text-sm">{results.projectDescription}</div>
                     </div>
-                    <div className="pb-3 border-b border-blue-400">
-                      <div className="text-sm opacity-90">Concrete Volume</div>
-                      <div className="font-bold text-2xl">{results.cubicYards} yd³</div>
-                      <div className="text-sm opacity-75">{results.volumeWithWaste} cu ft (with {results.wasteFactorApplied}% waste)</div>
+                    <div className="pb-2 border-b border-blue-400">
+                      <div className="text-xs opacity-90">Concrete Volume</div>
+                      <div className="font-bold text-xl">{results.cubicYards} yd³</div>
+                      <div className="text-xs opacity-75">{results.volumeWithWaste} cu ft (with {results.wasteFactorApplied}% waste)</div>
                     </div>
                     <div>
-                      <div className="text-sm opacity-90">Concrete Strength</div>
-                      <div className="font-semibold">{psiRating} PSI</div>
+                      <div className="text-xs opacity-90">Concrete Strength</div>
+                      <div className="font-semibold text-sm">{psiRating} PSI</div>
                       <div className="text-xs opacity-75 mt-1">{results.psiApplication}</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Reinforcement Disclaimer */}
-                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
-                  <div className="flex">
-                    <div className="flex-shrink-0">
-                      <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                    <div className="ml-3">
-                      <p className="text-sm text-yellow-700">
-                        <strong>Note:</strong> This materials list does not account for reinforcement needs (rebar, wire mesh, etc.). 
-                        Reinforcement may be required depending on your project type, local building codes, soil conditions, and structural requirements. 
-                        Consult local building codes and a structural engineer for reinforcement specifications.
-                      </p>
                     </div>
                   </div>
                 </div>
 
                 {/* Material Options */}
                 <SectionCard title="Material Needed" icon={Package}>
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     <MaterialCard
                       title="Bagged Concrete (80 lb)"
                       value={results.bags80lb}
@@ -993,8 +968,8 @@ const ConcreteCalculator = () => {
                       color="green"
                     />
                     
-                    <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                      <div className="text-sm text-gray-700">
+                    <div className="p-2 bg-yellow-50 rounded-lg border border-yellow-200">
+                      <div className="text-xs text-gray-700">
                         <strong>💡 Recommendation:</strong> {results.methodRecommendation}
                       </div>
                     </div>
@@ -1007,36 +982,24 @@ const ConcreteCalculator = () => {
                   onPrint={() => printCalculation('Concrete Calculator')}
                   copyButtonText={copyButtonText}
                 />
+              </div>
 
-                {/* Additional Materials Toggle */}
-                {projectType === 'slab' && results.squareFeet > 0 && (
-<SectionCard 
-  title="Additional Materials" 
-  collapsible={true} 
-  defaultExpanded={false}
->
-                    <div className="space-y-3">
-                      <MaterialCard 
-  title='Rebar (#4 @ 18" o.c.)' 
-  value={results.rebarPieces20ft} 
-  subtitle="20' pieces" 
-  color="orange" 
-/>
-                      <MaterialCard 
-                        title="Wire Mesh (6×6 W1.4)" 
-                        value={results.wireMeshRolls} 
-                        unit=" rolls" 
-                        color="cyan" 
-                      />
-                      <MaterialCard 
-  title={`Gravel Base (${results.baseThickness}")`} 
-  value={results.gravelCubicYards} 
-  unit=" yd³" 
-  color="gray" 
-/>
+              {/* Right Column */}
+              <div className="space-y-4">
+                {/* Reinforcement Disclaimer */}
+                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <AlertCircle className="h-4 w-4 text-yellow-400 mt-0.5" />
                     </div>
-                  </SectionCard>
-                )}
+                    <div className="ml-2">
+                      <p className="text-xs text-yellow-700">
+                        <strong>Note:</strong> This materials list does not account for reinforcement needs. 
+                        Consult local building codes and a structural engineer for reinforcement specifications.
+                      </p>
+                    </div>
+                  </div>
+                </div>
 
                 {/* Recommendations */}
                 {(results.recommendations.length > 0 || results.regionalNotes.length > 0) && (
@@ -1045,14 +1008,14 @@ const ConcreteCalculator = () => {
                       {results.recommendations.map((rec, index) => (
                         <div
                           key={index}
-                          className={`p-3 rounded-lg text-sm ${
+                          className={`p-2 rounded-lg text-xs ${
                             rec.type === 'warning'
                               ? 'bg-yellow-50 border border-yellow-200 text-yellow-800'
                               : 'bg-blue-50 border border-blue-200 text-blue-800'
                           }`}
                         >
-                          <div className="flex items-start gap-2">
-                            <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                          <div className="flex items-start gap-1">
+                            <AlertCircle className="w-3 h-3 flex-shrink-0 mt-0.5" />
                             <span>{rec.text}</span>
                           </div>
                         </div>
@@ -1061,10 +1024,10 @@ const ConcreteCalculator = () => {
                       {results.regionalNotes.map((note, index) => (
                         <div
                           key={index}
-                          className="p-3 rounded-lg text-sm bg-purple-50 border border-purple-200 text-purple-800"
+                          className="p-2 rounded-lg text-xs bg-purple-50 border border-purple-200 text-purple-800"
                         >
-                          <div className="flex items-start gap-2">
-                            <Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                          <div className="flex items-start gap-1">
+                            <Info className="w-3 h-3 flex-shrink-0 mt-0.5" />
                             <span>{note}</span>
                           </div>
                         </div>
@@ -1073,14 +1036,10 @@ const ConcreteCalculator = () => {
                   </SectionCard>
                 )}
               </div>
-            ) : (
-              <div className="bg-white rounded-lg shadow-lg p-8 text-center text-gray-500 sticky top-4">
-                <Calculator className="w-16 h-16 mx-auto mb-4 opacity-20" />
-                <p>Enter your project dimensions to see results</p>
-              </div>
-            )}
+            </div>
           </div>
-        </div>
+        )}
+      </div>
 
         {/* Footer Information */}
         <div className="mt-8 bg-white rounded-lg shadow-lg p-6">
