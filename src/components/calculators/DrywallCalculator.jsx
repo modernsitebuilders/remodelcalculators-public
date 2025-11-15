@@ -8,6 +8,7 @@ import { printCalculation } from '@/utils/printCalculation';
 import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
 import { FAQSection } from '@/components/FAQSection';
+import { trackCalculatorInteraction } from '@/utils/buttonTracking';
 
 // Industry standards based on USG specifications and ASTM C840
 const SHEET_SIZES = {
@@ -226,6 +227,9 @@ export default function DrywallCalculator() {
       roomCount: rooms.length
     });
     
+    // Track Calculate button click
+    trackCalculatorInteraction.calculate('drywall', true);  // ✅ CORRECT - outside setTimeout
+    
     setTimeout(() => {
       resultsRef.current?.scrollIntoView({ 
         behavior: 'smooth',
@@ -235,6 +239,7 @@ export default function DrywallCalculator() {
   };
 
   const reset = () => {
+    trackCalculatorInteraction.startOver('drywall');
     setRooms([{ length: '', width: '', height: '8', includeCeiling: false, deductions: '' }]);
     setSheetSize('4x8');
     setThickness('half');
@@ -242,6 +247,7 @@ export default function DrywallCalculator() {
   };
 
  const handleCopyCalculation = async () => {
+  trackCalculatorInteraction.copyResults('drywall');
     if (!results) return;
     
     // Prepare inputs

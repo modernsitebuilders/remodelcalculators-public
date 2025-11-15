@@ -6,6 +6,7 @@ import { trackCalculation } from '@/utils/tracking';
 import { copyCalculation } from '@/utils/copyCalculation';
 import { printCalculation } from '@/utils/printCalculation';
 import { CommonRules, ValidationTypes } from '@/utils/validation';
+import { trackCalculatorInteraction } from '@/utils/buttonTracking';
 import { useValidation } from '@/hooks/useValidation';
 import { FAQSection } from '@/components/FAQSection';
 
@@ -185,6 +186,8 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
         wasteFactor: includeWaste ? 5 : 0
       });
     }
+     // Track Calculate button click
+      trackCalculatorInteraction.calculate('mulch', true);
   };
 
   // Prevent scroll from changing number inputs
@@ -193,6 +196,8 @@ const preventScrollChange = (e) => {
 };
 
   const handleReset = () => {
+        // Track Start Over button click
+    trackCalculatorInteraction.startOver('mulch');
     setLength('');
     setWidth('');
     setDiameter('');
@@ -207,7 +212,7 @@ const preventScrollChange = (e) => {
 
   const handleCopyCalculation = async () => {
     if (!showResults || !hasResults) return;
-    
+    trackCalculatorInteraction.copyResults('mulch');
     // Prepare inputs
     const inputs = {
       'Shape': shape === 'rectangle' ? 'Rectangle' : 'Circle'

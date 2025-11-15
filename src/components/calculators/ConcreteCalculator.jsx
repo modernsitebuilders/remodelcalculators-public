@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calculator, Info, Package, Ruler, AlertCircle } from 'lucide-react';
 import { trackCalculation } from '@/utils/tracking';
+import { trackCalculatorInteraction } from '@/utils/buttonTracking';
 import { copyCalculation } from '@/utils/copyCalculation';
 import { printCalculation } from '@/utils/printCalculation';
 import { CommonRules, ValidationTypes } from '@/utils/validation';
@@ -446,28 +447,41 @@ if (region === 'freezethaw') {
       gravelCubicYards: gravelCubicYards.toFixed(2),
       baseThickness
     });
+
   
-  // ADD THIS TRACKING CALL
-  trackCalculation('concrete', {
-    projectType,
-    psiRating,
-    region,
-    dimensions: projectType === 'slab' ? 
-      { length: slabLength, width: slabWidth, thickness: slabThickness } :
-      projectType === 'footing' ?
-      { length: footingLength, width: footingWidth, depth: footingDepth } :
-      { type: projectType }
-  }, {
-    cubicYards: cubicYards.toFixed(2),
-    bags80lb,
-    totalCost: null // or calculate if you want
-  });
+  // Track calculation to GA4 and Google Sheets
+    trackCalculation('concrete', {
+      projectType,
+      psiRating,
+      region,
+      dimensions: projectType === 'slab' ? 
+        { length: slabLength, width: slabWidth, thickness: slabThickness } :
+        projectType === 'footing' ?
+        { length: footingLength, width: footingWidth, depth: footingDepth } :
+        projectType === 'post' ?
+        { diameter: postDiameter, depth: postDepth, count: postCount } :
+        projectType === 'stairs' ?
+        { width: stairWidth, riserHeight, treadDepth, steps: numberOfSteps } :
+        projectType === 'wall' ?
+        { length: wallLength, height: wallHeight, thickness: wallThickness } :
+        projectType === 'column' ?
+        { diameter: columnDiameter, height: columnHeight, count: columnCount } :
+        { type: projectType }
+    }, {
+      cubicYards: parseFloat(cubicYards.toFixed(2)),
+      bags80lb,
+      bags60lb
+    });
+    
+    // Track Calculate button click
+    trackCalculatorInteraction.calculate('concrete', true);
   };
   const handleCalculate = () => {
     calculateConcrete();
   };
 
   const handleReset = () => {
+    trackCalculatorInteraction.startOver('concrete');
     // Reset all inputs
     setSlabLength('');
     setSlabWidth('');
@@ -498,6 +512,8 @@ if (region === 'freezethaw') {
 
   const handleCopyCalculation = async () => {
   if (!results) return;
+
+  trackCalculatorInteraction.copyResults('concrete');
   
   // Prepare inputs object
   const inputs = {

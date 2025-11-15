@@ -7,6 +7,7 @@ import { printCalculation } from '@/utils/printCalculation';
 import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
 import { FAQSection } from '@/components/FAQSection';
+import { trackCalculatorInteraction } from '@/utils/buttonTracking';
 
 export default function FlooringCalculator() {
   const [selectedFlooringType, setSelectedFlooringType] = useState('');
@@ -253,9 +254,11 @@ const preventScrollChange = (e) => {
       additionalMaterials: additionalMaterials,
       recommendations: recommendations
     });
+    trackCalculatorInteraction.calculate('flooring', true);
   };
 
   const handleReset = () => {
+    trackCalculatorInteraction.startOver('flooring');
     setSelectedFlooringType('');
     setRoomLength('');
     setRoomWidth('');
@@ -274,6 +277,7 @@ const preventScrollChange = (e) => {
   };  
 
   const handleCopyCalculation = async () => {
+    trackCalculatorInteraction.copyResults('flooring');
     if (!showResults || !results) return;
     
     // Prepare inputs

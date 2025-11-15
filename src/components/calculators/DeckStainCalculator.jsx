@@ -8,6 +8,7 @@ import { printCalculation } from '@/utils/printCalculation';
 import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
 import { FAQSection } from '@/components/FAQSection';
+import { trackCalculatorInteraction } from '@/utils/buttonTracking';
 
 const DeckStainCalculator = () => {
   const [showResults, setShowResults] = useState(false);
@@ -45,6 +46,7 @@ const DeckStainCalculator = () => {
   });
 
   const handleReset = () => {
+    trackCalculatorInteraction.startOver('deck-stain');
     setInputs({
       deckLength: '',
       deckWidth: '',
@@ -455,6 +457,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
 }, [inputs]);  
 
   const handleCopyCalculation = async () => {
+    trackCalculatorInteraction.copyResults('deck-stain');
     if (!showResults || results.totalArea === 0) return;
     
     // Prepare inputs
@@ -1129,6 +1132,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     coats: inputs.coats,
                     applicationMethod: applicationMethods[inputs.applicationMethod].name
                   });
+                  trackCalculatorInteraction.calculate('deck-stain', true);
                 }}
                 className="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-bold py-4 px-6 rounded-lg shadow-lg transition-colors duration-200"
 >

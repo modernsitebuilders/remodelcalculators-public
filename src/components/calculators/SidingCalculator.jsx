@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Calculator, Home, Ruler, Package, FileText, ChevronRight, ChevronLeft } from 'lucide-react';
 import { trackCalculation } from '@/utils/tracking';
+import { trackCalculatorInteraction } from '@/utils/buttonTracking';
 import { copyCalculation } from '@/utils/copyCalculation';
 import { printCalculation } from '@/utils/printCalculation';
 import { CommonRules, ValidationTypes } from '@/utils/validation';
@@ -294,10 +295,13 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
       nails: fasteners?.nails?.total,
       underlaymentRolls: underlayment?.rolls
     });
+    trackCalculatorInteraction.calculate('siding', true);
 };  
 
   const handleCopyCalculation = async () => {
     if (!results) return;
+
+      trackCalculatorInteraction.copyResults('siding');
     
     // Prepare inputs
     const inputsData = {
@@ -1360,7 +1364,10 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
     
     {/* ADD THIS PRINT BUTTON */}
     <button 
-      onClick={() => printCalculation('Siding Calculator')}
+      onClick={() => {
+  trackCalculatorInteraction.print('siding');
+  printCalculation('Siding Calculator');
+}}
       className="copy-calc-btn flex-1"
     >
       🖨️ Print Results
@@ -1410,9 +1417,10 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
             {step === 5 && (
               <button
                 onClick={() => {
-                  setStep(1);
-                  setResults(null);
-                }}
+  trackCalculatorInteraction.startOver('siding');
+  setStep(1);
+  setResults(null);
+}}
                 className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 cursor-pointer"
               >
                 New Calculation

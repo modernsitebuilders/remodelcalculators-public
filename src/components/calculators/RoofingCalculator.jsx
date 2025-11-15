@@ -2,11 +2,13 @@
 
 import React, { useState } from 'react';
 import { trackCalculation } from '@/utils/tracking';
+import { trackCalculatorInteraction } from '@/utils/buttonTracking';
 import { copyCalculation } from '@/utils/copyCalculation';
 import { printCalculation } from '@/utils/printCalculation';
 import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
 import { FAQSection } from '@/components/FAQSection';
+
 
 const RoofingMaterialsCalculator = () => {
   // State for all inputs
@@ -65,6 +67,7 @@ const RoofingMaterialsCalculator = () => {
       ridgeVentNeeded: adjustedRidgeVent,
       requiredNFA: requiredNFA
     });
+    trackCalculatorInteraction.calculate('roofing', true);
   };
 
   const validationRules = {
@@ -120,7 +123,9 @@ const getValues = () => ({
 });
 
 const { validate, ValidationDisplay } = useValidation(validationRules);
+
   const handleStartOver = () => {
+    trackCalculatorInteraction.startOver('roofing');  // ✅ Moved inside!
     setRoofLength(40);
     setRoofWidth(30);
     setRoofPitch(6);
@@ -138,6 +143,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
 };  
 
   const handleCopyCalculation = async () => {
+    trackCalculatorInteraction.copyResults('roofing');
     if (!showResults) return;
     
     // Prepare inputs
@@ -818,7 +824,10 @@ const preventScrollChange = (e) => {
     
     {/* ADD THIS PRINT BUTTON */}
     <button 
-      onClick={() => printCalculation('Roofing Calculator')}
+      onClick={() => {
+  trackCalculatorInteraction.print('roofing');
+  printCalculation('Roofing Calculator');
+}}
       className="copy-calc-btn flex-1"
     >
       🖨️ Print Results

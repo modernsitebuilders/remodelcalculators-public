@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { Info, Home, Droplets } from 'lucide-react';
 import { trackCalculation } from '@/utils/tracking';
 import { copyCalculation } from '@/utils/copyCalculation';
+import { trackCalculatorInteraction } from '@/utils/buttonTracking';
 import { printCalculation } from '@/utils/printCalculation';
 import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
@@ -169,8 +170,8 @@ const preventScrollChange = (e) => {
       coats: inputs.coats,
       needsPrimer: inputs.needsPrimer
     });
+    trackCalculatorInteraction.calculate('exterior-paint', true);
   };
-
   const validationRules = {
   squareFeet: [
     CommonRules.unrealistic(100, 20000, 'Surface area'),
@@ -189,6 +190,7 @@ const getValues = () => ({
 const { validate, ValidationDisplay } = useValidation(validationRules);
 
   const handleReset = () => {
+    trackCalculatorInteraction.startOver('exterior-paint');
     setInputs({
       squareFeet: 2000,
       surfaceType: 'vinyl',
@@ -202,7 +204,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
 
   const handleCopyCalculation = async () => {
     if (!showResults || !calculations) return;
-    
+    trackCalculatorInteraction.copyResults('exterior-paint');
     // Prepare inputs
     const inputsData = {
       'Surface area': `${inputs.squareFeet} sq ft`,

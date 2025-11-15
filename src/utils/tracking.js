@@ -1,19 +1,24 @@
 /**
- * Simplified Tracking for Construction Calculators
- * This version is guaranteed to work with the fixed Apps Script
+ * Enhanced Tracking for Construction Calculators
+ * Tracks to both Google Sheets and Google Analytics 4
  */
 
 // REPLACE WITH YOUR DEPLOYED APPS SCRIPT URL
 const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzG6EphsB_DShdNMO3K7Zh3PZ8y6g_hNEesYw_7Vh4s_JbkCDlvpE5yh3vpJPqDXJHJ/exec';
 
 /**
- * Track calculation to Google Sheets
- * Uses no-cors mode to avoid CORS issues with Apps Script
+ * Track calculation to both Google Sheets and GA4
+ * @param {string} calculatorType - Type of calculator (concrete, drywall, etc)
+ * @param {object} inputs - User input values
+ * @param {object} result - Calculation results
+ * @returns {Promise<boolean>}
  */
 export async function trackCalculation(calculatorType, inputs, result) {
-  // Build the tracking payload
+  console.log('🔍 trackCalculation called:', { calculatorType, inputs, result });
+  
+  // Build the tracking payload for Sheets
   const trackingData = {
-    siteId: 'construction-calcs',
+    siteId: 'job-calculators',
     calculatorType: calculatorType || 'unknown',
     inputs: inputs || {},
     result: result || {},
@@ -22,71 +27,111 @@ export async function trackCalculation(calculatorType, inputs, result) {
     timestamp: new Date().toISOString()
   };
 
-  console.log('📊 Sending tracking data:', {
-    type: calculatorType,
-    yards: result?.cubicYards,
-    bags: result?.bags80lb
-  });
+  console.log('📊 Tracking data prepared:', trackingData);
 
-  // Send to Google Sheets via Apps Script
+  // Track to Google Sheets
+  await trackToSheets(trackingData);
+  
+  // Track to Google Analytics
+  trackToGA4(calculatorType, inputs, result);
+  
+  return true;
+}
+
+/**
+ * Send tracking data to Google Sheets
+ */
+async function trackToSheets(trackingData) {
   try {
-    // We use no-cors mode because Apps Script doesn't return proper CORS headers
-    // This means we can't read the response, but the data still gets logged
+    console.log('📤 Sending to Google Sheets...');
+    
     await fetch(SHEETS_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(trackingData),
-      mode: 'no-cors' // CRITICAL: This prevents CORS errors
+      mode: 'no-cors' // Required for Apps Script
     });
     
-    console.log('✅ Tracking data sent successfully');
-    
+    console.log('✅ Sheets tracking sent successfully');
   } catch (err) {
-    // Log error but don't break the calculator
-    console.warn('⚠️ Tracking error (non-critical):', err.message);
+    console.warn('⚠️ Sheets tracking error (non-critical):', err.message);
   }
-
-  // Also track to Google Analytics if available
-  if (typeof window.gtag !== 'undefined') {
-    try {
-      window.gtag('event', 'calculator_use', {
-        calculator_type: calculatorType,
-        result_cubic_yards: result?.cubicYards || 0,
-        result_bags_80lb: result?.bags80lb || 0,
-        event_category: 'calculators',
-        event_label: calculatorType
-      });
-      console.log('✅ GA4 tracking sent');
-    } catch (gaError) {
-      console.warn('⚠️ GA4 tracking error:', gaError);
-    }
-  }
-  
-  // Always return success to not break the calculator
-  return true;
 }
 
 /**
- * Test function - paste this in browser console to verify tracking
+ * Send tracking event to Google Analytics 4
+ */
+function trackToGA4(calculatorType, inputs, result) {
+  // Check if gtag is available
+  if (typeof window.gtag === 'undefined') {
+    console.warn('⚠️ GA4 not available - gtag function not found');
+    console.log('💡 This is normal if GA4 script hasn\'t loaded yet');
+    return;
+  }
+
+  try {
+    console.log('📤 Sending to GA4...');
+    
+    // Send calculator_use event
+    window.gtag('event', 'calculator_use', {
+      event_category: 'calculators',
+      event_label: calculatorType,
+      calculator_type: calculatorType,
+      // Include relevant result data (calculator-specific)
+      ...(result?.cubicYards && { result_cubic_yards: result.cubicYards }),
+      ...(result?.bags80lb && { result_bags_80lb: result.bags80lb }),
+      ...(result?.sheets && { result_sheets: result.sheets }),
+      ...(result?.gallons && { result_gallons: result.gallons }),
+      ...(result?.squareFeet && { result_square_feet: result.squareFeet }),
+      value: 1 // Generic value for counting uses
+    });
+    
+    console.log('✅ GA4 tracking sent:', {
+      event: 'calculator_use',
+      calculator_type: calculatorType
+    });
+    
+  } catch (gaError) {
+    console.error('❌ GA4 tracking error:', gaError);
+  }
+}
+
+/**
+ * Test function - Run in browser console to verify tracking
+ * Usage: window.testTracking()
  */
 if (typeof window !== 'undefined') {
   window.testTracking = async function() {
-    console.log('🧪 Testing tracking endpoint...');
-    console.log('📍 URL:', SHEETS_URL);
+    console.log('🧪 Testing tracking system...');
+    console.log('📍 Sheets URL:', SHEETS_URL);
+    console.log('📍 gtag available:', typeof window.gtag !== 'undefined');
     
     const result = await trackCalculation(
       'test-calculator',
-      { test: true, timestamp: new Date().toISOString() },
-      { testResult: 'Browser console test', cubicYards: 1.23 }
+      { test: true, length: 10, width: 10 },
+      { testResult: 'Browser console test', cubicYards: 3.7 }
     );
     
-    console.log('✅ Test complete - check your Google Sheet!');
-    console.log('📋 Sheet name: "Calculator Tracking"');
+    console.log('✅ Test complete!');
+    console.log('📋 Check your Google Sheet: "Calculator Tracking" tab');
+    console.log('📊 Check GA4: Realtime → Events');
     return result;
   };
   
-  // Log instructions on load
-  console.log('💡 Tracking loaded. Run testTracking() to verify setup.');
+  // Check GA4 status on load
+  window.checkGA4 = function() {
+    console.log('🔍 Checking GA4 status...');
+    console.log('gtag available:', typeof window.gtag !== 'undefined');
+    console.log('dataLayer available:', typeof window.dataLayer !== 'undefined');
+    if (typeof window.dataLayer !== 'undefined') {
+      console.log('dataLayer contents:', window.dataLayer);
+    }
+  };
+  
+  // Log instructions on page load
+  console.log('💡 Tracking utilities loaded:');
+  console.log('  - Run testTracking() to test both Sheets and GA4');
+  console.log('  - Run checkGA4() to verify GA4 status');
 }

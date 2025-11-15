@@ -3,6 +3,7 @@ import Link from 'next/link';
 import React, { useState } from 'react';
 import { Calculator, Info } from 'lucide-react';
 import { trackCalculation } from '@/utils/tracking';
+import { trackCalculatorInteraction } from '@/utils/buttonTracking';
 import { copyCalculation } from '@/utils/copyCalculation';
 import { printCalculation } from '@/utils/printCalculation';
 import { CommonRules, ValidationTypes } from '@/utils/validation';
@@ -301,15 +302,54 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
       totalWallArea: totalWallArea.toFixed(0),
       totalCeilingArea: totalCeilingArea.toFixed(0)
     };
-};  
+};
 
-// Prevent scroll from changing number inputs
-const preventScrollChange = (e) => {
+  const handleReset = () => {
+    // Track Start Over button click
+    trackCalculatorInteraction.startOver('interior-paint');
+    
+    // Reset all state to defaults
+    setRooms([{
+      id: 1,
+      length: '',
+      width: '',
+      height: '',
+      doors: [{ id: 1, size: 'standard' }],
+      windows: [{ id: 1, size: 'standard' }, { id: 2, size: 'standard' }],
+      customDoorArea: '',
+      customWindowArea: '',
+      useCustomDoorSizes: false,
+      useCustomWindowSizes: false
+    }]);
+    
+    // Reset wall paint settings
+    setPaintWalls(true);
+    setWallCoats(2);
+    setWallSurfaceTexture('smooth');
+    setWallSurfaceCondition('painted');
+    setWallApplicationMethod('roller');
+    setWallPaintType('standard');
+    
+    // Reset ceiling paint settings
+    setPaintCeiling(false);
+    setCeilingCoats(1);
+    setCeilingSurfaceCondition('painted');
+    setCeilingApplicationMethod('roller');
+    setCeilingPaintType('standard');
+    
+    // Clear results
+    setShowResults(false);
+    setResults(null);
+  };
+
+  // Prevent scroll from changing number inputs
+  const preventScrollChange = (e) => {
   e.target.blur();
 };
 
 
   const handleCopyCalculation = async () => {
+    trackCalculatorInteraction.copyResults('interior-paint');
     if (!showResults || !results) return;
     
     // Prepare inputs
@@ -838,7 +878,7 @@ const preventScrollChange = (e) => {
                 totalPrimerGallons: (results.walls ? results.walls.primerGallons : 0) + 
                                   (results.ceiling ? results.ceiling.primerGallons : 0),
                 roomCount: rooms.length
-              });
+              }); trackCalculatorInteraction.calculate('interior-paint', true);
             }}
             disabled={!paintWalls && !paintCeiling}
             className={`w-full py-3 rounded-lg transition-colors font-semibold text-lg shadow-lg ${
@@ -1058,7 +1098,7 @@ const preventScrollChange = (e) => {
 </ul>
             </div>
             
-            {/* Copy Calculation Button */}
+           {/* Action Buttons */}
 <div className="bg-white rounded-lg shadow-lg p-6">
   <div className="flex gap-3">
     <button 
@@ -1068,12 +1108,18 @@ const preventScrollChange = (e) => {
       {copyButtonText}
     </button>
     
-    {/* ADD THIS PRINT BUTTON */}
     <button 
       onClick={() => printCalculation('Interior Paint Calculator')}
       className="copy-calc-btn flex-1"
     >
       🖨️ Print Results
+    </button>
+    
+    <button 
+      onClick={handleReset}
+      className="copy-calc-btn flex-1"
+    >
+      🔄 Start Over
     </button>
   </div>
 </div>

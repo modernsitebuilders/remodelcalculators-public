@@ -7,6 +7,7 @@ import { Calculator, Ruler, TrendingUp, Info, AlertCircle, CheckCircle } from 'l
 import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
 import { FAQSection } from '@/components/FAQSection';
+import { trackCalculatorInteraction } from '@/utils/buttonTracking';
 
 export default function FenceInstallationCalculator() {
   const [linearFeet, setLinearFeet] = useState('');
@@ -357,9 +358,11 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
       meshFabric: meshFabric,
       fenceTypeName: fenceTypes[fenceType].name
     });
+    trackCalculatorInteraction.calculate('fence', true);
 };  
   
   const handleCopyCalculation = async () => {
+    trackCalculatorInteraction.copyResults('fence');
     if (!hasCalculated || !materials || !materials.posts) return;
     
     // Prepare inputs
@@ -422,8 +425,35 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
 const preventScrollChange = (e) => {
   e.target.blur();
 };
-  
-  return (  
+
+  const handleReset = () => {
+    // Track Start Over button click
+    trackCalculatorInteraction.startOver('fence');
+    
+    // Reset all inputs to defaults
+    setLinearFeet('');
+    setFenceType('picket');
+    setHeight('6');
+    setBoardWidth('5.5');
+    setBoardSpacing('0');
+    setRailLength('8');
+    setTerrain('flat');
+    setSlopeMethod('stepped');
+    setFrostDepth('36');
+    setGates3ft('0');
+    setGates4ft('0');
+    setGates6ft('0');
+    setGates10ft('0');
+    setGates12ft('0');
+    setCorners('4');
+    setFenceLayout('perimeter');
+    
+    // Clear results
+    setMaterials(null);
+    setHasCalculated(false);
+  };
+
+  return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         <div className="bg-white rounded-2xl shadow-2xl p-6 md:p-8 mb-6 border border-gray-200">
@@ -752,7 +782,7 @@ const preventScrollChange = (e) => {
                 </div>
               </div>
               
-              {/* Copy Calculation Button */}
+             {/* Action Buttons */}
 <div className="bg-white rounded-lg shadow-lg p-6">
   <div className="flex gap-3">
     <button 
@@ -762,12 +792,18 @@ const preventScrollChange = (e) => {
       {copyButtonText}
     </button>
     
-    {/* ADD THIS PRINT BUTTON */}
     <button 
       onClick={() => printCalculation('Fence Calculator')}
       className="copy-calc-btn flex-1"
     >
       🖨️ Print Results
+    </button>
+    
+    <button 
+      onClick={handleReset}
+      className="copy-calc-btn flex-1"
+    >
+      🔄 Start Over
     </button>
   </div>
 </div>
