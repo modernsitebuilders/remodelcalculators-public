@@ -5,7 +5,7 @@
  * 
  * Handles:
  * - Scroll prevention (no accidental value changes)
- * - Visual validation states (orange = empty required, yellow = dropdown, gray = complete)
+ * - Visual validation states (red = empty required, yellow = filled)
  * - Units display
  * - Consistent styling across all calculators
  */
@@ -16,19 +16,20 @@ export function NumberInput({
   onChange,
   unit = '',
   required = false,
+  disabled = false,  // ✅ ADD THIS
   min,
   max,
   step = '0.1',
   fieldName,
   placeholder = '',
-  helpText = ''
+  note = ''  // ✅ CHANGE helpText to note (matches DrywallCalculator)
 }) {
   // Prevent scroll from changing values
   const handleWheel = (e) => {
     e.target.blur();
   };
 
- const borderColor = required && (value === '' || value === null || value === undefined)
+  const borderColor = required && (value === '' || value === null || value === undefined)
     ? 'border-red-400'
     : 'border-yellow-400';
 
@@ -44,12 +45,15 @@ export function NumberInput({
           type="number"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          onWheel={handleWheel}
+          onWheel={(e) => e.target.blur()}
+          disabled={disabled}
+          placeholder={placeholder}
           min={min}
           max={max}
           step={step}
-          placeholder={placeholder}
-          className={`w-full px-4 py-2 border-2 ${borderColor} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors`}
+          className={`w-full px-4 py-2 border-2 ${borderColor} rounded-lg focus:outline-none transition-colors ${
+            disabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
+          } [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
         />
         {unit && (
           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-medium pointer-events-none">
@@ -58,8 +62,8 @@ export function NumberInput({
         )}
       </div>
       
-      {helpText && (
-        <p className="mt-1 text-xs text-gray-500">{helpText}</p>
+      {note && (
+        <p className="mt-1 text-xs text-gray-500">{note}</p>
       )}
     </div>
   );
