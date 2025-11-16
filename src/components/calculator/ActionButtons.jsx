@@ -14,7 +14,7 @@ export function CalculateButtons({
   onCalculate,
   onStartOver,
   showStartOver = false,
-  calculateText = 'Calculate Materials Needed',
+  calculateText = 'Calculate',
   startOverText = 'Start Over'
 }) {
   return (

@@ -28,10 +28,9 @@ export function NumberInput({
     e.target.blur();
   };
 
- const getBorderColor = () => {
-  if (required && (!value || value === '')) return 'border-red-400';
-  return 'border-gray-300';
-};
+ const borderColor = required && (value === '' || value === null || value === undefined)
+    ? 'border-red-400'
+    : 'border-yellow-400';
 
   return (
     <div>
@@ -50,7 +49,7 @@ export function NumberInput({
           max={max}
           step={step}
           placeholder={placeholder}
-          className={`w-full px-4 py-2 border-2 ${getBorderColor()} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors`}
+          className={`w-full px-4 py-2 border-2 ${borderColor} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors`}
         />
         {unit && (
           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-medium pointer-events-none">

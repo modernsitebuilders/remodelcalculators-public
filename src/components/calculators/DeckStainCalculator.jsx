@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { Info, AlertCircle, Droplets, Layers, Calculator } from 'lucide-react';
 import { trackCalculation } from '@/utils/tracking';
 import { copyCalculation } from '@/utils/copyCalculation';
@@ -9,10 +9,28 @@ import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
 import { FAQSection } from '@/components/FAQSection';
 import { trackCalculatorInteraction } from '@/utils/buttonTracking';
+import { 
+  NumberInput, 
+  SelectInput, 
+  MaterialCard, 
+  SectionCard, 
+  InputGrid, 
+  CalculateButtons, 
+  ResultsButtons 
+} from '@/components/calculator';
+
+// Convert option objects to array format for SelectInput
+const formatOptions = (optionsObj) => {
+  return Object.entries(optionsObj).map(([value, data]) => ({
+    value,
+    label: data.name
+  }));
+};
 
 const DeckStainCalculator = () => {
   const [showResults, setShowResults] = useState(false);
   const [copyButtonText, setCopyButtonText] = useState('📋 Copy Calculation');
+  const resultsRef = useRef(null);
   
   const [inputs, setInputs] = useState({
     deckLength: '',
@@ -233,98 +251,90 @@ const DeckStainCalculator = () => {
     '8x8': { width: 7.25, height: 7.25, name: '8×8 (7.25" × 7.25")' }
   };
 
-  // Prevent scroll from changing number inputs
-const preventScrollChange = (e) => {
-  e.target.blur();
-};
-
   const validationRules = {
-  deckLength: [
-    CommonRules.unrealistic(5, 100, 'Deck length')
-  ],
-  deckWidth: [
-    CommonRules.unrealistic(5, 50, 'Deck width')
-  ],
-  railingLinearFeet: [
-    {
-      condition: (val, allVals) => {
-        const railing = parseFloat(val);
-        const length = parseFloat(allVals.deckLength) || 0;
-        const width = parseFloat(allVals.deckWidth) || 0;
-        const perimeter = 2 * (length + width);
-        return railing > 0 && railing > perimeter * 1.5;
+    deckLength: [
+      CommonRules.unrealistic(5, 100, 'Deck length')
+    ],
+    deckWidth: [
+      CommonRules.unrealistic(5, 50, 'Deck width')
+    ],
+    railingLinearFeet: [
+      {
+        condition: (val, allVals) => {
+          const railing = parseFloat(val);
+          const length = parseFloat(allVals.deckLength) || 0;
+          const width = parseFloat(allVals.deckWidth) || 0;
+          const perimeter = 2 * (length + width);
+          return railing > 0 && railing > perimeter * 1.5;
+        },
+        message: 'Railing length exceeds typical deck perimeter - please verify',
+        type: ValidationTypes.WARNING
+      }
+    ],
+    railingPanelHeight: [
+      {
+        condition: (val) => parseFloat(val) < 36,
+        message: '⚠️ IRC requires 36" minimum railing height for decks',
+        type: ValidationTypes.ERROR
       },
-      message: 'Railing length exceeds typical deck perimeter - please verify',
-      type: ValidationTypes.WARNING
-    }
-  ],
-  railingPanelHeight: [
-    {
-      condition: (val) => parseFloat(val) < 36,
-      message: '⚠️ IRC requires 36" minimum railing height for decks',
-      type: ValidationTypes.ERROR
-    },
-    CommonRules.tooLarge(48, 'Railing height >48" is uncommon')
-  ],
-  numberOfSteps: [
-    CommonRules.unrealistic(1, 30, 'Number of steps')
-  ],
-  stepWidth: [
-    {
-      condition: (val) => parseFloat(val) < 36,
-      message: '⚠️ IRC requires 36" minimum stair width',
-      type: ValidationTypes.ERROR
-    }
-  ],
-  riserHeight: [
-    {
-      condition: (val) => parseFloat(val) > 7.75,
-      message: '⚠️ IRC limits riser height to 7.75" maximum',
-      type: ValidationTypes.ERROR
-    }
-  ],
-  treadDepth: [
-    {
-      condition: (val) => parseFloat(val) < 10,
-      message: '⚠️ IRC requires minimum 10" tread depth',
-      type: ValidationTypes.ERROR
-    }
-  ]
-};
+      CommonRules.tooLarge(48, 'Railing height >48" is uncommon')
+    ],
+    numberOfSteps: [
+      CommonRules.unrealistic(1, 30, 'Number of steps')
+    ],
+    stepWidth: [
+      {
+        condition: (val) => parseFloat(val) < 36,
+        message: '⚠️ IRC requires 36" minimum stair width',
+        type: ValidationTypes.ERROR
+      }
+    ],
+    riserHeight: [
+      {
+        condition: (val) => parseFloat(val) > 7.75,
+        message: '⚠️ IRC limits riser height to 7.75" maximum',
+        type: ValidationTypes.ERROR
+      }
+    ],
+    treadDepth: [
+      {
+        condition: (val) => parseFloat(val) < 10,
+        message: '⚠️ IRC requires minimum 10" tread depth',
+        type: ValidationTypes.ERROR
+      }
+    ]
+  };
 
-const getValues = () => ({
-  deckLength: inputs.deckLength,
-  deckWidth: inputs.deckWidth,
-  railingLinearFeet: inputs.railingLinearFeet,
-  railingPanelHeight: inputs.railingPanelHeight,
-  numberOfSteps: inputs.numberOfSteps,
-  stepWidth: inputs.stepWidth,
-  riserHeight: inputs.riserHeight,
-  treadDepth: inputs.treadDepth
-});
-
-const { validate, ValidationDisplay } = useValidation(validationRules);
-
- const handleInputChange = (field, value) => {
-  setInputs(prev => {
-    // Only parse if value is purely numeric (not '4x4', '6x6', etc.)
-    const parsedValue = /^\d+(\.\d+)?$/.test(value) ? parseFloat(value) : value;
-    
-    const updates = {
-      ...prev,
-      [field]: parsedValue
-    };
-    
-    // Auto-sync railing wood type with deck wood type
-    if (field === 'woodType') {
-      updates.railingWoodType = value;
-    }
-    
-    return updates;
+  const getValues = () => ({
+    deckLength: inputs.deckLength,
+    deckWidth: inputs.deckWidth,
+    railingLinearFeet: inputs.railingLinearFeet,
+    railingPanelHeight: inputs.railingPanelHeight,
+    numberOfSteps: inputs.numberOfSteps,
+    stepWidth: inputs.stepWidth,
+    riserHeight: inputs.riserHeight,
+    treadDepth: inputs.treadDepth
   });
-  // Trigger validation after state update
-  setTimeout(() => validate(getValues()), 100);
-};
+
+  const { validate, ValidationDisplay } = useValidation(validationRules);
+
+  const handleInputChange = (field, value) => {
+    setInputs(prev => {
+      const parsedValue = /^\d+(\.\d+)?$/.test(value) ? parseFloat(value) : value;
+      
+      const updates = {
+        ...prev,
+        [field]: parsedValue
+      };
+      
+      if (field === 'woodType') {
+        updates.railingWoodType = value;
+      }
+      
+      return updates;
+    });
+    setTimeout(() => validate(getValues()), 100);
+  };
 
   const results = useMemo(() => {
     const deckArea = (parseFloat(inputs.deckLength) || 0) * (parseFloat(inputs.deckWidth) || 0);
@@ -366,7 +376,6 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
     if (inputs.includeBeams && (parseFloat(inputs.numberOfBeams) || 0) > 0) {
       const beamDimensions = beamSizes[inputs.beamSize || '4x4'];
       if (beamDimensions) {
-        // Calculate full perimeter for vertical posts (all 4 sides exposed)
         const perimeterInches = (2 * beamDimensions.width) + (2 * beamDimensions.height);
         const perimeterFeet = perimeterInches / 12;
         beamsArea = perimeterFeet * (parseFloat(inputs.beamLength) || 0) * (parseFloat(inputs.numberOfBeams) || 0);
@@ -380,7 +389,6 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
 
     const totalArea = Math.round(deckArea + deckRailingArea + stairsArea + stairRailingArea + landingsArea + beamsArea + undersideArea);
 
-    // Calculate effective coverage for deck (using deck woodType)
     const deckBaseCoverage = Math.min(
       woodTypes[inputs.woodType].coverage,
       stainTypes[inputs.stainType].coverage
@@ -390,7 +398,6 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
       (surfaceTextures[inputs.surfaceTexture].multiplier * woodConditions[inputs.woodCondition].multiplier)
     );
 
-    // Calculate effective coverage for railing (using railingWoodType)
     const railingBaseCoverage = Math.min(
       woodTypes[inputs.railingWoodType || inputs.woodType].coverage,
       stainTypes[inputs.stainType].coverage
@@ -400,7 +407,6 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
       (surfaceTextures[inputs.surfaceTexture].multiplier * woodConditions[inputs.woodCondition].multiplier)
     );
 
-    // Calculate gallons per component per coat
     const calculateGallons = (area, effectiveCoverage) => {
       let gallons = 0;
       
@@ -425,17 +431,14 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
       return gallons;
     };
 
-    // Calculate gallons for each component
     const deckGallons = calculateGallons(deckArea + stairsArea + landingsArea + beamsArea + undersideArea, deckEffectiveCoverage);
     const railingGallons = calculateGallons(deckRailingArea + stairRailingArea, railingEffectiveCoverage);
     
     const totalGallonsRaw = deckGallons + railingGallons;
 
-    // Apply waste factor based on application method
     const wasteFactor = applicationMethods[inputs.applicationMethod].wasteFactor;
     const totalGallonsWithWaste = totalGallonsRaw * wasteFactor;
 
-    // Round up to nearest 0.5 gallon for purchasing
     const roundedGallons = Math.ceil(totalGallonsWithWaste * 2) / 2;
 
     return {
@@ -454,13 +457,12 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
       totalWithWaste: roundedGallons || 0,
       wastePercentage: Math.round((wasteFactor - 1) * 100)
     };
-}, [inputs]);  
+  }, [inputs]);  
 
   const handleCopyCalculation = async () => {
     trackCalculatorInteraction.copyResults('deck-stain');
     if (!showResults || results.totalArea === 0) return;
     
-    // Prepare inputs
     const inputsData = {
       'Deck size': `${inputs.deckLength}' × ${inputs.deckWidth}'`
     };
@@ -487,7 +489,6 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
     inputsData['Application method'] = applicationMethods[inputs.applicationMethod].name;
     inputsData['Number of coats'] = inputs.coats;
     
-    // Prepare outputs
     const outputs = {
       'Total area to stain': `${results.totalArea} square feet`,
       'Stain needed': `${results.totalWithWaste} gallons`,
@@ -513,6 +514,36 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
     }
   };
 
+  const handleCalculate = () => {
+    if (!inputs.deckLength || !inputs.deckWidth) {
+      alert('Please enter deck dimensions (length and width) before calculating.');
+      return;
+    }
+    
+    setShowResults(true);
+    
+    setTimeout(() => {
+      resultsRef.current?.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+      });
+    }, 100);
+    
+    trackCalculation('deck-stain', inputs, {
+      totalArea: results.totalArea,
+      totalGallons: results.totalWithWaste,
+      effectiveCoverage: results.effectiveCoverage,
+      deckArea: results.deckArea,
+      railingArea: results.deckRailingArea,
+      stairsArea: results.stairsArea,
+      woodType: woodTypes[inputs.woodType].name,
+      stainType: stainTypes[inputs.stainType].name,
+      coats: inputs.coats,
+      applicationMethod: applicationMethods[inputs.applicationMethod].name
+    });
+    trackCalculatorInteraction.calculate('deck-stain', true);
+  };
+
   return ( 
     <div className="max-w-6xl mx-auto p-6">
       <div className="bg-white rounded-lg shadow-xl p-8 mb-8">
@@ -527,61 +558,36 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
 
         <div className="grid lg:grid-cols-2 gap-8">
           <div className="space-y-6">
-            <div className="bg-blue-50 rounded-lg p-6 border-l-4 border-blue-500">
-              <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <Layers className="w-6 h-6 text-blue-600" />
-                Deck Dimensions
-              </h2>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Deck Length (feet)
-                  </label>
-                  <input
-                    type="number"
-                    value={inputs.deckLength}
-                    onChange={(e) => handleInputChange('deckLength', e.target.value)}
-                    onWheel={preventScrollChange}
-                    disabled={showResults}
-                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      showResults ? 'bg-gray-100 cursor-not-allowed' : ''
-                    } ${
-                      !inputs.deckLength ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    placeholder="Enter length"
-                    min="1"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Deck Width (feet)
-                  </label>
-                  <input
-                    type="number"
-                        value={inputs.deckWidth}
-                    onChange={(e) => handleInputChange('deckWidth', e.target.value)}
-                    onWheel={preventScrollChange}
-                    disabled={showResults}
-                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      showResults ? 'bg-gray-100 cursor-not-allowed' : ''
-                    } ${
-                      !inputs.deckWidth ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    placeholder="Enter width"
-                    min="1"
-                  />
-                </div>
-              </div>
-
-              <div className="mt-4 p-3 bg-white rounded-lg">
-                <div className="text-sm text-gray-600">Deck Surface Area</div>
-                <div className="text-2xl font-bold text-blue-600">
-                  {results.deckArea} sq ft
-                </div>
-              </div>
-            </div>
+            <SectionCard title="Deck Dimensions" icon={Layers}>
+              <InputGrid columns={2}>
+                <NumberInput
+                  label="Deck Length"
+                  value={inputs.deckLength}
+                  onChange={(value) => handleInputChange('deckLength', value)}
+                  unit="feet"
+                  required
+                  fieldName="deckLength"
+                  disabled={showResults}
+                  placeholder="Enter length"
+                />
+                <NumberInput
+                  label="Deck Width"
+                  value={inputs.deckWidth}
+                  onChange={(value) => handleInputChange('deckWidth', value)}
+                  unit="feet"
+                  required
+                  fieldName="deckWidth"
+                  disabled={showResults}
+                  placeholder="Enter width"
+                />
+              </InputGrid>
+              <MaterialCard
+                title="Deck Surface Area"
+                value={results.deckArea}
+                unit="sq ft"
+                color="blue"
+              />
+            </SectionCard>
 
             <div className="bg-purple-50 rounded-lg p-6 border-l-4 border-purple-500">
               <div className="flex items-center justify-between mb-4">
@@ -593,7 +599,9 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     type="checkbox"
                     checked={inputs.includeRailing}
                     onChange={(e) => handleInputChange('includeRailing', e.target.checked)}
-                    disabled={showResults} className="w-5 h-5 text-purple-600 rounded focus:ring-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={showResults}
+                    className="w-5 h-5 text-purple-600 rounded focus:ring-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    required={true}
                   />
                   <span className="text-sm font-medium text-gray-700">Include</span>
                 </div>
@@ -601,86 +609,42 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
 
               {inputs.includeRailing && (
                 <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Railing Linear Feet
-                    </label>
-                    <input
-                      type="number"
-                      disabled={showResults}
-                      value={inputs.railingLinearFeet}
-                      onChange={(e) => handleInputChange('railingLinearFeet', e.target.value)}
-                    onWheel={preventScrollChange}
-                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
-                        inputs.includeRailing && !inputs.railingLinearFeet ? 'border-red-500' : 'border-gray-300'
-                      } ${showResults ? "bg-gray-100 cursor-not-allowed" : ""}`}
-                      min="0"
-                    />
-                    <div className="mt-1 text-xs text-gray-500">
-                      Measure total perimeter of railing
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Railing Style
-                    </label>
-                    <select disabled={showResults}
-                      value={inputs.railingStyle}
-                      onChange={(e) => handleInputChange('railingStyle', e.target.value)}
-                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    >
-                      {Object.entries(railingStyles).map(([key, style]) => (
-                        <option key={key} value={key}>
-                          {style.name}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="mt-1 text-xs text-gray-500">
-                      {railingStyles[inputs.railingStyle].description}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Railing Height (inches)
-                    </label>
-                    <input
-                      type="number"
-                      disabled={showResults}
-                      value={inputs.railingPanelHeight}
-                      onChange={(e) => handleInputChange('railingPanelHeight', e.target.value)}
-                    onWheel={preventScrollChange}
-                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
-                        inputs.includeRailing && !inputs.railingPanelHeight ? 'border-red-500' : 'border-gray-300'
-                      } ${showResults ? "bg-gray-100 cursor-not-allowed" : ""}`}
-                      min="24"
-                      max="48"
-                    />
-                    <div className="mt-1 text-xs text-gray-500">
-                      Typically 36-42 inches
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Railing Wood Type
-                    </label>
-                    <select disabled={showResults}
-                      value={inputs.railingWoodType}
-                      onChange={(e) => handleInputChange('railingWoodType', e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-                    >
-                      {Object.entries(woodTypes).map(([key, type]) => (
-                        <option key={key} value={key}>
-                          {type.name}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="mt-1 text-xs text-gray-500">
-                      Defaults to match deck wood type
-                    </div>
-                  </div>
+                  <NumberInput
+                    label="Railing Linear Feet"
+                    value={inputs.railingLinearFeet}
+                    onChange={(value) => handleInputChange('railingLinearFeet', value)}
+                    fieldName="railingLinearFeet"
+                    disabled={showResults}
+                    note="Measure total perimeter of railing"
+                    required={true}
+                  />
+                  <SelectInput
+                    label="Railing Style"
+                    value={inputs.railingStyle}
+                    onChange={(value) => handleInputChange('railingStyle', value)}
+                    options={formatOptions(railingStyles)}
+                    disabled={showResults}
+                  />
+                  <NumberInput
+                    label="Railing Height"
+                    value={inputs.railingPanelHeight}
+                    onChange={(value) => handleInputChange('railingPanelHeight', value)}
+                    unit="inches"
+                    fieldName="railingPanelHeight"
+                    disabled={showResults}
+                    required={true}
+                    note="Typically 36-42 inches"
+                    min="24"
+                    max="48"
+                  />
+                  <SelectInput
+                    label="Railing Wood Type"
+                    value={inputs.railingWoodType}
+                    onChange={(value) => handleInputChange('railingWoodType', value)}
+                    options={formatOptions(woodTypes)}
+                    disabled={showResults}
+                    note="Defaults to match deck wood type"
+                  />
                 </div>
               )}
             </div>
@@ -695,7 +659,8 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     type="checkbox"
                     checked={inputs.includeStairs}
                     onChange={(e) => handleInputChange('includeStairs', e.target.checked)}
-                    disabled={showResults} className="w-5 h-5 text-green-600 rounded focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={showResults}
+                    className="w-5 h-5 text-green-600 rounded focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                   <span className="text-sm font-medium text-gray-700">Include</span>
                 </div>
@@ -703,93 +668,56 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
 
               {inputs.includeStairs && (
                 <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Number of Steps
-                      </label>
-                      <input
-                        type="number"
-                      disabled={showResults}
+                  <InputGrid columns={2}>
+                    <NumberInput
+                      label="Number of Steps"
                       value={inputs.numberOfSteps}
-                        onChange={(e) => handleInputChange('numberOfSteps', e.target.value)}
-                    onWheel={preventScrollChange}
-                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                          inputs.includeStairs && !inputs.numberOfSteps ? 'border-red-500' : 'border-gray-300'
-                        } ${showResults ? "bg-gray-100 cursor-not-allowed" : ""}`}
-                        min="0"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Step Width (inches)
-                      </label>
-                      <input
-                        type="number"
+                      onChange={(value) => handleInputChange('numberOfSteps', value)}
+                      fieldName="numberOfSteps"
                       disabled={showResults}
-                      value={inputs.stepWidth}
-                        onChange={(e) => handleInputChange('stepWidth', e.target.value)}
-                    onWheel={preventScrollChange}
-                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                          inputs.includeStairs && !inputs.stepWidth ? 'border-red-500' : 'border-gray-300'
-                        } ${showResults ? "bg-gray-100 cursor-not-allowed" : ""}`}
-                        min="24"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Tread Depth (inches)
-                      </label>
-                      <input
-                        type="number"
-                      disabled={showResults}
-                      value={inputs.treadDepth}
-                        onChange={(e) => handleInputChange('treadDepth', e.target.value)}
-                    onWheel={preventScrollChange}
-                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                          inputs.includeStairs && !inputs.treadDepth ? 'border-red-500' : 'border-gray-300'
-                        } ${showResults ? "bg-gray-100 cursor-not-allowed" : ""}`}
-                        min="9"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Riser Height (inches)
-                      </label>
-                      <input
-                        type="number"
-                      disabled={showResults}
-                      value={inputs.riserHeight}
-                        onChange={(e) => handleInputChange('riserHeight', e.target.value)}
-                    onWheel={preventScrollChange}
-                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                          inputs.includeStairs && !inputs.riserHeight ? 'border-red-500' : 'border-gray-300'
-                        } ${showResults ? "bg-gray-100 cursor-not-allowed" : ""}`}
-                        min="4"
-                        max="8"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Stair Railing Linear Feet (optional)
-                    </label>
-                    <input
-                      type="number"
-                      disabled={showResults}
-                      value={inputs.stairRailingLinearFeet}
-                      onChange={(e) => handleInputChange('stairRailingLinearFeet', e.target.value)}
-                    onWheel={preventScrollChange}
-                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                      min="0"
+                      required={true}
                     />
-                  </div>
+                    <NumberInput
+                      label="Step Width"
+                      value={inputs.stepWidth}
+                      onChange={(value) => handleInputChange('stepWidth', value)}
+                      unit="inches"
+                      fieldName="stepWidth"
+                      disabled={showResults}
+                      required={true}
+                      min="24"
+                    />
+                  </InputGrid>
+                  <InputGrid columns={2}>
+                    <NumberInput
+                      label="Tread Depth"
+                      value={inputs.treadDepth}
+                      onChange={(value) => handleInputChange('treadDepth', value)}
+                      unit="inches"
+                      fieldName="treadDepth"
+                      disabled={showResults}
+                      min="9"
+                      required={true}
+                    />
+                    <NumberInput
+                      label="Riser Height"
+                      value={inputs.riserHeight}
+                      onChange={(value) => handleInputChange('riserHeight', value)}
+                      unit="inches"
+                      fieldName="riserHeight"
+                      disabled={showResults}
+                      required={true}
+                      min="4"
+                      max="8"
+                    />
+                  </InputGrid>
+                  <NumberInput
+                    label="Stair Railing Linear Feet"
+                    value={inputs.stairRailingLinearFeet}
+                    onChange={(value) => handleInputChange('stairRailingLinearFeet', value)}
+                    disabled={showResults}
+                    note="Optional"
+                  />
                 </div>
               )}
             </div>
@@ -804,7 +732,8 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     type="checkbox"
                     checked={inputs.includeLandings}
                     onChange={(e) => handleInputChange('includeLandings', e.target.checked)}
-                    disabled={showResults} className="w-5 h-5 text-yellow-600 rounded focus:ring-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={showResults}
+                    className="w-5 h-5 text-yellow-600 rounded focus:ring-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                   <span className="text-sm font-medium text-gray-700">Include</span>
                 </div>
@@ -812,58 +741,34 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
 
               {inputs.includeLandings && (
                 <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Number of Landings
-                    </label>
-                    <input
-                      type="number"
-                      disabled={showResults}
-                      value={inputs.numberOfLandings}
-                      onChange={(e) => handleInputChange('numberOfLandings', e.target.value)}
-                    onWheel={preventScrollChange}
-                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent ${
-                        inputs.includeLandings && !inputs.numberOfLandings ? 'border-red-500' : 'border-gray-300'
-                      } ${showResults ? "bg-gray-100 cursor-not-allowed" : ""}`}
-                      min="0"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Landing Length (feet)
-                      </label>
-                      <input
-                        type="number"
-                      disabled={showResults}
+                  <NumberInput
+                    label="Number of Landings"
+                    value={inputs.numberOfLandings}
+                    onChange={(value) => handleInputChange('numberOfLandings', value)}
+                    fieldName="numberOfLandings"
+                    disabled={showResults}
+                    required={true}
+                  />
+                  <InputGrid columns={2}>
+                    <NumberInput
+                      label="Landing Length"
                       value={inputs.landingLength}
-                        onChange={(e) => handleInputChange('landingLength', e.target.value)}
-                    onWheel={preventScrollChange}
-                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent ${
-                          inputs.includeLandings && !inputs.landingLength ? 'border-red-500' : 'border-gray-300'
-                        } ${showResults ? "bg-gray-100 cursor-not-allowed" : ""}`}
-                        min="1"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Landing Width (feet)
-                      </label>
-                      <input
-                        type="number"
+                      onChange={(value) => handleInputChange('landingLength', value)}
+                      unit="feet"
+                      fieldName="landingLength"
                       disabled={showResults}
+                      required={true}
+                    />
+                    <NumberInput
+                      label="Landing Width"
                       value={inputs.landingWidth}
-                        onChange={(e) => handleInputChange('landingWidth', e.target.value)}
-                    onWheel={preventScrollChange}
-                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent ${
-                          inputs.includeLandings && !inputs.landingWidth ? 'border-red-500' : 'border-gray-300'
-                        } ${showResults ? "bg-gray-100 cursor-not-allowed" : ""}`}
-                        min="1"
-                      />
-                    </div>
-                  </div>
+                      onChange={(value) => handleInputChange('landingWidth', value)}
+                      unit="feet"
+                      fieldName="landingWidth"
+                      disabled={showResults}
+                      required={true}
+                    />
+                  </InputGrid>
                 </div>
               )}
             </div>
@@ -878,7 +783,8 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     type="checkbox"
                     checked={inputs.includeBeams}
                     onChange={(e) => handleInputChange('includeBeams', e.target.checked)}
-                    disabled={showResults} className="w-5 h-5 text-orange-600 rounded focus:ring-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={showResults}
+                    className="w-5 h-5 text-orange-600 rounded focus:ring-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                   <span className="text-sm font-medium text-gray-700">Include</span>
                 </div>
@@ -886,64 +792,34 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
 
               {inputs.includeBeams && (
                 <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Number of Posts
-                      </label>
-                      <input
-                        type="number"
-                      disabled={showResults}
+                  <InputGrid columns={2}>
+                    <NumberInput
+                      label="Number of Posts"
                       value={inputs.numberOfBeams}
-                        onChange={(e) => handleInputChange('numberOfBeams', e.target.value)}
-                    onWheel={preventScrollChange}
-                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
-                          inputs.includeBeams && !inputs.numberOfBeams ? 'border-red-500' : 'border-gray-300'
-                        } ${showResults ? "bg-gray-100 cursor-not-allowed" : ""}`}
-                        min="0"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Post Height (feet)
-                      </label>
-                      <input
-                        type="number"
+                      onChange={(value) => handleInputChange('numberOfBeams', value)}
+                      fieldName="numberOfBeams"
                       disabled={showResults}
+                      required={true}
+                    />
+                    <NumberInput
+                      label="Post Height"
                       value={inputs.beamLength}
-                        onChange={(e) => handleInputChange('beamLength', e.target.value)}
-                    onWheel={preventScrollChange}
-                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
-                          inputs.includeBeams && !inputs.beamLength ? 'border-red-500' : 'border-gray-300'
-                        } ${showResults ? "bg-gray-100 cursor-not-allowed" : ""}`}
-                        min="1"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Post Size
-                    </label>
-                    <select disabled={showResults}
-                      value={inputs.beamSize}
-                      onChange={(e) => handleInputChange('beamSize', e.target.value)}
-                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
-                        inputs.includeBeams && !inputs.beamSize ? 'border-red-500' : 'border-gray-300'
-                      } ${showResults ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-                    >
-                      <option value="">Select post size...</option>
-                      {Object.entries(beamSizes).map(([key, size]) => (
-                        <option key={key} value={key}>
-                          {size.name}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="mt-1 text-xs text-gray-500">
-                      All 4 sides stained (vertical posts - full perimeter)
-                    </div>
-                  </div>
+                      onChange={(value) => handleInputChange('beamLength', value)}
+                      unit="feet"
+                      fieldName="beamLength"
+                      disabled={showResults}
+                      required={true}
+                    />
+                  </InputGrid>
+                  <SelectInput
+                    label="Post Size"
+                    value={inputs.beamSize}
+                    onChange={(value) => handleInputChange('beamSize', value)}
+                    options={formatOptions(beamSizes)}
+                    fieldName="beamSize"
+                    disabled={showResults}
+                    note="All 4 sides stained (vertical posts - full perimeter)"
+                  />
                 </div>
               )}
             </div>
@@ -958,199 +834,93 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     type="checkbox"
                     checked={inputs.includeUnderside}
                     onChange={(e) => handleInputChange('includeUnderside', e.target.checked)}
-                    disabled={showResults} className="w-5 h-5 text-red-600 rounded focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={showResults}
+                    className="w-5 h-5 text-red-600 rounded focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                   <span className="text-sm font-medium text-gray-700">Include</span>
                 </div>
               </div>
 
               {inputs.includeUnderside && (
-                <div className="p-3 bg-white rounded-lg">
-                  <div className="text-xs text-gray-600 mb-2">
-                    Includes rough lumber underside + all joists and structure.
-                    Calculated as 2× deck surface area due to rough texture.
-                  </div>
-                  <div className="text-lg font-semibold text-red-600">
-                    {results.undersideArea} sq ft
-                  </div>
-                </div>
+                <MaterialCard
+                  title="Underside Area"
+                  value={results.undersideArea}
+                  unit="sq ft"
+                  color="red"
+                  note="Includes rough lumber underside + all joists and structure. Calculated as 2× deck surface area due to rough texture."
+                />
               )}
             </div>
           </div>
 
           <div className="space-y-6">
-            <div className="bg-amber-50 rounded-lg p-6 border-l-4 border-amber-500">
-              <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <Droplets className="w-6 h-6 text-amber-600" />
-                Wood & Stain Details
-              </h2>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Wood Type
-                </label>
-                <select disabled={showResults}
-                  value={inputs.woodType}
-                  onChange={(e) => handleInputChange('woodType', e.target.value)}
-                  className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                >
-                  {Object.entries(woodTypes).map(([key, type]) => (
-                    <option key={key} value={key}>
-                      {type.name}
-                    </option>
-                  ))}
-                </select>
-                <div className="mt-1 text-xs text-gray-500">
-                  {woodTypes[inputs.woodType].description}
-                </div>
-              </div>
-
-              <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Wood Condition
-                </label>
-                <select disabled={showResults}
-                  value={inputs.woodCondition}
-                  onChange={(e) => handleInputChange('woodCondition', e.target.value)}
-                  className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                >
-                  {Object.entries(woodConditions).map(([key, condition]) => (
-                    <option key={key} value={key}>
-                      {condition.name}
-                    </option>
-                  ))}
-                </select>
-                <div className="mt-1 text-xs text-gray-500">
-                  {woodConditions[inputs.woodCondition].description}
-                </div>
-              </div>
-
-              <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Surface Texture
-                </label>
-                <select disabled={showResults}
-                  value={inputs.surfaceTexture}
-                  onChange={(e) => handleInputChange('surfaceTexture', e.target.value)}
-                  className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                >
-                  {Object.entries(surfaceTextures).map(([key, texture]) => (
-                    <option key={key} value={key}>
-                      {texture.name}
-                    </option>
-                  ))}
-                </select>
-                <div className="mt-1 text-xs text-gray-500">
-                  {surfaceTextures[inputs.surfaceTexture].description}
-                </div>
-              </div>
-
-              <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Stain Type
-                </label>
-                <select disabled={showResults}
-                  value={inputs.stainType}
-                  onChange={(e) => handleInputChange('stainType', e.target.value)}
-                  className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                >
-                  {Object.entries(stainTypes).map(([key, type]) => (
-                    <option key={key} value={key}>
-                      {type.name}
-                    </option>
-                  ))}
-                </select>
-                <div className="mt-1 text-xs text-gray-500">
-                  {stainTypes[inputs.stainType].description}
-                </div>
-              </div>
-
-              <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Application Method
-                </label>
-                <select disabled={showResults}
-                  value={inputs.applicationMethod}
-                  onChange={(e) => handleInputChange('applicationMethod', e.target.value)}
-                  className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                >
-                  {Object.entries(applicationMethods).map(([key, method]) => (
-                    <option key={key} value={key}>
-                      {method.name}
-                    </option>
-                  ))}
-                </select>
-                <div className="mt-1 text-xs text-gray-500">
-                  {applicationMethods[inputs.applicationMethod].description}
-                </div>
-              </div>
-
-              <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Number of Coats
-                </label>
-                <select disabled={showResults}
-                  value={inputs.coats}
-                  onChange={(e) => handleInputChange('coats', e.target.value)}
-                  className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                >
-                  <option value={1}>1 Coat</option>
-                  <option value={2}>2 Coats (Recommended)</option>
-                  <option value={3}>3 Coats</option>
-                </select>
-                <div className="mt-1 text-xs text-gray-500">
-                  Recommended: {stainTypes[inputs.stainType].coatsRecommended} coats for this stain type
-                </div>
-              </div>
-            </div>
+            <SectionCard title="Wood & Stain Details" icon={Droplets} variant="info">
+              <SelectInput
+                label="Wood Type"
+                value={inputs.woodType}
+                onChange={(value) => handleInputChange('woodType', value)}
+                options={formatOptions(woodTypes)}
+                disabled={showResults}
+              />
+              <SelectInput
+                label="Wood Condition"
+                value={inputs.woodCondition}
+                onChange={(value) => handleInputChange('woodCondition', value)}
+                options={formatOptions(woodConditions)}
+                disabled={showResults}
+              />
+              <SelectInput
+                label="Surface Texture"
+                value={inputs.surfaceTexture}
+                onChange={(value) => handleInputChange('surfaceTexture', value)}
+                options={formatOptions(surfaceTextures)}
+                disabled={showResults}
+              />
+              <SelectInput
+                label="Stain Type"
+                value={inputs.stainType}
+                onChange={(value) => handleInputChange('stainType', value)}
+                options={formatOptions(stainTypes)}
+                disabled={showResults}
+              />
+              <SelectInput
+                label="Application Method"
+                value={inputs.applicationMethod}
+                onChange={(value) => handleInputChange('applicationMethod', value)}
+                options={formatOptions(applicationMethods)}
+                disabled={showResults}
+              />
+              <SelectInput
+                label="Number of Coats"
+                value={inputs.coats}
+                onChange={(value) => handleInputChange('coats', value)}
+                options={formatOptions({
+                  1: { name: '1 Coat' },
+                  2: { name: '2 Coats (Recommended)' },
+                  3: { name: '3 Coats' }
+                })}
+                disabled={showResults}
+                note={`Recommended: ${stainTypes[inputs.stainType].coatsRecommended} coats for this stain type`}
+              />
+            </SectionCard>
           </div>
         </div>
 
-        <div className="space-y-6 mt-6">
-          <div className="flex gap-4">
-            <ValidationDisplay />
-            {!showResults && (
-              <button
-                onClick={() => {
-                  // Validate required inputs
-                  if (!inputs.deckLength || !inputs.deckWidth) {
-                    alert('Please enter deck dimensions (length and width) before calculating.');
-                    return;
-                  }
-                  
-                  setShowResults(true);
-                  // Track the calculation
-                  trackCalculation('deck-stain', inputs, {
-                    totalArea: results.totalArea,
-                    totalGallons: results.totalWithWaste,
-                    effectiveCoverage: results.effectiveCoverage,
-                    deckArea: results.deckArea,
-                    railingArea: results.deckRailingArea,
-                    stairsArea: results.stairsArea,
-                    woodType: woodTypes[inputs.woodType].name,
-                    stainType: stainTypes[inputs.stainType].name,
-                    coats: inputs.coats,
-                    applicationMethod: applicationMethods[inputs.applicationMethod].name
-                  });
-                  trackCalculatorInteraction.calculate('deck-stain', true);
-                }}
-                className="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-bold py-4 px-6 rounded-lg shadow-lg transition-colors duration-200"
->
-  Calculate Stain Needed
-</button>
-            )}
-            
-            <button
-              onClick={handleReset}
-              className="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold py-4 px-6 rounded-lg shadow-lg transition-colors duration-200"
-            >
-              {showResults ? 'Reset for New Calculation' : 'Reset Calculator'}
-            </button>
-          </div>
+       <div className="space-y-6 mt-6">
+  <ValidationDisplay />
+  
+  <CalculateButtons
+    onCalculate={handleCalculate}
+    onStartOver={handleReset}
+    showStartOver={showResults}
+  />
 
           {showResults && (
             <>
-              <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg shadow-lg p-6 border-2 border-amber-200">
+              <div 
+                ref={resultsRef}
+                className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg shadow-lg p-6 border-2 border-amber-200"
+              >
                 <h2 className="text-2xl font-bold text-gray-800 mb-6">Results</h2>
 
                 <div className="space-y-3 mb-6">
@@ -1200,34 +970,20 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                   </div>
                 </div>
 
-                <div className="bg-white rounded-lg p-4 mb-6">
-                  <div className="text-sm text-gray-600 mb-2">Effective Coverage Rate</div>
-                  <div className="text-lg font-semibold text-gray-800">
-                    {results.effectiveCoverage} sq ft per gallon
-                  </div>
-                  <div className="text-xs text-gray-500 mt-1">
-                    Base: {results.baseCoverage} sq ft/gal adjusted for wood condition & surface texture
-                  </div>
-                </div>
+                <MaterialCard
+                  title="Effective Coverage Rate"
+                  value={results.effectiveCoverage}
+                  unit="sq ft per gallon"
+                  subtitle={`Base: ${results.baseCoverage} sq ft/gal adjusted for wood condition & surface texture`}
+                  color="blue"
+                />
 
-                {/* Copy Calculation Button */}
                 <div className="bg-white rounded-lg shadow-lg p-6">
-                  <div className="flex gap-3">
-                    <button 
-                      onClick={handleCopyCalculation}
-                      className="copy-calc-btn flex-1"
-                    >
-                      {copyButtonText}
-                    </button>
-                    
-                    {/* ADD THIS PRINT BUTTON */}
-                    <button 
-                      onClick={() => printCalculation('Deck Stain Calculator')}
-                      className="copy-calc-btn flex-1"
-                    >
-                      🖨️ Print Results
-                    </button>
-                  </div>
+                  <ResultsButtons
+                    onCopy={handleCopyCalculation}
+                    onPrint={() => printCalculation('Deck Stain Calculator')}
+                    copyButtonText={copyButtonText}
+                  />
                 </div>
 
                 <div className="mt-8 bg-gray-50 rounded-lg p-6">
