@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { Info, Home, Droplets } from 'lucide-react';
 import { trackCalculation } from '@/utils/tracking';
 import { copyCalculation } from '@/utils/copyCalculation';
@@ -9,6 +9,15 @@ import { printCalculation } from '@/utils/printCalculation';
 import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
 import { FAQSection } from '@/components/FAQSection';
+import {
+  NumberInput,
+  SelectInput,
+  MaterialCard,
+  SectionCard,
+  InputGrid,
+  CalculateButtons,
+  ResultsButtons
+} from '@/components/calculator';
 
 const ExteriorPaintCalculator = () => {
   const [inputs, setInputs] = useState({
@@ -22,6 +31,7 @@ const ExteriorPaintCalculator = () => {
 
   const [showResults, setShowResults] = useState(false);
   const [copyButtonText, setCopyButtonText] = useState('📋 Copy Calculation');
+  const resultsRef = useRef(null);
 
   // Helper function to round UP to nearest 0.1 gallon (never round down)
   const roundUpToTenth = (value) => {
@@ -93,6 +103,32 @@ const ExteriorPaintCalculator = () => {
     }
   };
 
+  // Format options for SelectInput
+  const formatOptions = (optionsObj) => {
+    return Object.entries(optionsObj).map(([value, data]) => ({
+      value,
+      label: `${data.name} (${data.coverage} sq ft/gal)`
+    }));
+  };
+
+  const surfaceConditionOptions = [
+    { value: 'excellent', label: 'Mostly Sealed - minimal bare spots exposed' },
+    { value: 'good', label: 'Mostly Sealed - some bare spots (+10% paint)' },
+    { value: 'fair', label: 'Partially Exposed - moderate bare substrate (+25% paint)' },
+    { value: 'poor', label: 'Heavily Exposed - extensive bare substrate (+50% paint)' }
+  ];
+
+  const applicationMethodOptions = [
+    { value: 'roll', label: 'Brush/Roller (10% waste)' },
+    { value: 'spray_hvlp', label: 'HVLP Spray (25% waste, 50% faster)' },
+    { value: 'spray_airless', label: 'Airless Spray (35% waste, 70% faster)' }
+  ];
+
+  const coatsOptions = [
+    { value: 2, label: '2 Coats (Recommended for exterior)' },
+    { value: 3, label: '3 Coats' }
+  ];
+
   const calculations = useMemo(() => {
     const surface = surfaceTypes[inputs.surfaceType];
     const baseCoverage = surface.coverage;
@@ -150,13 +186,16 @@ const ExteriorPaintCalculator = () => {
     };
   }, [inputs]);
 
-  // Prevent scroll from changing number inputs
-const preventScrollChange = (e) => {
-  e.target.blur();
-};
-
   const handleCalculate = () => {
     setShowResults(true);
+    
+    // Auto-scroll to results
+    setTimeout(() => {
+      resultsRef.current?.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+      });
+    }, 100);
     
     // Track the calculation
     trackCalculation('exterior-paint', inputs, {
@@ -172,22 +211,23 @@ const preventScrollChange = (e) => {
     });
     trackCalculatorInteraction.calculate('exterior-paint', true);
   };
+
   const validationRules = {
-  squareFeet: [
-    CommonRules.unrealistic(100, 20000, 'Surface area'),
-    {
-      condition: (val) => parseFloat(val) > 10000,
-      message: 'Large project (>10,000 sq ft) - consider professional spraying',
-      type: ValidationTypes.INFO
-    }
-  ]
-};
+    squareFeet: [
+      CommonRules.unrealistic(100, 20000, 'Surface area'),
+      {
+        condition: (val) => parseFloat(val) > 10000,
+        message: 'Large project (>10,000 sq ft) - consider professional spraying',
+        type: ValidationTypes.INFO
+      }
+    ]
+  };
 
-const getValues = () => ({
-  squareFeet: inputs.squareFeet
-});
+  const getValues = () => ({
+    squareFeet: inputs.squareFeet
+  });
 
-const { validate, ValidationDisplay } = useValidation(validationRules);
+  const { validate, ValidationDisplay } = useValidation(validationRules);
 
   const handleReset = () => {
     trackCalculatorInteraction.startOver('exterior-paint');
@@ -205,6 +245,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
   const handleCopyCalculation = async () => {
     if (!showResults || !calculations) return;
     trackCalculatorInteraction.copyResults('exterior-paint');
+    
     // Prepare inputs
     const inputsData = {
       'Surface area': `${inputs.squareFeet} sq ft`,
@@ -217,19 +258,11 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
     
     // Prepare outputs
     const outputs = {
-      'Paint gallons needed': `${calculations.paintGallonsFormatted} gallons`,
-      'Paint to purchase': `${calculations.paintGallonsToPurchase} gallons`,
-      'Coverage rate': `${calculations.effectiveCoverage} sq ft/gallon`,
-      'Total paint cost': `$${calculations.totalPaintCost}`
+      'Paint gallons needed': `${roundUpToTenth(calculations.totalPaint).toFixed(1)} gallons`,
+      'Paint to purchase': `${roundUpToWholeGallon(roundUpToTenth(calculations.totalPaint))} gallons`,
+      'Primer gallons needed': `${roundUpToTenth(calculations.primerGallons).toFixed(1)} gallons`,
+      'Primer to purchase': `${roundUpToWholeGallon(roundUpToTenth(calculations.primerGallons))} gallons`
     };
-    
-    if (inputs.needsPrimer) {
-      outputs['Primer gallons needed'] = `${calculations.primerGallonsFormatted} gallons`;
-      outputs['Primer to purchase'] = `${calculations.primerGallonsToPurchase} gallons`;
-      outputs['Total primer cost'] = `$${calculations.totalPrimerCost}`;
-    }
-    
-    outputs['Total project cost'] = `$${calculations.totalProjectCost}`;
     
     const note = `Based on PCA and MPI standards. Accounts for surface porosity, texture, and application method waste.`;
     
@@ -261,95 +294,52 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
 
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Input Section */}
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-800 border-b-2 border-blue-500 pb-2">
-              Project Details
-            </h2>
-
-            {/* Square Footage */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                <Home className="w-4 h-4 inline mr-2" />
-                Paintable Surface Area (sq ft)
-              </label>
-              <input
-                type="number"
+          <SectionCard title="Project Details" icon={Home}>
+            <InputGrid columns={1}>
+              {/* Square Footage */}
+              <NumberInput
+                label="Paintable Surface Area (sq ft)"
                 value={inputs.squareFeet}
-                onWheel={preventScrollChange}
-                onChange={(e) => {
-  setInputs({...inputs, squareFeet: Number(e.target.value)});
-  setTimeout(() => validate(getValues()), 100);
-}}
-                onFocus={(e) => e.target.select()}
-                className={`w-full px-4 py-3 border-2 rounded-lg focus:border-blue-500 focus:outline-none text-lg ${
-                  !inputs.squareFeet ? 'border-orange-400' : 'border-gray-300'
-                }`}
-                min="100"
-                step="100"
+                onChange={(value) => {
+                  setInputs({...inputs, squareFeet: Number(value)});
+                  setTimeout(() => validate(getValues()), 100);
+                }}
+                unit="sq ft"
+                required={true}
+                fieldName="squareFeet"
+                helperText="Measure: (Perimeter × Height) + gables + soffits. Many pros don't subtract doors/windows."
               />
-              <p className="text-xs text-gray-500 mt-1">
-                Measure: (Perimeter × Height) + gables + soffits. Many pros don't subtract doors/windows.
-              </p>
-            </div>
 
-            {/* Surface Type */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Surface Type
-              </label>
-              <select
+              {/* Surface Type */}
+              <SelectInput
+                label="Surface Type"
                 value={inputs.surfaceType}
-                onChange={(e) => setInputs({...inputs, surfaceType: e.target.value})}
-                className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:border-blue-500 focus:outline-none text-lg"
-              >
-                {Object.entries(surfaceTypes).map(([key, surface]) => (
-                  <option key={key} value={key}>
-                    {surface.name} ({surface.coverage} sq ft/gal)
-                  </option>
-                ))}
-              </select>
-              <p className="text-xs text-gray-600 mt-2 bg-gray-50 p-2 rounded">
+                onChange={(value) => setInputs({...inputs, surfaceType: value})}
+                options={formatOptions(surfaceTypes)}
+              />
+              <p className="text-xs text-gray-600 -mt-4 bg-gray-50 p-2 rounded">
                 {surfaceTypes[inputs.surfaceType].description}
               </p>
-            </div>
 
-            {/* Surface Status - only shown for porous surfaces */}
-            {inputs.surfaceType !== 'vinyl' && inputs.surfaceType !== 'aluminum' && (
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Surface Status (After Prep)
-                </label>
-                <select
+              {/* Surface Status - only shown for porous surfaces */}
+              {inputs.surfaceType !== 'vinyl' && inputs.surfaceType !== 'aluminum' && (
+                <SelectInput
+                  label="Surface Status (After Prep)"
                   value={inputs.surfaceCondition}
-                  onChange={(e) => setInputs({...inputs, surfaceCondition: e.target.value})}
-                  className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:border-blue-500 focus:outline-none text-lg"
-                >
-                  <option value="excellent">Mostly Sealed - minimal bare spots exposed</option>
-                  <option value="good">Mostly Sealed - some bare spots (+10% paint)</option>
-                  <option value="fair">Partially Exposed - moderate bare substrate (+25% paint)</option>
-                  <option value="poor">Heavily Exposed - extensive bare substrate (+50% paint)</option>
-                </select>
-                <p className="text-xs text-gray-500 mt-1">
-                  More exposed bare wood/masonry = more paint absorption
-                </p>
-              </div>
-            )}
+                  onChange={(value) => setInputs({...inputs, surfaceCondition: value})}
+                  options={surfaceConditionOptions}
+                  helperText="More exposed bare wood/masonry = more paint absorption"
+                />
+              )}
 
-            {/* Application Method */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                <Droplets className="w-4 h-4 inline mr-2" />
-                Application Method
-              </label>
-              <select
+              {/* Application Method */}
+              <SelectInput
+                label="Application Method"
                 value={inputs.applicationMethod}
-                onChange={(e) => setInputs({...inputs, applicationMethod: e.target.value})}
-                className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:border-blue-500 focus:outline-none text-lg"
-              >
-                <option value="roll">Brush/Roller (10% waste)</option>
-                <option value="spray_hvlp">HVLP Spray (25% waste, 50% faster)</option>
-                <option value="spray_airless">Airless Spray (35% waste, 70% faster)</option>
-              </select>
+                onChange={(value) => setInputs({...inputs, applicationMethod: value})}
+                options={applicationMethodOptions}
+                icon={Droplets}
+              />
               {inputs.applicationMethod !== 'roll' && (
                 <div className="mt-2 bg-orange-50 border border-orange-200 rounded p-3">
                   <p className="text-xs text-orange-800">
@@ -358,53 +348,43 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                   </p>
                 </div>
               )}
-            </div>
 
-            {/* Coats */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Number of Coats
-              </label>
-              <select
+              {/* Coats */}
+              <SelectInput
+                label="Number of Coats"
                 value={inputs.coats}
-                onChange={(e) => setInputs({...inputs, coats: Number(e.target.value)})}
-                className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:border-blue-500 focus:outline-none text-lg"
-              >
-                <option value={2}>2 Coats (Recommended for exterior)</option>
-                <option value={3}>3 Coats</option>
-              </select>
-              <p className="text-xs text-gray-500 mt-1">
-                Note: Exterior projects almost always require 2 coats for proper weather protection
-              </p>
-            </div>
-
-            {/* Primer */}
-            <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-yellow-400">
-              <input
-                type="checkbox"
-                checked={inputs.needsPrimer}
-                onChange={(e) => setInputs({...inputs, needsPrimer: e.target.checked})}
-                className="w-5 h-5 text-blue-600"
+                onChange={(value) => setInputs({...inputs, coats: Number(value)})}
+                options={coatsOptions}
+                helperText="Note: Exterior projects almost always require 2 coats for proper weather protection"
               />
-              <span className="text-sm font-semibold text-gray-700">
-                Needs Primer (200-300 sq ft/gallon coverage)
-              </span>
-            </div>
-            <p className="text-xs text-gray-500 mt-2 ml-3">
-              Always required for bare wood, masonry, and metal. Can be skipped on previously 
-              painted surfaces in good condition with same/darker colors.
-            </p>
-<ValidationDisplay />
+
+              {/* Primer */}
+              <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-yellow-400">
+                <input
+                  type="checkbox"
+                  checked={inputs.needsPrimer}
+                  onChange={(e) => setInputs({...inputs, needsPrimer: e.target.checked})}
+                  className="w-5 h-5 text-blue-600"
+                />
+                <span className="text-sm font-semibold text-gray-700">
+                  Needs Primer (200-300 sq ft/gallon coverage)
+                </span>
+              </div>
+              <p className="text-xs text-gray-500 -mt-2 ml-3">
+                Always required for bare wood, masonry, and metal. Can be skipped on previously 
+                painted surfaces in good condition with same/darker colors.
+              </p>
+
+              <ValidationDisplay />
+            </InputGrid>
+
             {/* Calculate Button */}
-            <div className="pt-4">
-              <button
-                onClick={handleCalculate}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-lg text-lg transition-colors shadow-lg hover:shadow-xl"
-              >
-                Calculate Paint Needed
-              </button>
-            </div>
-          </div>
+            <CalculateButtons
+              onCalculate={handleCalculate}
+              onStartOver={handleReset}
+              showStartOver={showResults}
+            />
+          </SectionCard>
 
           {/* Results Section */}
           {!showResults && (
@@ -423,124 +403,99 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
           )}
 
           {showResults && (
-            <div className="space-y-6">
+            <div ref={resultsRef} className="space-y-6">
               <div className="flex justify-between items-center border-b-2 border-green-500 pb-2">
                 <h2 className="text-2xl font-bold text-gray-800">
                   Material Estimate
                 </h2>
-                <button
-                  onClick={handleReset}
-                  className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg text-sm transition-colors"
-                >
-                  Start Over
-                </button>
               </div>
 
-            {/* Paint Requirements */}
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border-2 border-blue-200">
-              <h3 className="text-xl font-bold text-blue-900 mb-4">Paint Required</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-700">First Coat:</span>
-                  <span className="text-xl font-bold text-blue-700">
-                    {roundUpToTenth(calculations.firstCoatGallons)} gallons
-                  </span>
-                </div>
-                {inputs.coats > 1 && (
+              {/* Paint Requirements */}
+              <MaterialCard
+                title="Paint Required"
+                value={roundUpToWholeGallon(roundUpToTenth(calculations.firstCoatGallons) + roundUpToTenth(calculations.subsequentCoatsGallons))}
+                unit="gallons"
+                subtitle="Purchase quantity"
+                note="Rounded up to nearest whole gallon"
+                color="blue"
+              >
+                <div className="space-y-3 mt-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-700">Additional Coats:</span>
+                    <span className="text-gray-700">First Coat:</span>
                     <span className="text-xl font-bold text-blue-700">
-                      {roundUpToTenth(calculations.subsequentCoatsGallons)} gallons
+                      {roundUpToTenth(calculations.firstCoatGallons)} gallons
                     </span>
                   </div>
-                )}
-                <div className="border-t-2 border-blue-300 pt-3 flex justify-between items-center">
-                  <span className="text-gray-800 font-semibold">Calculated Total:</span>
-                  <span className="text-2xl font-bold text-blue-900">
-                    {(roundUpToTenth(calculations.firstCoatGallons) + roundUpToTenth(calculations.subsequentCoatsGallons)).toFixed(1)} gallons
-                  </span>
-                </div>
-                <div className="bg-green-50 border-2 border-green-400 rounded-lg p-3 mt-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-800 font-bold">Purchase:</span>
-                    <span className="text-3xl font-bold text-green-700">
-                      {roundUpToWholeGallon(roundUpToTenth(calculations.firstCoatGallons) + roundUpToTenth(calculations.subsequentCoatsGallons))} gallons
-                    </span>
-                  </div>
-                  <p className="text-xs text-gray-600 mt-1">Rounded up to nearest whole gallon</p>
-                </div>
-                <div className="text-sm text-gray-600 bg-white rounded p-2">
-                  <div>Effective coverage: {Math.round(calculations.effectiveCoverage)} sq ft/gallon</div>
-                  <div>Includes {calculations.wastePercentage}% waste factor</div>
-                  <div className="text-xs italic mt-1">* All quantities rounded up to ensure sufficient paint</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Primer Requirements */}
-            {inputs.needsPrimer && (
-              <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border-2 border-purple-200">
-                <h3 className="text-xl font-bold text-purple-900 mb-4">Primer Required</h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-800 font-semibold">Calculated Total:</span>
-                    <span className="text-2xl font-bold text-purple-700">
-                      {roundUpToTenth(calculations.primerGallons)} gallons
-                    </span>
-                  </div>
-                  <div className="bg-green-50 border-2 border-green-400 rounded-lg p-3">
+                  {inputs.coats > 1 && (
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-800 font-bold">Purchase:</span>
-                      <span className="text-3xl font-bold text-green-700">
-                        {roundUpToWholeGallon(roundUpToTenth(calculations.primerGallons))} gallons
+                      <span className="text-gray-700">Additional Coats:</span>
+                      <span className="text-xl font-bold text-blue-700">
+                        {roundUpToTenth(calculations.subsequentCoatsGallons)} gallons
                       </span>
                     </div>
-                    <p className="text-xs text-gray-600 mt-1">Rounded up to nearest whole gallon</p>
+                  )}
+                  <div className="border-t-2 border-blue-300 pt-3 flex justify-between items-center">
+                    <span className="text-gray-800 font-semibold">Calculated Total:</span>
+                    <span className="text-2xl font-bold text-blue-900">
+                      {(roundUpToTenth(calculations.firstCoatGallons) + roundUpToTenth(calculations.subsequentCoatsGallons)).toFixed(1)} gallons
+                    </span>
                   </div>
-                  <p className="text-sm text-gray-600 mt-2">
-                    Exterior primer covers 25-40% less area than topcoat (includes {calculations.wastePercentage}% waste)
-                  </p>
+                  <div className="text-sm text-gray-600 bg-white rounded p-2">
+                    <div>Effective coverage: {Math.round(calculations.effectiveCoverage)} sq ft/gallon</div>
+                    <div>Includes {calculations.wastePercentage}% waste factor</div>
+                    <div className="text-xs italic mt-1">* All quantities rounded up to ensure sufficient paint</div>
+                  </div>
+                </div>
+              </MaterialCard>
+
+              {/* Primer Requirements */}
+              {inputs.needsPrimer && (
+                <MaterialCard
+                  title="Primer Required"
+                  value={roundUpToWholeGallon(roundUpToTenth(calculations.primerGallons))}
+                  unit="gallons"
+                  subtitle="Purchase quantity"
+                  note="Rounded up to nearest whole gallon"
+                  color="purple"
+                >
+                  <div className="space-y-3 mt-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-800 font-semibold">Calculated Total:</span>
+                      <span className="text-2xl font-bold text-purple-700">
+                        {roundUpToTenth(calculations.primerGallons)} gallons
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-600 mt-2">
+                      Exterior primer covers 25-40% less area than topcoat (includes {calculations.wastePercentage}% waste)
+                    </p>
+                  </div>
+                </MaterialCard>
+              )}
+
+              {/* Important Notes */}
+              <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                <div className="flex items-start gap-2">
+                  <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-blue-800 space-y-1">
+                    <p><strong>Coverage varies widely:</strong> Smooth surfaces use 350-400 sq ft/gal while rough stucco only covers 150-200 sq ft/gal.</p>
+                    <p><strong>First coat uses more:</strong> Porous surfaces absorb 15-50% more paint on the first coat.</p>
+                    <p><strong>Spray increases waste:</strong> Airless spraying wastes 35% of paint through overspray vs 10% for rolling.</p>
+                    <p><strong>Two coats recommended:</strong> Exterior surfaces need two coats for proper weather protection.</p>
+                  </div>
                 </div>
               </div>
-            )}
-
-            {/* Important Notes */}
-            <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
-              <div className="flex items-start gap-2">
-                <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                <div className="text-sm text-blue-800 space-y-1">
-                  <p><strong>Coverage varies widely:</strong> Smooth surfaces use 350-400 sq ft/gal while rough stucco only covers 150-200 sq ft/gal.</p>
-                  <p><strong>First coat uses more:</strong> Porous surfaces absorb 15-50% more paint on the first coat.</p>
-                  <p><strong>Spray increases waste:</strong> Airless spraying wastes 35% of paint through overspray vs 10% for rolling.</p>
-                  <p><strong>Two coats recommended:</strong> Exterior surfaces need two coats for proper weather protection.</p>
-               </div>
-              </div>
-            </div>
-            
-            {/* Copy Calculation Button */}
-<div className="bg-white rounded-lg shadow-lg p-6">
-  <div className="flex gap-3">
-    <button 
-      onClick={handleCopyCalculation}
-      className="copy-calc-btn flex-1"
-    >
-      {copyButtonText}
-    </button>
-    
-    {/* ADD THIS PRINT BUTTON */}
-    <button 
-      onClick={() => printCalculation('Exterior Paint Calculator')}
-      className="copy-calc-btn flex-1"
-    >
-      🖨️ Print Results
-    </button>
-  </div>
-</div>
-            
+              
+              {/* Copy and Print Buttons */}
+              <ResultsButtons
+                onCopy={handleCopyCalculation}
+                onPrint={() => printCalculation('Exterior Paint Calculator')}
+                copyButtonText={copyButtonText}
+              />
             </div>
           )}
         </div>
-{/* Helpful Guides Section */}
+
+        {/* Helpful Guides Section */}
         {showResults && (
           <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
@@ -587,6 +542,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
             </div>
           </div>
         )}
+
         {/* Footer */}
         <div className="mt-8 pt-6 border-t-2 border-gray-200 text-center text-sm text-gray-600">
           <p>
@@ -596,7 +552,6 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
         </div>
       </div>
       <FAQSection calculatorId="exterior-paint-calculator" />
-
     </div>
   );
 };
