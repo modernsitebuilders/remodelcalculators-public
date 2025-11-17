@@ -2,12 +2,21 @@
 import { trackCalculation } from '@/utils/tracking';
 import { copyCalculation } from '@/utils/copyCalculation';
 import { printCalculation } from '@/utils/printCalculation';
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Calculator, Ruler, TrendingUp, Info, AlertCircle, CheckCircle } from 'lucide-react';
 import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
 import { FAQSection } from '@/components/FAQSection';
 import { trackCalculatorInteraction } from '@/utils/buttonTracking';
+import { 
+  NumberInput,
+  SelectInput,
+  MaterialCard,
+  SectionCard,
+  InputGrid,
+  CalculateButtons,
+  ResultsButtons
+} from '@/components/calculator';
 
 export default function FenceInstallationCalculator() {
   const [linearFeet, setLinearFeet] = useState('');
@@ -29,8 +38,9 @@ export default function FenceInstallationCalculator() {
   const [fenceLayout, setFenceLayout] = useState('continuous');
   const [materials, setMaterials] = useState({});
   const [hasCalculated, setHasCalculated] = useState(false);
-  const [copyButtonText, setCopyButtonText] = useState('📋 Copy Calculation');  // ADD THIS
-  
+  const [copyButtonText, setCopyButtonText] = useState('📋 Copy Calculation');
+  const resultsRef = useRef(null);
+
   const fenceTypes = {
     'standard-privacy': { name: 'Standard Privacy (Wood)', postSpacing: 8, railsPerHeight: 3, needsWood: true },
     'board-on-board': { name: 'Board-on-Board Privacy (Wood)', postSpacing: 8, railsPerHeight: 3, needsWood: true },
@@ -45,74 +55,119 @@ export default function FenceInstallationCalculator() {
     'wrought-iron': { name: 'Wrought Iron', postSpacing: 8, railsPerHeight: 0, needsWood: false }
   };
 
-  // Add after your state declarations, before calculateMaterials
-const validationRules = {
-  linearFeet: [
-    CommonRules.unrealistic(5, 1000, 'Fence length'),
-    {
-      condition: (val) => parseFloat(val) > 500,
-      message: 'Large fence project (>500 feet) - consider breaking into phases',
-      type: ValidationTypes.INFO
-    }
-  ],
-  height: [
-    {
-      condition: (val) => parseFloat(val) < 3,
-      message: 'Fence height <3 feet is uncommon - verify this is correct',
-      type: ValidationTypes.WARNING
-    },
-    {
-      condition: (val) => parseFloat(val) > 8,
-      message: 'Fence height >8 feet may require engineering approval in most jurisdictions',
-      type: ValidationTypes.ERROR
-    },
-    CommonRules.unrealistic(2, 12, 'Fence height')
-  ],
-  boardWidth: [
-    CommonRules.unrealistic(3, 12, 'Board width'),
-    {
-      condition: (val) => parseFloat(val) < 4,
-      message: 'Board width <4" may not meet privacy fence standards',
-      type: ValidationTypes.WARNING
-    }
-  ],
-  frostDepth: [
-    {
-      condition: (val) => parseFloat(val) < 24,
-      message: 'Frost depth <24" - verify local frost line requirements',
-      type: ValidationTypes.WARNING
-    },
-    CommonRules.unrealistic(12, 72, 'Frost depth')
-  ],
-  corners: [
-    CommonRules.unrealistic(0, 20, 'Number of corners'),
-    {
-  condition: (val, allVals) => {
-    const num = parseFloat(val);
-    const linear = parseFloat(allVals.linearFeet);
-    // Only validate if both values are valid numbers
-    if (!num || !linear || num === 0 || linear === 0) return false;
-    // Warn if more than 1 corner per 15 feet
-    return num > linear / 15;
-  },
-  message: 'High number of corners for fence length - please verify',
-  type: ValidationTypes.WARNING
-}
-  ]
-};
+  const terrainOptions = [
+    { value: 'flat', label: 'Flat terrain' },
+    { value: 'slight-slope', label: 'Slight slope' },
+    { value: 'moderate-slope', label: 'Moderate slope' },
+    { value: 'steep-slope', label: 'Steep slope' },
+    { value: 'rocky', label: 'Rocky soil' }
+  ];
 
-const getValues = () => ({
-  linearFeet,
-  height,
-  boardWidth,
-  frostDepth,
-  corners
-});
+  const frostDepthOptions = [
+    { value: '0', label: 'No frost' },
+    { value: '24', label: '24"' },
+    { value: '36', label: '36"' },
+    { value: '42', label: '42"' },
+    { value: '48', label: '48"' },
+    { value: '60', label: '60"' }
+  ];
 
-const { validate, ValidationDisplay } = useValidation(validationRules);
+  const heightOptions = [
+    { value: '3', label: '3 feet' },
+    { value: '4', label: '4 feet' },
+    { value: '5', label: '5 feet' },
+    { value: '6', label: '6 feet' },
+    { value: '7', label: '7 feet' },
+    { value: '8', label: '8 feet' }
+  ];
 
+  const fenceLayoutOptions = [
+    { value: 'continuous', label: 'Continuous Loop (returns to starting point)' },
+    { value: 'open', label: 'Open-Ended (has terminal posts)' }
+  ];
 
-  
+  const railLengthOptions = [
+    { value: '8', label: '8 feet' },
+    { value: '8.5', label: '8.5 feet' },
+    { value: '11', label: '11 feet - Most Common' }
+  ];
+
+  const boardWidthOptions = [
+    { value: '3.5', label: '1×4 (3.5" actual)' },
+    { value: '5.5', label: '1×6 (5.5" actual)' },
+    { value: '7.25', label: '1×8 (7.25" actual)' }
+  ];
+
+  const formatOptions = (optionsObj) => {
+    return Object.entries(optionsObj).map(([value, config]) => ({
+      value,
+      label: config.name
+    }));
+  };
+
+  const validationRules = {
+    linearFeet: [
+      CommonRules.unrealistic(5, 1000, 'Fence length'),
+      {
+        condition: (val) => parseFloat(val) > 500,
+        message: 'Large fence project (>500 feet) - consider breaking into phases',
+        type: ValidationTypes.INFO
+      }
+    ],
+    height: [
+      {
+        condition: (val) => parseFloat(val) < 3,
+        message: 'Fence height <3 feet is uncommon - verify this is correct',
+        type: ValidationTypes.WARNING
+      },
+      {
+        condition: (val) => parseFloat(val) > 8,
+        message: 'Fence height >8 feet may require engineering approval in most jurisdictions',
+        type: ValidationTypes.ERROR
+      },
+      CommonRules.unrealistic(2, 12, 'Fence height')
+    ],
+    boardWidth: [
+      CommonRules.unrealistic(3, 12, 'Board width'),
+      {
+        condition: (val) => parseFloat(val) < 4,
+        message: 'Board width <4" may not meet privacy fence standards',
+        type: ValidationTypes.WARNING
+      }
+    ],
+    frostDepth: [
+      {
+        condition: (val) => parseFloat(val) < 24,
+        message: 'Frost depth <24" - verify local frost line requirements',
+        type: ValidationTypes.WARNING
+      },
+      CommonRules.unrealistic(12, 72, 'Frost depth')
+    ],
+    corners: [
+      CommonRules.unrealistic(0, 20, 'Number of corners'),
+      {
+        condition: (val, allVals) => {
+          const num = parseFloat(val);
+          const linear = parseFloat(allVals.linearFeet);
+          if (!num || !linear || num === 0 || linear === 0) return false;
+          return num > linear / 15;
+        },
+        message: 'High number of corners for fence length - please verify',
+        type: ValidationTypes.WARNING
+      }
+    ]
+  };
+
+  const getValues = () => ({
+    linearFeet,
+    height,
+    boardWidth,
+    frostDepth,
+    corners
+  });
+
+  const { validate, ValidationDisplay } = useValidation(validationRules);
+
   const calculateMaterials = () => {
     const linearFt = parseFloat(linearFeet);
     const cornersCount = parseFloat(corners);
@@ -140,22 +195,18 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
     
     const sections = Math.ceil(linearFt / postSpacing);
     
-    // Calculate total posts needed
     let linePosts;
     let terminalPosts = 0;
     
     if (fenceLayout === 'continuous') {
-      // Continuous fence (closed loop): posts = sections
       linePosts = sections;
     } else {
-      // Fence with endpoints: posts = sections + 1, plus 2 terminal posts are 6×6
       linePosts = sections + 1;
-      terminalPosts = 2; // Start and end posts should be 6×6
+      terminalPosts = 2;
     }
     
     const totalPosts = linePosts;
     
-    // Calculate 6×6 post requirements
     let post6x6Breakdown = {
       terminal: 0,
       corners: 0,
@@ -168,35 +219,25 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
     let post6x6Count = 0;
     
     if (height > 6) {
-      // All posts should be 6×6 for fences over 6 feet
       post6x6Count = totalPosts;
       post6x6Breakdown.tall = totalPosts;
       post6x6Breakdown.total = totalPosts;
     } else {
-      // Calculate 6×6 posts needed
-      // Terminal posts (if open-ended)
       if (fenceLayout !== 'continuous') {
         post6x6Breakdown.terminal = 2;
       }
       
-      // Corner posts
       post6x6Breakdown.corners = cornersCount;
       
-      // Gate posts (2 posts per gate, 6×6 for gates 4ft and larger)
       const gates4ftPlus = gates4ft + gates6ft + gates10ft + gates12ft;
       const gates3ftCount = gates3ft;
       
-      // All gates 4ft and larger need 6×6 posts (2 per gate)
       post6x6Breakdown.gates = gates4ftPlus * 2;
       
-      // Sum up all 6×6 posts needed
       post6x6Count = post6x6Breakdown.terminal + post6x6Breakdown.corners + post6x6Breakdown.gates;
-      
-      // Can't have more 6×6 posts than total posts
       post6x6Count = Math.min(post6x6Count, totalPosts);
       post6x6Breakdown.total = post6x6Count;
       
-      // Remaining posts are 4×4
       post4x4Count = totalPosts - post6x6Count;
     }
     
@@ -312,14 +353,12 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
     };
 
     setTimeout(() => {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}, 100);
-    
+      resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
 
     setMaterials(materialsData);
     setHasCalculated(true);
     
-    // Track the calculation
     trackCalculation('fence', {
       linearFeet: linearFt,
       fenceType: fenceType,
@@ -359,13 +398,12 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
       fenceTypeName: fenceTypes[fenceType].name
     });
     trackCalculatorInteraction.calculate('fence', true);
-};  
+  };  
   
   const handleCopyCalculation = async () => {
     trackCalculatorInteraction.copyResults('fence');
     if (!hasCalculated || !materials || !materials.posts) return;
     
-    // Prepare inputs
     const inputs = {
       'Fence length': `${linearFeet} linear feet`,
       'Fence type': fenceTypes[fenceType].name,
@@ -374,7 +412,6 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
       'Terrain': terrain
     };
     
-    // Add gates if any
     const totalGates = parseInt(gates3ft || 0) + parseInt(gates4ft || 0) + parseInt(gates6ft || 0) + parseInt(gates10ft || 0) + parseInt(gates12ft || 0);
     if (totalGates > 0) {
       const gateList = [];
@@ -386,7 +423,6 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
       inputs['Gates'] = `${totalGates} gates (${gateList.join(', ')})`;
     }
     
-    // Prepare outputs
     const outputs = {
       'Total posts': `${materials.posts.total} posts`,
       'Concrete needed': `${materials.concrete.bags} bags (80lb)`,
@@ -421,16 +457,9 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
     }
   };
 
-      // Prevent scroll from changing number inputs
-const preventScrollChange = (e) => {
-  e.target.blur();
-};
-
   const handleReset = () => {
-    // Track Start Over button click
     trackCalculatorInteraction.startOver('fence');
     
-    // Reset all inputs to defaults
     setLinearFeet('');
     setFenceType('picket');
     setHeight('6');
@@ -448,7 +477,6 @@ const preventScrollChange = (e) => {
     setCorners('4');
     setFenceLayout('perimeter');
     
-    // Clear results
     setMaterials(null);
     setHasCalculated(false);
   };
@@ -472,190 +500,176 @@ const preventScrollChange = (e) => {
         
         <div className="grid lg:grid-cols-2 gap-6 items-start">
           <div className="space-y-6">
-            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <Ruler className="w-6 h-6 text-green-600" />
-                Basic Measurements
-              </h2>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Linear Feet of Fencing</label>
-                  <input type="number"
-                         value={linearFeet}
-                         
-                         onChange={(e) => {
-                           setLinearFeet(e.target.value);
-                           setTimeout(() => validate(getValues()), 100);
-                         }} 
-                         onWheel={preventScrollChange}
-                         className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                           !linearFeet ? 'border-orange-400' : 'border-gray-300'
-                         }`}
-                         min="1" 
-                         placeholder="Enter linear feet (e.g., 150)" />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Fence Height (feet)</label>
-                  <select value={height} onChange={(e) => {
-                    setHeight(parseInt(e.target.value));
+            <SectionCard title="Basic Measurements" icon={Ruler}>
+              <InputGrid columns={1}>
+                <NumberInput
+                  label="Linear Feet of Fencing"
+                  value={linearFeet}
+                  onChange={(value) => {
+                    setLinearFeet(value);
                     setTimeout(() => validate(getValues()), 100);
-                  }} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                    <option value="3">3 feet</option>
-                    <option value="4">4 feet</option>
-                    <option value="5">5 feet</option>
-                    <option value="6">6 feet</option>
-                    <option value="7">7 feet</option>
-                    <option value="8">8 feet</option>
-                  </select>
-                </div>
+                  }}
+                  unit="feet"
+                  required={true}
+                  fieldName="linearFeet"
+                  placeholder="Enter linear feet (e.g., 150)"
+                />
                 
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Number of Corners</label>
-                  <input type="number" value={corners} onChange={(e) => {
-                    setCorners(e.target.value);
+                <SelectInput
+                  label="Fence Height"
+                  value={height.toString()}
+                  onChange={(value) => {
+                    setHeight(parseInt(value));
                     setTimeout(() => validate(getValues()), 100);
-                  }} onWheel={preventScrollChange} className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                    !corners ? 'border-orange-400' : 'border-gray-300'
-                  }`} min="0" placeholder="Enter number of corners (e.g., 4)" />
-                </div>
+                  }}
+                  options={heightOptions}
+                />
                 
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Fence Layout</label>
-                  <select value={fenceLayout} onChange={(e) => setFenceLayout(e.target.value)} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                    <option value="continuous">Continuous Loop (returns to starting point)</option>
-                    <option value="open">Open-Ended (has terminal posts)</option>
-                  </select>
-                  <p className="text-xs text-gray-500 mt-1">Open-ended fences require stronger terminal posts</p>
-                </div>
-              </div>
-            </div>
+                <NumberInput
+                  label="Number of Corners"
+                  value={corners}
+                  onChange={(value) => {
+                    setCorners(value);
+                    setTimeout(() => validate(getValues()), 100);
+                  }}
+                  required={true}
+                  fieldName="corners"
+                  placeholder="Enter number of corners (e.g., 4)"
+                />
+                
+                <SelectInput
+                  label="Fence Layout"
+                  value={fenceLayout}
+                  onChange={setFenceLayout}
+                  options={fenceLayoutOptions}
+                />
+                <p className="text-xs text-gray-500 -mt-2">Open-ended fences require stronger terminal posts</p>
+              </InputGrid>
+            </SectionCard>
             
-            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Fence Type</h2>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Fence Style</label>
-                  <select value={fenceType} onChange={(e) => setFenceType(e.target.value)} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                    {Object.entries(fenceTypes).map(([key, config]) => (
-                      <option key={key} value={key}>{config.name}</option>
-                    ))}
-                  </select>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {(fenceType === 'split-rail' || fenceType === 'split-rail-chain') 
-                      ? `Rail length: ${railLength}ft (Post spacing: ~${(railLength - 0.5).toFixed(1)}ft)`
-                      : `Post spacing: ${fenceTypes[fenceType].postSpacing} feet on center`
-                    }
-                  </p>
-                </div>
+            <SectionCard title="Fence Type">
+              <InputGrid columns={1}>
+                <SelectInput
+                  label="Fence Style"
+                  value={fenceType}
+                  onChange={setFenceType}
+                  options={formatOptions(fenceTypes)}
+                />
+                <p className="text-xs text-gray-500 -mt-2">
+                  {(fenceType === 'split-rail' || fenceType === 'split-rail-chain') 
+                    ? `Rail length: ${railLength}ft (Post spacing: ~${(railLength - 0.5).toFixed(1)}ft)`
+                    : `Post spacing: ${fenceTypes[fenceType].postSpacing} feet on center`
+                  }
+                </p>
                 
                 {(fenceType === 'split-rail' || fenceType === 'split-rail-chain') && (
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Rail Length</label>
-                    <select value={railLength} onChange={(e) => setRailLength(parseFloat(e.target.value))} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                      <option value="8">8 feet</option>
-                      <option value="8.5">8.5 feet</option>
-                      <option value="11">11 feet - Most Common</option>
-                    </select>
-                  </div>
+                  <SelectInput
+                    label="Rail Length"
+                    value={railLength.toString()}
+                    onChange={(value) => setRailLength(parseFloat(value))}
+                    options={railLengthOptions}
+                  />
                 )}
                 
                 {['standard-privacy', 'board-on-board', 'picket', 'horizontal-slat'].includes(fenceType) && (
                   <>
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">Board Width (actual inches)</label>
-                    <select value={boardWidth} onChange={(e) => { 
-  setBoardWidth(parseFloat(e.target.value)); 
-  setTimeout(() => validate(getValues()), 100);
-}} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                        <option value="3.5">1×4 (3.5" actual)</option>
-                        <option value="5.5">1×6 (5.5" actual)</option>
-                        <option value="7.25">1×8 (7.25" actual)</option>
-                      </select>
-                    </div>
+                    <SelectInput
+                      label="Board Width (actual inches)"
+                      value={boardWidth.toString()}
+                      onChange={(value) => {
+                        setBoardWidth(parseFloat(value));
+                        setTimeout(() => validate(getValues()), 100);
+                      }}
+                      options={boardWidthOptions}
+                    />
                     
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">Board Spacing (inches)</label>
-                      <input type="number" value={boardSpacing} onChange={(e) => setBoardSpacing(parseFloat(e.target.value) || 0)} onWheel={preventScrollChange} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" min="0" max="4" step="0.25" />
-                    </div>
+                    <NumberInput
+                      label="Board Spacing (inches)"
+                      value={boardSpacing.toString()}
+                      onChange={(value) => setBoardSpacing(parseFloat(value) || 0)}
+                      unit="inches"
+                      min="0"
+                      max="4"
+                      step="0.25"
+                    />
                   </>
                 )}
-              </div>
-            </div>
+              </InputGrid>
+            </SectionCard>
             
-            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Gates</h2>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">3-foot Gates</label>
-                    <input type="number" value={gates3ft} onChange={(e) => setGates3ft(parseInt(e.target.value) || 0)} onWheel={preventScrollChange} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" min="0" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">4-foot Gates</label>
-                    <input type="number" value={gates4ft} onChange={(e) => setGates4ft(parseInt(e.target.value) || 0)} onWheel={preventScrollChange} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" min="0" />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">6-foot Gates</label>
-                  <input type="number" value={gates6ft} onChange={(e) => setGates6ft(parseInt(e.target.value) || 0)} onWheel={preventScrollChange} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" min="0" />
-                </div>
-                <div className="border-t pt-4">
-                  <h3 className="font-semibold text-gray-700 mb-3">Double Driveway Gates</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">10-foot Double</label>
-                      <input type="number" value={gates10ft} onChange={(e) => setGates10ft(parseInt(e.target.value) || 0)} onWheel={preventScrollChange} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" min="0" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">12-foot Double</label>
-                      <input type="number" value={gates12ft} onChange={(e) => setGates12ft(parseInt(e.target.value) || 0)} onWheel={preventScrollChange} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" min="0" />
-                    </div>
-                  </div>
-                </div>
+            <SectionCard title="Gates">
+              <InputGrid columns={2}>
+                <NumberInput
+                  label="3-foot Gates"
+                  value={gates3ft.toString()}
+                  onChange={(value) => setGates3ft(parseInt(value) || 0)}
+                  min="0"
+                />
+                <NumberInput
+                  label="4-foot Gates"
+                  value={gates4ft.toString()}
+                  onChange={(value) => setGates4ft(parseInt(value) || 0)}
+                  min="0"
+                />
+              </InputGrid>
+              
+              <NumberInput
+                label="6-foot Gates"
+                value={gates6ft.toString()}
+                onChange={(value) => setGates6ft(parseInt(value) || 0)}
+                min="0"
+              />
+              
+              <div className="border-t pt-4">
+                <h3 className="font-semibold text-gray-700 mb-3">Double Driveway Gates</h3>
+                <InputGrid columns={2}>
+                  <NumberInput
+                    label="10-foot Double"
+                    value={gates10ft.toString()}
+                    onChange={(value) => setGates10ft(parseInt(value) || 0)}
+                    min="0"
+                  />
+                  <NumberInput
+                    label="12-foot Double"
+                    value={gates12ft.toString()}
+                    onChange={(value) => setGates12ft(parseInt(value) || 0)}
+                    min="0"
+                  />
+                </InputGrid>
               </div>
-            </div>
+            </SectionCard>
             
-            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Site Conditions</h2>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Terrain Type</label>
-                  <select value={terrain} onChange={(e) => setTerrain(e.target.value)} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                    <option value="flat">Flat terrain</option>
-                    <option value="slight-slope">Slight slope</option>
-                    <option value="moderate-slope">Moderate slope</option>
-                    <option value="steep-slope">Steep slope</option>
-                    <option value="rocky">Rocky soil</option>
-                  </select>
-                </div>
+            <SectionCard title="Site Conditions">
+              <InputGrid columns={1}>
+                <SelectInput
+                  label="Terrain Type"
+                  value={terrain}
+                  onChange={setTerrain}
+                  options={terrainOptions}
+                />
                 
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Frost Depth (inches)</label>
-                  <select value={frostDepth} onChange={(e) => { setFrostDepth(parseInt(e.target.value)); setTimeout(() => validate(getValues()), 100); }} className="w-full px-4 py-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                    <option value="0">No frost</option>
-                    <option value="24">24"</option>
-                    <option value="36">36"</option>
-                    <option value="42">42"</option>
-                    <option value="48">48"</option>
-                    <option value="60">60"</option>
-                  </select>
-                </div>
-              </div>
-            </div>
+                <SelectInput
+                  label="Frost Depth (inches)"
+                  value={frostDepth.toString()}
+                  onChange={(value) => {
+                    setFrostDepth(parseInt(value));
+                    setTimeout(() => validate(getValues()), 100);
+                  }}
+                  options={frostDepthOptions}
+                />
+              </InputGrid>
+            </SectionCard>
 
             <ValidationDisplay />
             
-            <div className="bg-gradient-to-br from-green-600 to-emerald-700 rounded-xl shadow-2xl p-8 text-center">
-              <button onClick={calculateMaterials} className="w-full bg-white text-green-700 font-bold text-xl py-6 px-8 rounded-xl shadow-lg hover:bg-green-50 hover:shadow-xl transform hover:scale-105 transition-all duration-200">
-  Calculate Materials
-</button>
-            </div>
+            <CalculateButtons
+              onCalculate={calculateMaterials}
+              onStartOver={handleReset}
+              showStartOver={hasCalculated}
+            />
           </div>
           
-          <div className="space-y-6">
+          <div className="space-y-6" ref={resultsRef}>
             {!hasCalculated ? (
               <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-200 text-center">
                 <Calculator className="w-16 h-16 text-gray-400 mx-auto mb-4" />
@@ -665,26 +679,24 @@ const preventScrollChange = (e) => {
             ) : (
               <>
               <div className="grid grid-cols-3 gap-4 mb-6">
-                <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-xl border border-green-200">
-                  <Ruler className="w-6 h-6 text-green-600 mb-2" />
-                  <div className="text-2xl font-bold text-gray-900">{linearFeet}</div>
-                  <div className="text-xs text-gray-600 font-medium">Linear Feet</div>
-                </div>
-                <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-4 rounded-xl border border-blue-200">
-                  <TrendingUp className="w-6 h-6 text-blue-600 mb-2" />
-                  <div className="text-2xl font-bold text-gray-900">{height}'</div>
-                  <div className="text-xs text-gray-600 font-medium">Height</div>
-                </div>
-                <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-xl border border-purple-200">
-                  <Info className="w-6 h-6 text-purple-600 mb-2" />
-                  <div className="text-2xl font-bold text-gray-900">{materials.posts?.total || 0}</div>
-                  <div className="text-xs text-gray-600 font-medium">Total Posts</div>
-                </div>
+                <MaterialCard
+                  title="Linear Feet"
+                  value={linearFeet}
+                  color="green"
+                />
+                <MaterialCard
+                  title="Height"
+                  value={`${height}'`}
+                  color="blue"
+                />
+                <MaterialCard
+                  title="Total Posts"
+                  value={materials.posts?.total || 0}
+                  color="purple"
+                />
               </div>
               
-              <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Materials Breakdown</h2>
-                
+              <SectionCard title="Materials Breakdown">
                 <div className="space-y-4 text-sm">
                   <div className="border-b pb-3">
                     <div className="font-semibold text-gray-900 mb-2">Posts</div>
@@ -780,34 +792,13 @@ const preventScrollChange = (e) => {
                     </div>
                   )}
                 </div>
-              </div>
+              </SectionCard>
               
-             {/* Action Buttons */}
-<div className="bg-white rounded-lg shadow-lg p-6">
-  <div className="flex gap-3">
-    <button 
-      onClick={handleCopyCalculation}
-      className="copy-calc-btn flex-1"
-    >
-      {copyButtonText}
-    </button>
-    
-    <button 
-      onClick={() => printCalculation('Fence Calculator')}
-      className="copy-calc-btn flex-1"
-    >
-      🖨️ Print Results
-    </button>
-    
-    <button 
-      onClick={handleReset}
-      className="copy-calc-btn flex-1"
-    >
-      🔄 Start Over
-    </button>
-  </div>
-</div>
-              
+              <ResultsButtons
+                onCopy={handleCopyCalculation}
+                onPrint={() => printCalculation('Fence Calculator')}
+                copyButtonText={copyButtonText}
+              />
               </>
             )}
           </div>
