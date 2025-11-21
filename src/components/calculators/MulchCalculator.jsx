@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { Calculator, Info, AlertCircle } from 'lucide-react';
 import { trackCalculation } from '@/utils/tracking';
 import { copyCalculation } from '@/utils/copyCalculation';
@@ -9,6 +9,15 @@ import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { trackCalculatorInteraction } from '@/utils/buttonTracking';
 import { useValidation } from '@/hooks/useValidation';
 import { FAQSection } from '@/components/FAQSection';
+import { 
+  NumberInput,
+  SelectInput,
+  MaterialCard,
+  SectionCard,
+  InputGrid,
+  CalculateButtons,
+  ResultsButtons
+} from '@/components/calculator';
 
 const MulchCalculator = () => {
   // State management
@@ -23,7 +32,8 @@ const MulchCalculator = () => {
   const [includeWaste, setIncludeWaste] = useState(true);
   const [customDepth, setCustomDepth] = useState('');
   const [showResults, setShowResults] = useState(false);
-  const [copyButtonText, setCopyButtonText] = useState('📋 Copy Calculation'); 
+  const [copyButtonText, setCopyButtonText] = useState('📋 Copy Calculation');
+  const resultsRef = useRef(null);
 
   // Material weights (lbs per cubic yard)
   const materialWeights = {
@@ -39,59 +49,7 @@ const MulchCalculator = () => {
     'lava-rock': 650
   };
 
-  const validationRules = {
-  length: [
-    CommonRules.unrealistic(1, 500, 'Area length'),
-    {
-      condition: (val) => parseFloat(val) > 200,
-      message: 'Large area (>200 feet) - consider bulk delivery',
-      type: ValidationTypes.INFO
-    }
-  ],
-  width: [
-    CommonRules.unrealistic(1, 500, 'Area width')
-  ],
-  diameter: [
-    CommonRules.unrealistic(1, 200, 'Circular area diameter')
-  ],
-  depth: [
-    {
-      condition: (val) => {
-        const d = val === 'custom' ? parseFloat(customDepth) : parseFloat(val);
-        return d > 0 && d < 1;
-      },
-      message: 'Mulch depth <1" is too shallow - minimum 2" recommended',
-      type: ValidationTypes.WARNING
-    },
-    {
-      condition: (val) => {
-        const d = val === 'custom' ? parseFloat(customDepth) : parseFloat(val);
-        return d > 6;
-      },
-      message: 'Mulch depth >6" may suffocate plant roots',
-      type: ValidationTypes.ERROR
-    }
-  ],
-  customDepth: [
-    {
-      condition: (val) => depth === 'custom' && parseFloat(val) > 8,
-      message: 'Excessive mulch depth (>8") - verify measurement',
-      type: ValidationTypes.WARNING
-    }
-  ]
-};
-
-const getValues = () => ({
-  length,
-  width,
-  diameter,
-  depth,
-  customDepth
-});
-
-const { validate, ValidationDisplay } = useValidation(validationRules);
-
-  // Depth presets by application
+  // Depth presets
   const depthPresets = [
     { value: '1', label: '1" - Compost/Fine Mulch' },
     { value: '2', label: '2" - Flower Beds' },
@@ -99,6 +57,79 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
     { value: '4', label: '4" - Pathways' },
     { value: 'custom', label: 'Custom Depth' }
   ];
+
+  // Material options
+  const materialOptions = [
+    { value: 'wood-chips', label: 'Wood Chips (600 lbs/yard)' },
+    { value: 'shredded-bark', label: 'Shredded Bark (506 lbs/yard)' },
+    { value: 'bark-nuggets', label: 'Bark Nuggets (700 lbs/yard)' },
+    { value: 'pine-needles', label: 'Pine Needles (1,375 lbs/yard)' },
+    { value: 'straw', label: 'Straw (600 lbs/yard)' },
+    { value: 'compost', label: 'Compost (1,300 lbs/yard)' },
+    { value: 'rubber-mulch', label: 'Rubber Mulch (1,250 lbs/yard)' },
+    { value: 'pea-gravel', label: 'Pea Gravel (2,700 lbs/yard)' },
+    { value: 'river-rock', label: 'River Rock (1,250 lbs/yard)' },
+    { value: 'lava-rock', label: 'Lava Rock (800 lbs/yard)' }
+  ];
+
+  // Bag size options
+  const bagSizeOptions = [
+    { value: '2', label: '2 cu ft (13.5 bags per yard)' },
+    { value: '3', label: '3 cu ft (9 bags per yard)' },
+    { value: '1.5', label: '1.5 cu ft (18 bags per yard)' }
+  ];
+
+  const validationRules = {
+    length: [
+      CommonRules.unrealistic(1, 500, 'Area length'),
+      {
+        condition: (val) => parseFloat(val) > 200,
+        message: 'Large area (>200 feet) - consider bulk delivery',
+        type: ValidationTypes.INFO
+      }
+    ],
+    width: [
+      CommonRules.unrealistic(1, 500, 'Area width')
+    ],
+    diameter: [
+      CommonRules.unrealistic(1, 200, 'Circular area diameter')
+    ],
+    depth: [
+      {
+        condition: (val) => {
+          const d = val === 'custom' ? parseFloat(customDepth) : parseFloat(val);
+          return d > 0 && d < 1;
+        },
+        message: 'Mulch depth <1" is too shallow - minimum 2" recommended',
+        type: ValidationTypes.WARNING
+      },
+      {
+        condition: (val) => {
+          const d = val === 'custom' ? parseFloat(customDepth) : parseFloat(val);
+          return d > 6;
+        },
+        message: 'Mulch depth >6" may suffocate plant roots',
+        type: ValidationTypes.ERROR
+      }
+    ],
+    customDepth: [
+      {
+        condition: (val) => depth === 'custom' && parseFloat(val) > 8,
+        message: 'Excessive mulch depth (>8") - verify measurement',
+        type: ValidationTypes.WARNING
+      }
+    ]
+  };
+
+  const getValues = () => ({
+    length,
+    width,
+    diameter,
+    depth,
+    customDepth
+  });
+
+  const { validate, ValidationDisplay } = useValidation(validationRules);
 
   // Calculate square footage based on shape
   const squareFootage = useMemo(() => {
@@ -126,7 +157,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
   const cubicYards = useMemo(() => {
     if (squareFootage === 0 || actualDepth === 0) return 0;
     const baseYards = (squareFootage * actualDepth) / 324;
-    return includeWaste ? baseYards * 1.075 : baseYards; // 7.5% waste factor
+    return includeWaste ? baseYards * 1.075 : baseYards;
   }, [squareFootage, actualDepth, includeWaste]);
 
   // Calculate cubic feet
@@ -153,7 +184,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
 
   // Truck load estimate
   const truckLoads = useMemo(() => {
-    return (cubicYards / 2.5).toFixed(1); // Average pickup truck holds 2-2.5 yards
+    return (cubicYards / 2.5).toFixed(1);
   }, [cubicYards]);
 
   const hasResults = squareFootage > 0 && actualDepth > 0;
@@ -163,6 +194,14 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
     if (hasResults) {
       setShowResults(true);
       
+      // Auto-scroll to results
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        });
+      }, 100);
+
       // Track the calculation
       trackCalculation('mulch', {
         shape: shape,
@@ -186,17 +225,10 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
         wasteFactor: includeWaste ? 5 : 0
       });
     }
-     // Track Calculate button click
-      trackCalculatorInteraction.calculate('mulch', true);
+    trackCalculatorInteraction.calculate('mulch', true);
   };
 
-  // Prevent scroll from changing number inputs
-const preventScrollChange = (e) => {
-  e.target.blur();
-};
-
   const handleReset = () => {
-        // Track Start Over button click
     trackCalculatorInteraction.startOver('mulch');
     setLength('');
     setWidth('');
@@ -208,12 +240,12 @@ const preventScrollChange = (e) => {
     setIncludeWaste(true);
     setCustomDepth('');
     setShowResults(false);
-}; 
+  };
 
   const handleCopyCalculation = async () => {
     if (!showResults || !hasResults) return;
     trackCalculatorInteraction.copyResults('mulch');
-    // Prepare inputs
+    
     const inputs = {
       'Shape': shape === 'rectangle' ? 'Rectangle' : 'Circle'
     };
@@ -229,7 +261,6 @@ const preventScrollChange = (e) => {
     inputs['Material type'] = materialType.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
     inputs['Purchase format'] = purchaseFormat === 'bulk' ? 'Bulk (cubic yards)' : 'Bagged';
     
-    // Prepare outputs
     const outputs = {
       'Area covered': `${squareFootage.toFixed(1)} square feet`,
       'Cubic yards needed': `${cubicYards.toFixed(2)} cubic yards`,
@@ -261,19 +292,17 @@ const preventScrollChange = (e) => {
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <SectionCard>
           <div className="flex items-center gap-3 mb-2">
             <Calculator className="w-8 h-8 text-green-600" />
             <h2 className="text-3xl font-bold text-gray-800">Mulch Calculator</h2>
           </div>
           <p className="text-gray-600">Calculate how much mulch you need for your landscaping project</p>
-        </div>
+        </SectionCard>
 
         <div className="grid lg:grid-cols-2 gap-6">
           {/* Input Section */}
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Project Details</h2>
-
+          <SectionCard title="Project Details">
             {/* Shape Selection */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">Area Shape</label>
@@ -303,110 +332,81 @@ const preventScrollChange = (e) => {
 
             {/* Dimensions */}
             {shape === 'rectangle' ? (
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Length (feet)</label>
-                  <input
-                    type="number"
-                    value={length}
-                    onWheel={preventScrollChange}
-                    onChange={(e) => { setLength(e.target.value); setTimeout(() => validate(getValues()), 100); }}
-                    className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                      !length ? 'border-orange-400' : 'border-gray-300'
-                    }`}
-                    placeholder="0"
-                    min="0"
-                    step="0.1"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Width (feet)</label>
-                  <input
-                    type="number"
-                    value={width}
-                    onWheel={preventScrollChange}
-                    onChange={(e) => { setWidth(e.target.value); setTimeout(() => validate(getValues()), 100); }}
-                    className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                      !width ? 'border-orange-400' : 'border-gray-300'
-                    }`}
-                    placeholder="0"
-                    min="0"
-                    step="0.1"
-                  />
-                </div>
-              </div>
+              <InputGrid columns={2} className="mb-6">
+                <NumberInput
+                  label="Length"
+                  value={length}
+                  onChange={(value) => { 
+                    setLength(value); 
+                    setTimeout(() => validate(getValues()), 100); 
+                  }}
+                  unit="feet"
+                  required={true}
+                  fieldName="length"
+                />
+                <NumberInput
+                  label="Width"
+                  value={width}
+                  onChange={(value) => { 
+                    setWidth(value); 
+                    setTimeout(() => validate(getValues()), 100); 
+                  }}
+                  unit="feet"
+                  required={true}
+                  fieldName="width"
+                />
+              </InputGrid>
             ) : (
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Diameter (feet)</label>
-                <input
-                  type="number"
+                <NumberInput
+                  label="Diameter"
                   value={diameter}
-                  onWheel={preventScrollChange}
-                  onChange={(e) => { setDiameter(e.target.value); setTimeout(() => validate(getValues()), 100); }}
-                  className={`w-full p-3 border-2 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                    !diameter ? 'border-orange-400' : 'border-gray-300'
-                  }`}
-                  placeholder="0"
-                  min="0"
-                  step="0.1"
+                  onChange={(value) => { 
+                    setDiameter(value); 
+                    setTimeout(() => validate(getValues()), 100); 
+                  }}
+                  unit="feet"
+                  required={true}
+                  fieldName="diameter"
                 />
               </div>
             )}
 
             {/* Depth Selection */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Mulch Depth</label>
-              <select
+              <SelectInput
+                label="Mulch Depth"
                 value={depth}
-                onChange={(e) => { setDepth(e.target.value); setTimeout(() => validate(getValues()), 100); }}
-                className="w-full p-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              >
-                {depthPresets.map((preset) => (
-                  <option key={preset.value} value={preset.value}>
-                    {preset.label}
-                  </option>
-                ))}
-              </select>
+                onChange={(value) => { 
+                  setDepth(value); 
+                  setTimeout(() => validate(getValues()), 100); 
+                }}
+                options={depthPresets}
+              />
               {depth === 'custom' && (
-                <input
-                  type="number"
+                <NumberInput
+                  label="Custom Depth"
                   value={customDepth}
-                  onWheel={preventScrollChange}
-                  onChange={(e) => { setCustomDepth(e.target.value); setTimeout(() => validate(getValues()), 100); }}
-                  className={`w-full p-3 border-2 rounded-lg mt-2 focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                    !customDepth ? 'border-orange-400' : 'border-gray-300'
-                  }`}
-                  placeholder="Enter depth in inches"
-                  min="0.5"
-                  max="12"
-                  step="0.5"
+                  onChange={(value) => { 
+                    setCustomDepth(value); 
+                    setTimeout(() => validate(getValues()), 100); 
+                  }}
+                  unit="inches"
+                  required={true}
+                  fieldName="customDepth"
+                  className="mt-2"
                 />
               )}
             </div>
 
             {/* Material Type */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Material Type</label>
-              <select
+              <SelectInput
+                label="Material Type"
                 value={materialType}
-                onChange={(e) => setMaterialType(e.target.value)}
-                className="w-full p-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              >
-                <optgroup label="Organic Mulch">
-                  <option value="wood-chips">Wood Chips (600 lbs/yard)</option>
-                  <option value="shredded-bark">Shredded Bark (506 lbs/yard)</option>
-                  <option value="bark-nuggets">Bark Nuggets (700 lbs/yard)</option>
-                  <option value="pine-needles">Pine Needles (1,375 lbs/yard)</option>
-                  <option value="straw">Straw (600 lbs/yard)</option>
-                  <option value="compost">Compost (1,300 lbs/yard)</option>
-                </optgroup>
-                <optgroup label="Inorganic Mulch">
-                  <option value="rubber-mulch">Rubber Mulch (1,250 lbs/yard)</option>
-                  <option value="pea-gravel">Pea Gravel (2,700 lbs/yard)</option>
-                  <option value="river-rock">River Rock (1,250 lbs/yard)</option>
-                  <option value="lava-rock">Lava Rock (800 lbs/yard)</option>
-                </optgroup>
-              </select>
+                onChange={setMaterialType}
+                options={materialOptions}
+              />
             </div>
 
             {/* Purchase Format */}
@@ -439,16 +439,12 @@ const preventScrollChange = (e) => {
             {/* Bag Size (if bags selected) */}
             {purchaseFormat === 'bags' && (
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Bag Size</label>
-                <select
+                <SelectInput
+                  label="Bag Size"
                   value={bagSize}
-                  onChange={(e) => setBagSize(e.target.value)}
-                  className="w-full p-3 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                >
-                  <option value="2">2 cu ft (13.5 bags per yard)</option>
-                  <option value="3">3 cu ft (9 bags per yard)</option>
-                  <option value="1.5">1.5 cu ft (18 bags per yard)</option>
-                </select>
+                  onChange={setBagSize}
+                  options={bagSizeOptions}
+                />
               </div>
             )}
 
@@ -467,65 +463,53 @@ const preventScrollChange = (e) => {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-3">
-              <button
-                onClick={handleCalculate}
-                disabled={!hasResults}
-                className={`flex-1 py-3 px-6 rounded-lg font-semibold transition-all ${
-  hasResults
-    ? 'bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-xl'
-    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-}`}
->
-  Calculate
-</button>
-              <button
-                onClick={handleReset}
-                className="px-6 py-3 rounded-lg font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 transition-all"
-              >
-                Reset
-              </button>
-            </div>
-          </div>
+            <CalculateButtons
+              onCalculate={handleCalculate}
+              onStartOver={handleReset}
+              showStartOver={showResults}
+              calculateDisabled={!hasResults}
+            />
+          </SectionCard>
 
           {/* Results Section */}
           <div>
             {showResults && hasResults ? (
-              <div className="space-y-4">
+              <div ref={resultsRef} className="space-y-4">
                 {/* Main Results Card */}
                 <div className="bg-gradient-to-br from-green-600 to-emerald-600 rounded-lg shadow-lg p-6 text-white">
                   <h2 className="text-2xl font-bold mb-4">Your Results</h2>
                   
                   <div className="space-y-4">
-                    <div className="bg-white/10 rounded-lg p-4 backdrop-blur">
-                      <div className="text-sm opacity-90 mb-1">Total Volume Needed</div>
-                      <div className="text-3xl font-bold">{cubicYards.toFixed(2)} cubic yards</div>
-                      <div className="text-sm opacity-75 mt-1">{cubicFeet.toFixed(1)} cubic feet</div>
-                    </div>
+                    <MaterialCard
+                      title="Total Volume Needed"
+                      value={cubicYards.toFixed(2)}
+                      unit="cubic yards"
+                      note={`${cubicFeet.toFixed(1)} cubic feet`}
+                      color="green"
+                    />
 
                     {purchaseFormat === 'bags' && (
-                      <div className="bg-white/10 rounded-lg p-4 backdrop-blur">
-                        <div className="text-sm opacity-90 mb-1">Bags Required</div>
-                        <div className="text-3xl font-bold">{bagsNeeded} bags</div>
-                        <div className="text-sm opacity-75 mt-1">
-                          {bagSize} cu ft bags
-                        </div>
-                      </div>
+                      <MaterialCard
+                        title="Bags Required"
+                        value={bagsNeeded.toString()}
+                        subtitle="bags"
+                        note={`${bagSize} cu ft bags`}
+                        color="green"
+                      />
                     )}
 
-                    <div className="bg-white/10 rounded-lg p-4 backdrop-blur">
-                      <div className="text-sm opacity-90 mb-1">Estimated Weight</div>
-                      <div className="text-3xl font-bold">{estimatedWeight.toLocaleString()} lbs</div>
-                      <div className="text-sm opacity-75 mt-1">
-                        {(estimatedWeight / 2000).toFixed(2)} tons
-                      </div>
-                    </div>
+                    <MaterialCard
+                      title="Estimated Weight"
+                      value={estimatedWeight.toLocaleString()}
+                      subtitle="lbs"
+                      note={`${(estimatedWeight / 2000).toFixed(2)} tons`}
+                      color="green"
+                    />
                   </div>
                 </div>
 
                 {/* Additional Details Card */}
-                <div className="bg-white rounded-lg shadow-lg p-6">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Project Details</h3>
+                <SectionCard title="Project Details">
                   <div className="space-y-3 text-sm">
                     <div className="flex justify-between py-2 border-b border-gray-100">
                       <span className="text-gray-600">Coverage Area:</span>
@@ -548,76 +532,52 @@ const preventScrollChange = (e) => {
                       <span className="font-semibold text-gray-800">{includeWaste ? 'Included' : 'Not included'}</span>
                     </div>
                   </div>
-                </div>
+                </SectionCard>
 
                 {/* Tips Card */}
-                <div className="bg-blue-50 rounded-lg shadow p-6">
-                  <div className="flex items-start gap-3">
-                    <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <h3 className="text-sm font-semibold text-blue-900 mb-2">Installation Tips</h3>
-                      <ul className="text-sm text-blue-800 space-y-1">
-                        <li>• Keep mulch 3-6 inches away from tree trunks and plant stems</li>
-                        <li>• Create a "donut" shape around trees, not a "volcano"</li>
-                        <li>• Water after application to help mulch settle</li>
-                        <li>• Check vehicle payload capacity before hauling</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
+                <SectionCard variant="info" icon={Info} title="Installation Tips">
+                  <ul className="text-sm space-y-1">
+                    <li>• Keep mulch 3-6 inches away from tree trunks and plant stems</li>
+                    <li>• Create a "donut" shape around trees, not a "volcano"</li>
+                    <li>• Water after application to help mulch settle</li>
+                    <li>• Check vehicle payload capacity before hauling</li>
+                  </ul>
+                </SectionCard>
 
                 <ValidationDisplay />
 
-                {/* Copy Calculation Button */}
-<div className="bg-white rounded-lg shadow-lg p-6">
-  <div className="flex gap-3">
-    <button 
-      onClick={handleCopyCalculation}
-      className="copy-calc-btn flex-1"
-    >
-      {copyButtonText}
-    </button>
-    
-    {/* ADD THIS PRINT BUTTON */}
-    <button 
-      onClick={() => printCalculation('Mulch Calculator')}
-      className="copy-calc-btn flex-1"
-    >
-      🖨️ Print Results
-    </button>
-  </div>
-</div>
+                {/* Action Buttons */}
+                <SectionCard>
+                  <ResultsButtons
+                    onCopy={handleCopyCalculation}
+                    onPrint={() => printCalculation('Mulch Calculator')}
+                    copyButtonText={copyButtonText}
+                  />
+                </SectionCard>
 
                 {/* Weight Warning */}
                 {estimatedWeight > 2000 && (
-                  <div className="bg-amber-50 rounded-lg shadow p-6">
-                    <div className="flex items-start gap-3">
-                      <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                      <div>
-                        <h3 className="text-sm font-semibold text-amber-900 mb-2">Weight Consideration</h3>
-                        <p className="text-sm text-amber-800">
-                          This is a heavy load. Consider delivery service or multiple trips. 
-                          Most pickup trucks safely handle 1,000-1,500 lbs.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                  <SectionCard variant="warning" icon={AlertCircle} title="Weight Consideration">
+                    <p className="text-sm">
+                      This is a heavy load. Consider delivery service or multiple trips. 
+                      Most pickup trucks safely handle 1,000-1,500 lbs.
+                    </p>
+                  </SectionCard>
                 )}
               </div>
             ) : (
-              <div className="bg-white rounded-lg shadow-lg p-12 text-center">
+              <SectionCard className="text-center">
                 <Calculator className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gray-400 mb-2">Enter Your Dimensions</h3>
                 <p className="text-gray-500">Fill in the project details to calculate your mulch needs</p>
-              </div>
+              </SectionCard>
             )}
           </div>
         </div>
 
         {/* Footer Info */}
-        <div className="mt-6 bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-3">Depth Guidelines by Application</h3>
-          <div className="grid md:grid-cols-2 gap-4 text-sm">
+        <SectionCard title="Depth Guidelines by Application">
+          <InputGrid columns={2}>
             <div>
               <strong className="text-gray-700">Fine Mulch (1-2"):</strong>
               <p className="text-gray-600">Compost, grass clippings, pine needles</p>
@@ -634,8 +594,8 @@ const preventScrollChange = (e) => {
               <strong className="text-gray-700">Pathways (3-4"):</strong>
               <p className="text-gray-600">Wood chips for walking areas</p>
             </div>
-          </div>
-        </div>
+          </InputGrid>
+        </SectionCard>
       </div>
       <FAQSection calculatorId="mulch-calculator" />
     </div>

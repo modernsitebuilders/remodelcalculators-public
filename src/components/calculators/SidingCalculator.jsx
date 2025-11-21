@@ -1,6 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import { 
+  NumberInput,        
+  SelectInput,        
+  MaterialCard,       
+  SectionCard,        
+  InputGrid,          
+  CalculateButtons,   
+  ResultsButtons      
+} from '@/components/calculator';
 import { Calculator, Home, Ruler, Package, FileText, ChevronRight, ChevronLeft } from 'lucide-react';
 import { trackCalculation } from '@/utils/tracking';
 import { trackCalculatorInteraction } from '@/utils/buttonTracking';
@@ -50,11 +59,7 @@ const SidingCalculator = () => {
 
   const [results, setResults] = useState(null);
   const [copyButtonText, setCopyButtonText] = useState('📋 Copy Calculation');
-
-  // Prevent scroll from changing number inputs
-  const preventScrollChange = (e) => {
-    e.target.blur();
-  };
+  const resultsRef = useRef(null);
 
   // Siding specifications database
   const sidingSpecs = {
@@ -87,58 +92,112 @@ const SidingCalculator = () => {
     complex: 0.15
   };
 
+  // Format options helpers
+  const formatOptions = (optionsObj) => {
+    return Object.entries(optionsObj).map(([value, data]) => ({
+      value,
+      label: data.name || data
+    }));
+  };
+
+  const complexityOptions = [
+    { value: 'simple', label: 'Simple (10% waste)' },
+    { value: 'gabled', label: 'Moderate (12.5% waste)' },
+    { value: 'complex', label: 'Complex (15% waste)' }
+  ];
+
+  const climateOptions = [
+    { value: 'normal', label: 'Normal (Above 40°F installation)' },
+    { value: 'cold', label: 'Cold Climate (Below 40°F installation)' },
+    { value: 'coastal', label: 'Coastal (Within 3,000 ft of saltwater)' }
+  ];
+
+  const sidingTypeOptions = [
+    { value: 'vinyl', label: 'Vinyl Siding' },
+    { value: 'fiberCement', label: 'Fiber Cement' },
+    { value: 'wood', label: 'Wood Siding' }
+  ];
+
+  const underlaymentOptions = [
+    { value: 'tyvek', label: 'Tyvek House Wrap (9\' x 100\' rolls)' },
+    { value: 'felt', label: '15# Felt Paper (36" x 144\' rolls)' }
+  ];
+
+  const soffitDepthOptions = [
+    { value: '12', label: '12"' },
+    { value: '16', label: '16"' },
+    { value: '24', label: '24"' },
+    { value: '36', label: '36"' }
+  ];
+
+  const soffitTypeOptions = [
+    { value: 'triple4', label: 'Triple 4" (12" wide)' },
+    { value: 'double5', label: 'Double 5" (16" wide)' }
+  ];
+
+  const fasciaWidthOptions = [
+    { value: '6', label: '6"' },
+    { value: '8', label: '8"' },
+    { value: '10', label: '10"' },
+    { value: '12', label: '12"' }
+  ];
+
   const validationRules = {
-  'wall0-width': [
-    CommonRules.unrealistic(4, 100, 'Wall width')
-  ],
-  'wall0-height': [
-    {
-      condition: (val) => parseFloat(val) < 7,
-      message: 'Wall height <7 feet is uncommon for exterior walls',
-      type: ValidationTypes.WARNING
-    },
-    CommonRules.unrealistic(6, 40, 'Wall height')
-  ],
-  'gable0-width': [
-    {
-      condition: (val, allVals) => {
-        const gableWidth = parseFloat(val);
-        const wallWidth = parseFloat(allVals['wall0-width']) || 0;
-        return gableWidth > 0 && wallWidth > 0 && gableWidth > wallWidth * 1.5;
+    'wall0-width': [
+      CommonRules.unrealistic(4, 100, 'Wall width')
+    ],
+    'wall0-height': [
+      {
+        condition: (val) => parseFloat(val) < 7,
+        message: 'Wall height <7 feet is uncommon for exterior walls',
+        type: ValidationTypes.WARNING
       },
-      message: 'Gable width significantly exceeds wall width - verify measurement',
-      type: ValidationTypes.WARNING
-    }
-  ],
-  garageDoors: [
-    CommonRules.unrealistic(0, 6, 'Number of garage doors')
-  ],
-  windows: [
-    {
-      condition: (val) => parseFloat(val) > 50,
-      message: 'Large number of windows (>50) - verify count',
-      type: ValidationTypes.INFO
-    }
-  ]
-};
+      CommonRules.unrealistic(6, 40, 'Wall height')
+    ],
+    'gable0-width': [
+      {
+        condition: (val, allVals) => {
+          const gableWidth = parseFloat(val);
+          const wallWidth = parseFloat(allVals['wall0-width']) || 0;
+          return gableWidth > 0 && wallWidth > 0 && gableWidth > wallWidth * 1.5;
+        },
+        message: 'Gable width significantly exceeds wall width - verify measurement',
+        type: ValidationTypes.WARNING
+      }
+    ],
+    garageDoors: [
+      CommonRules.unrealistic(0, 6, 'Number of garage doors')
+    ],
+    windows: [
+      {
+        condition: (val) => parseFloat(val) > 50,
+        message: 'Large number of windows (>50) - verify count',
+        type: ValidationTypes.INFO
+      }
+    ]
+  };
 
-// Dynamic getValues based on walls/gables arrays
-const getValues = () => {
-  const values = { garageDoors, windows, doors: projectData.doors };
-  projectData.walls.forEach((wall, index) => {
-    values[`wall${index}-width`] = wall.width;
-    values[`wall${index}-height`] = wall.height;
-  });
-  if (projectData.includeGables) {
-    projectData.gables.forEach((gable, index) => {
-      values[`gable${index}-width`] = gable.width;
-      values[`gable${index}-height`] = gable.height;
+  // Dynamic getValues based on walls/gables arrays
+  const getValues = () => {
+    const values = { 
+      garageDoors: projectData.garageDoors, 
+      windows: projectData.windows, 
+      doors: projectData.doors 
+    };
+    projectData.walls.forEach((wall, index) => {
+      values[`wall${index}-width`] = wall.width;
+      values[`wall${index}-height`] = wall.height;
     });
-  }
-  return values;
-};
+    if (projectData.includeGables) {
+      projectData.gables.forEach((gable, index) => {
+        values[`gable${index}-width`] = gable.width;
+        values[`gable${index}-height`] = gable.height;
+      });
+    }
+    return values;
+  };
 
-const { validate, ValidationDisplay } = useValidation(validationRules);
+  const { validate, ValidationDisplay } = useValidation(validationRules);
 
   const gableWasteFactor = 0.30;
 
@@ -252,6 +311,14 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
 
     setStep(5);
 
+    // Auto-scroll to results
+    setTimeout(() => {
+      resultsRef.current?.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+      });
+    }, 100);
+
     // Track the calculation
     trackCalculation('siding', {
       complexity: projectData.complexity,
@@ -296,12 +363,12 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
       underlaymentRolls: underlayment?.rolls
     });
     trackCalculatorInteraction.calculate('siding', true);
-};  
+  };  
 
   const handleCopyCalculation = async () => {
     if (!results) return;
 
-      trackCalculatorInteraction.copyResults('siding');
+    trackCalculatorInteraction.copyResults('siding');
     
     // Prepare inputs
     const inputsData = {
@@ -355,6 +422,37 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
     }
   };
 
+  const handleStartOver = () => {
+    trackCalculatorInteraction.startOver('siding');
+    setStep(1);
+    setProjectData({
+      complexity: 'simple',
+      walls: [{ width: 0, height: 0 }],
+      gables: [],
+      includeGables: false,
+      dormers: [],
+      windows: 0,
+      doors: 0,
+      garageDoors: 0,
+      garageDoorSize: 128,
+      sidingType: 'vinyl',
+      vinylProfile: 'double4',
+      fiberCementWidth: '7.25',
+      woodType: 'cedar-lap-6',
+      soffit: { length: 0, depth: 12, type: 'triple4' },
+      fascia: { length: 0, width: 8 },
+      corners: { inside: 0, outside: 0 },
+      includeSoffit: false,
+      includeFascia: false,
+      includeCorners: false,
+      includeUnderlayment: true,
+      underlaymentType: 'tyvek',
+      climate: 'normal'
+    });
+    setResults(null);
+  };
+
+  // Rest of the calculation functions remain the same (calculateAccessories, calculateFasteners, calculateUnderlayment)
   const calculateAccessories = () => {  
     const accessories = {};
 
@@ -549,20 +647,105 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
     return hasWallArea;
   };
 
+  // Custom wall input component for dynamic walls
+  const WallInputs = () => (
+    <div className="space-y-4">
+      {projectData.walls.map((wall, index) => (
+        <SectionCard key={index} title={`Wall Section ${index + 1}`} variant="default">
+          <InputGrid columns={2}>
+            <NumberInput
+              label="Width (feet)"
+              value={wall.width}
+              onChange={(value) => updateWall(index, 'width', value)}
+              unit="feet"
+              required={true}
+              fieldName={`wall${index}-width`}
+            />
+            <NumberInput
+              label="Height (feet)"
+              value={wall.height}
+              onChange={(value) => updateWall(index, 'height', value)}
+              unit="feet"
+              required={true}
+              fieldName={`wall${index}-height`}
+            />
+          </InputGrid>
+          <div className="text-sm text-gray-600 mt-2">
+            Area: {(wall.width * wall.height).toFixed(1)} sq ft
+          </div>
+          {projectData.walls.length > 1 && (
+            <button
+              onClick={() => removeWall(index)}
+              className="mt-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+            >
+              Remove Wall
+            </button>
+          )}
+        </SectionCard>
+      ))}
+      <button
+        onClick={addWall}
+        className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+      >
+        + Add Wall Section
+      </button>
+    </div>
+  );
+
+  // Custom gable input component
+  const GableInputs = () => (
+    <div className="space-y-4">
+      {projectData.gables.map((gable, index) => (
+        <SectionCard key={index} title={`Gable ${index + 1}`} variant="default">
+          <InputGrid columns={2}>
+            <NumberInput
+              label="Width (feet)"
+              value={gable.width}
+              onChange={(value) => updateGable(index, 'width', value)}
+              unit="feet"
+              required={true}
+              fieldName={`gable${index}-width`}
+            />
+            <NumberInput
+              label="Height (feet) - Triangle only"
+              value={gable.height}
+              onChange={(value) => updateGable(index, 'height', value)}
+              unit="feet"
+              required={true}
+              fieldName={`gable${index}-height`}
+            />
+          </InputGrid>
+          <div className="text-sm text-gray-600 mt-2">
+            Base area: {((gable.width * gable.height) / 2).toFixed(1)} sq ft | 
+            With 30% waste: {(((gable.width * gable.height) / 2) * 1.3).toFixed(1)} sq ft
+          </div>
+          <button
+            onClick={() => removeGable(index)}
+            className="mt-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+          >
+            Remove Gable
+          </button>
+        </SectionCard>
+      ))}
+      <button
+        onClick={addGable}
+        className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+      >
+        + Add Another Gable
+      </button>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          <div className="flex items-center gap-3 mb-2">
-            <Calculator className="w-8 h-8 text-indigo-600" />
-            <h2 className="text-3xl font-bold text-gray-800">Professional Siding Calculator</h2>
-          </div>
+        <SectionCard title="Professional Siding Calculator" icon={Calculator} variant="info">
           <p className="text-gray-600">Industry-standard material calculations based on ASTM specifications</p>
-        </div>
+        </SectionCard>
 
         {/* Progress Indicator */}
-        <div className="bg-white rounded-lg shadow-lg p-4 mb-6">
+        <SectionCard variant="default">
           <div className="flex justify-between items-center">
             {['Project Info', 'Measurements', 'Siding Type', 'Accessories', 'Results'].map((label, idx) => (
               <div key={idx} className="flex items-center">
@@ -580,10 +763,10 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
               </div>
             ))}
           </div>
-        </div>
+        </SectionCard>
 
         {/* Main Content */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
+        <SectionCard variant="default">
           {/* Step 1: Project Information */}
           {step === 1 && (
             <div className="space-y-6">
@@ -592,12 +775,9 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                 Project Information
               </h2>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Project Complexity
-                </label>
+              <SectionCard title="Project Complexity" variant="info">
                 <p className="text-sm text-gray-500 mb-3">This determines the waste factor applied to calculations</p>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <InputGrid columns={3}>
                   {[
                     { value: 'simple', label: 'Simple', waste: '10%', desc: 'Rectangular house, minimal features' },
                     { value: 'gabled', label: 'Moderate', waste: '12.5%', desc: 'Gables, standard complexity' },
@@ -617,23 +797,15 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       <div className="text-sm text-gray-600 mt-2">{option.desc}</div>
                     </button>
                   ))}
-                </div>
-              </div>
+                </InputGrid>
+              </SectionCard>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Climate/Installation Conditions
-                </label>
-                <select
-                  value={projectData.climate}
-                  onChange={(e) => updateProjectData('climate', e.target.value)}
-                  className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                >
-                  <option value="normal">Normal (Above 40°F installation)</option>
-                  <option value="cold">Cold Climate (Below 40°F installation)</option>
-                  <option value="coastal">Coastal (Within 3,000 ft of saltwater)</option>
-                </select>
-              </div>
+              <SelectInput
+                label="Climate/Installation Conditions"
+                value={projectData.climate}
+                onChange={(value) => updateProjectData('climate', value)}
+                options={climateOptions}
+              />
             </div>
           )}
 
@@ -645,73 +817,19 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                 Measurements
               </h2>
 
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <SectionCard title="Measurement Tips" variant="info">
                 <p className="text-sm text-blue-800">
                   <strong>Tip:</strong> Do not deduct windows or doors under 25 sq ft. The extra material compensates for cutting waste around openings.
                 </p>
-              </div>
+              </SectionCard>
 
               {/* Walls */}
-              <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-3">Wall Sections</h3>
-                {projectData.walls.map((wall, index) => (
-                  <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3 p-4 bg-gray-50 rounded-lg">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Width (feet)
-                      </label>
-                      <input
-                        type="number"
-                        step="0.1"
-                        value={wall.width || ''}
-                        onChange={(e) => { updateWall(index, 'width', e.target.value); setTimeout(() => validate(getValues()), 100); }}
-                        onWheel={preventScrollChange}
-                        className={`w-full px-3 py-2 border rounded-lg ${
-                          !wall.width ? 'border-orange-400' : 'border-gray-300'
-                        }`}
-                        placeholder="0"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Height (feet)
-                      </label>
-                      <input
-                        type="number"
-                        step="0.1"
-                        value={wall.height || ''}
-                        onChange={(e) => { updateWall(index, 'height', e.target.value); setTimeout(() => validate(getValues()), 100); }}
-                        onWheel={preventScrollChange}
-                        className={`w-full px-3 py-2 border rounded-lg ${
-                          !wall.height ? 'border-orange-400' : 'border-gray-300'
-                        }`}
-                        placeholder="0"
-                      />
-                    </div>
-                    <div className="flex items-end">
-                      <button
-                        onClick={() => removeWall(index)}
-                        disabled={projectData.walls.length === 1}
-                        className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed cursor-pointer"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                    <div className="col-span-full text-sm text-gray-600">
-                      Area: {(wall.width * wall.height).toFixed(1)} sq ft
-                    </div>
-                  </div>
-                ))}
-                <button
-                  onClick={addWall}
-                  className="mt-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 cursor-pointer"
-                >
-                  + Add Wall Section
-                </button>
-              </div>
+              <SectionCard title="Wall Sections" variant="default">
+                <WallInputs />
+              </SectionCard>
 
               {/* Gables */}
-              <div>
+              <SectionCard title="Gable Ends" variant="default">
                 <div className="flex items-center gap-2 p-3 border border-yellow-400 rounded-lg mb-3">
                   <input
                     type="checkbox"
@@ -720,123 +838,51 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     className="w-4 h-4 text-indigo-600 rounded cursor-pointer"
                   />
                   <label className="text-lg font-semibold text-gray-800 cursor-pointer">
-                    Gable Ends
+                    Include Gable Ends
                   </label>
                 </div>
                 {projectData.includeGables && (
                   <>
                     <p className="text-sm text-gray-600 mb-2">Gables automatically receive 30% waste factor due to angled cuts</p>
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-3">
+                    <SectionCard title="Gable Measurement Tips" variant="warning">
                       <p className="text-sm text-gray-700">
                         <strong>Tip:</strong> Gable height is the triangular portion only - from the top of your rectangular wall to the peak. Do NOT measure from ground to peak (that would double-count the wall area). Add each gable separately if they have different dimensions.
                       </p>
-                    </div>
-                    {projectData.gables.map((gable, index) => (
-                      <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3 p-4 bg-gray-50 rounded-lg">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Width (feet)
-                          </label>
-                          <input
-                            type="number"
-                            step="0.1"
-                            value={gable.width || ''}
-                            onChange={(e) => { updateGable(index, 'width', e.target.value); setTimeout(() => validate(getValues()), 100); }}
-                            onWheel={preventScrollChange}
-                            className={`w-full px-3 py-2 border rounded-lg ${
-                              !gable.width ? 'border-orange-400' : 'border-gray-300'
-                            }`}
-                            placeholder="0"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Height (feet) - Triangle only
-                          </label>
-                          <input
-                            type="number"
-                            step="0.1"
-                            value={gable.height || ''}
-                            onChange={(e) => { updateGable(index, 'height', e.target.value); setTimeout(() => validate(getValues()), 100); }}
-                            onWheel={preventScrollChange}
-                            className={`w-full px-3 py-2 border rounded-lg ${
-                              !gable.height ? 'border-orange-400' : 'border-gray-300'
-                            }`}
-                            placeholder="0"
-                          />
-                          <p className="text-xs text-gray-500 mt-1">Top of wall to peak</p>
-                        </div>
-                        <div className="flex items-end">
-                          <button
-                            onClick={() => removeGable(index)}
-                            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 cursor-pointer"
-                          >
-                            Remove
-                          </button>
-                        </div>
-                        <div className="col-span-full text-sm text-gray-600">
-                          Base area: {((gable.width * gable.height) / 2).toFixed(1)} sq ft | With 30% waste: {(((gable.width * gable.height) / 2) * 1.3).toFixed(1)} sq ft
-                        </div>
-                      </div>
-                    ))}
-                    <button
-                      onClick={addGable}
-                      className="mt-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 cursor-pointer"
-                    >
-                      + Add Another Gable
-                    </button>
+                    </SectionCard>
+                    <GableInputs />
                   </>
                 )}
-              </div>
+              </SectionCard>
 
               {/* Openings */}
-              <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-3">Openings</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Number of Windows
-                    </label>
-                    <input
-                      type="number"
-                      value={projectData.windows || ''}
-                      onChange={(e) => updateProjectData('windows', parseInt(e.target.value) || 0)}
-                      onWheel={preventScrollChange}
-                      className="w-full px-3 py-2 border border-yellow-400 rounded-lg"
-                      placeholder="0"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">Not deducted from area</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Number of Doors
-                    </label>
-                    <input
-                      type="number"
-                      value={projectData.doors || ''}
-                      onChange={(e) => updateProjectData('doors', parseInt(e.target.value) || 0)}
-                      onWheel={preventScrollChange}
-                      className="w-full px-3 py-2 border border-yellow-400 rounded-lg"
-                      placeholder="0"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">Not deducted from area</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Number of Garage Doors
-                    </label>
-                    <input
-                      type="number"
-                      value={projectData.garageDoors || ''}
-                      onChange={(e) => updateProjectData('garageDoors', parseInt(e.target.value) || 0)}
-                      onWheel={preventScrollChange}
-                      className="w-full px-3 py-2 border border-yellow-400 rounded-lg"
-                      placeholder="0"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">Will be deducted (over 25 sq ft)</p>
-                  </div>
+              <SectionCard title="Openings" variant="default">
+                <InputGrid columns={3}>
+                  <NumberInput
+                    label="Number of Windows"
+                    value={projectData.windows}
+                    onChange={(value) => updateProjectData('windows', parseInt(value) || 0)}
+                    required={false}
+                    fieldName="windows"
+                  />
+                  <NumberInput
+                    label="Number of Doors"
+                    value={projectData.doors}
+                    onChange={(value) => updateProjectData('doors', parseInt(value) || 0)}
+                    required={false}
+                    fieldName="doors"
+                  />
+                  <NumberInput
+                    label="Number of Garage Doors"
+                    value={projectData.garageDoors}
+                    onChange={(value) => updateProjectData('garageDoors', parseInt(value) || 0)}
+                    required={false}
+                    fieldName="garageDoors"
+                  />
+                </InputGrid>
+                <div className="text-xs text-gray-500 mt-2">
+                  Note: Windows and doors under 25 sq ft are not deducted from area. Garage doors over 25 sq ft will be deducted.
                 </div>
-              </div>
+              </SectionCard>
             </div>
           )}
 
@@ -848,11 +894,8 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                 Siding Selection
               </h2>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Siding Material Type
-                </label>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <SectionCard title="Siding Material Type" variant="default">
+                <InputGrid columns={3}>
                   {[
                     { value: 'vinyl', label: 'Vinyl Siding', desc: 'Most common, easy installation' },
                     { value: 'fiberCement', label: 'Fiber Cement', desc: 'James Hardie, durable' },
@@ -871,67 +914,34 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       <div className="text-sm text-gray-600 mt-2">{option.desc}</div>
                     </button>
                   ))}
-                </div>
-              </div>
+                </InputGrid>
+              </SectionCard>
 
               {projectData.sidingType === 'vinyl' && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Vinyl Profile
-                  </label>
-                  <select
-                    value={projectData.vinylProfile}
-                    onChange={(e) => updateProjectData('vinylProfile', e.target.value)}
-                    className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                  >
-                    {Object.entries(sidingSpecs.vinyl).map(([key, spec]) => (
-                      <option key={key} value={key}>
-                        {spec.name} - {spec.exposure}" exposure - {spec.piecesPerSquare} pieces/square
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <SelectInput
+                  label="Vinyl Profile"
+                  value={projectData.vinylProfile}
+                  onChange={(value) => updateProjectData('vinylProfile', value)}
+                  options={formatOptions(sidingSpecs.vinyl)}
+                />
               )}
 
               {projectData.sidingType === 'fiberCement' && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Plank Width
-                  </label>
-                  <select
-                    value={projectData.fiberCementWidth}
-                    onChange={(e) => updateProjectData('fiberCementWidth', e.target.value)}
-                    className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                  >
-                    {Object.entries(sidingSpecs.fiberCement).map(([key, spec]) => (
-                      <option key={key} value={key}>
-                        {spec.name} - {spec.planksPerSquare} planks/square
-                      </option>
-                    ))}
-                  </select>
-                  <p className="text-sm text-gray-600 mt-2">
-                    Note: Fiber cement weighs approximately 250 lbs per square
-                  </p>
-                </div>
+                <SelectInput
+                  label="Plank Width"
+                  value={projectData.fiberCementWidth}
+                  onChange={(value) => updateProjectData('fiberCementWidth', value)}
+                  options={formatOptions(sidingSpecs.fiberCement)}
+                />
               )}
 
               {projectData.sidingType === 'wood' && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Wood Type and Size
-                  </label>
-                  <select
-                    value={projectData.woodType}
-                    onChange={(e) => updateProjectData('woodType', e.target.value)}
-                    className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                  >
-                    {Object.entries(sidingSpecs.wood).map(([key, spec]) => (
-                      <option key={key} value={key}>
-                        {spec.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <SelectInput
+                  label="Wood Type and Size"
+                  value={projectData.woodType}
+                  onChange={(value) => updateProjectData('woodType', value)}
+                  options={formatOptions(sidingSpecs.wood)}
+                />
               )}
 
               <div className="flex items-center gap-2 p-3 border border-yellow-400 rounded-lg">
@@ -946,14 +956,12 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                 </label>
               </div>
               {projectData.includeUnderlayment && (
-                <select
+                <SelectInput
+                  label="Underlayment Type"
                   value={projectData.underlaymentType}
-                  onChange={(e) => updateProjectData('underlaymentType', e.target.value)}
-                  className="mt-2 w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                >
-                  <option value="tyvek">Tyvek House Wrap (9' x 100' rolls)</option>
-                  <option value="felt">15# Felt Paper (36" x 144' rolls)</option>
-                </select>
+                  onChange={(value) => updateProjectData('underlaymentType', value)}
+                  options={underlaymentOptions}
+                />
               )}
             </div>
           )}
@@ -966,7 +974,8 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                 Accessories & Trim
               </h2>
 
-              <div>
+              {/* Corner Posts */}
+              <SectionCard title="Corner Posts" variant="default">
                 <div className="flex items-center gap-2 p-3 border border-yellow-400 rounded-lg mb-3">
                   <input
                     type="checkbox"
@@ -975,44 +984,31 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     className="w-4 h-4 text-indigo-600 rounded cursor-pointer"
                   />
                   <label className="text-lg font-semibold text-gray-800 cursor-pointer">
-                    Corner Posts
+                    Include Corner Posts
                   </label>
                 </div>
                 {projectData.includeCorners && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Inside Corners
-                      </label>
-                      <input
-                        type="number"
-                        value={projectData.corners.inside || ''}
-                        onChange={(e) => updateProjectData('corners', { ...projectData.corners, inside: parseInt(e.target.value) || 0 })}
-                        onWheel={preventScrollChange}
-                        className="w-full px-3 py-2 border border-yellow-400 rounded-lg"
-                        placeholder="0"
-                      />
-                      <p className="text-xs text-gray-500 mt-1">10-foot posts, 10 per carton</p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Outside Corners
-                      </label>
-                      <input
-                        type="number"
-                        value={projectData.corners.outside || ''}
-                        onChange={(e) => updateProjectData('corners', { ...projectData.corners, outside: parseInt(e.target.value) || 0 })}
-                        onWheel={preventScrollChange}
-                        className="w-full px-3 py-2 border border-yellow-400 rounded-lg"
-                        placeholder="0"
-                      />
-                      <p className="text-xs text-gray-500 mt-1">10-foot posts, 10 per carton</p>
-                    </div>
-                  </div>
+                  <InputGrid columns={2}>
+                    <NumberInput
+                      label="Inside Corners"
+                      value={projectData.corners.inside}
+                      onChange={(value) => updateProjectData('corners', { ...projectData.corners, inside: parseInt(value) || 0 })}
+                      required={false}
+                      fieldName="insideCorners"
+                    />
+                    <NumberInput
+                      label="Outside Corners"
+                      value={projectData.corners.outside}
+                      onChange={(value) => updateProjectData('corners', { ...projectData.corners, outside: parseInt(value) || 0 })}
+                      required={false}
+                      fieldName="outsideCorners"
+                    />
+                  </InputGrid>
                 )}
-              </div>
+              </SectionCard>
 
-              <div>
+              {/* Soffit */}
+              <SectionCard title="Soffit" variant="default">
                 <div className="flex items-center gap-2 p-3 border border-yellow-400 rounded-lg mb-3">
                   <input
                     type="checkbox"
@@ -1021,58 +1017,37 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     className="w-4 h-4 text-indigo-600 rounded cursor-pointer"
                   />
                   <label className="text-lg font-semibold text-gray-800 cursor-pointer">
-                    Soffit
+                    Include Soffit
                   </label>
                 </div>
                 {projectData.includeSoffit && (
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Total Eave Length (feet)
-                      </label>
-                      <input
-                        type="number"
-                        step="0.1"
-                        value={projectData.soffit.length || ''}
-                        onChange={(e) => updateProjectData('soffit', { ...projectData.soffit, length: parseFloat(e.target.value) || 0 })}
-                        onWheel={preventScrollChange}
-                        className="w-full px-3 py-2 border border-yellow-400 rounded-lg"
-                        placeholder="0"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Soffit Depth (inches)
-                      </label>
-                      <select
-                        value={projectData.soffit.depth}
-                        onChange={(e) => updateProjectData('soffit', { ...projectData.soffit, depth: parseInt(e.target.value) })}
-                        className="w-full px-3 py-2 border border-yellow-400 rounded-lg"
-                      >
-                        <option value="12">12"</option>
-                        <option value="16">16"</option>
-                        <option value="24">24"</option>
-                        <option value="36">36"</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Soffit Type
-                      </label>
-                      <select
-                        value={projectData.soffit.type}
-                        onChange={(e) => updateProjectData('soffit', { ...projectData.soffit, type: e.target.value })}
-                        className="w-full px-3 py-2 border border-yellow-400 rounded-lg"
-                      >
-                        <option value="triple4">Triple 4" (12" wide)</option>
-                        <option value="double5">Double 5" (16" wide)</option>
-                      </select>
-                    </div>
-                  </div>
+                  <InputGrid columns={3}>
+                    <NumberInput
+                      label="Total Eave Length (feet)"
+                      value={projectData.soffit.length}
+                      onChange={(value) => updateProjectData('soffit', { ...projectData.soffit, length: parseFloat(value) || 0 })}
+                      unit="feet"
+                      required={false}
+                      fieldName="soffitLength"
+                    />
+                    <SelectInput
+                      label="Soffit Depth (inches)"
+                      value={projectData.soffit.depth.toString()}
+                      onChange={(value) => updateProjectData('soffit', { ...projectData.soffit, depth: parseInt(value) })}
+                      options={soffitDepthOptions}
+                    />
+                    <SelectInput
+                      label="Soffit Type"
+                      value={projectData.soffit.type}
+                      onChange={(value) => updateProjectData('soffit', { ...projectData.soffit, type: value })}
+                      options={soffitTypeOptions}
+                    />
+                  </InputGrid>
                 )}
-              </div>
+              </SectionCard>
 
-              <div>
+              {/* Fascia */}
+              <SectionCard title="Fascia" variant="default">
                 <div className="flex items-center gap-2 p-3 border border-yellow-400 rounded-lg mb-3">
                   <input
                     type="checkbox"
@@ -1081,83 +1056,69 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     className="w-4 h-4 text-indigo-600 rounded cursor-pointer"
                   />
                   <label className="text-lg font-semibold text-gray-800 cursor-pointer">
-                    Fascia
+                    Include Fascia
                   </label>
                 </div>
                 {projectData.includeFascia && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Total Fascia Length (feet)
-                      </label>
-                      <input
-                        type="number"
-                        step="0.1"
-                        value={projectData.fascia.length || ''}
-                        onChange={(e) => updateProjectData('fascia', { ...projectData.fascia, length: parseFloat(e.target.value) || 0 })}
-                        onWheel={preventScrollChange}
-                        className="w-full px-3 py-2 border border-yellow-400 rounded-lg"
-                        placeholder="0"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Fascia Width (inches)
-                      </label>
-                      <select
-                        value={projectData.fascia.width}
-                        onChange={(e) => updateProjectData('fascia', { ...projectData.fascia, width: parseInt(e.target.value) })}
-                        className="w-full px-3 py-2 border border-yellow-400 rounded-lg"
-                      >
-                        <option value="6">6"</option>
-                        <option value="8">8"</option>
-                        <option value="10">10"</option>
-                        <option value="12">12"</option>
-                      </select>
-                    </div>
-                  </div>
+                  <InputGrid columns={2}>
+                    <NumberInput
+                      label="Total Fascia Length (feet)"
+                      value={projectData.fascia.length}
+                      onChange={(value) => updateProjectData('fascia', { ...projectData.fascia, length: parseFloat(value) || 0 })}
+                      unit="feet"
+                      required={false}
+                      fieldName="fasciaLength"
+                    />
+                    <SelectInput
+                      label="Fascia Width (inches)"
+                      value={projectData.fascia.width.toString()}
+                      onChange={(value) => updateProjectData('fascia', { ...projectData.fascia, width: parseInt(value) })}
+                      options={fasciaWidthOptions}
+                    />
+                  </InputGrid>
                 )}
-              </div>
+              </SectionCard>
             </div>
           )}
 
           {/* Step 5: Results */}
           {step === 5 && results && (
-            <div className="space-y-6">
+            <div ref={resultsRef} className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
                   <FileText className="w-6 h-6" />
                   Material Calculations
                 </h2>
-                <button
-                  onClick={() => window.print()}
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 cursor-pointer"
-                >
-                  Print Report
-                </button>
               </div>
 
               {/* Area Summary */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h3 className="text-lg font-semibold text-gray-800 mb-3">Area Summary</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                  <div>
-                    <div className="text-gray-600">Wall Area</div>
-                    <div className="text-xl font-bold text-gray-800">{results.areas.totalWall.toFixed(0)} sq ft</div>
-                  </div>
-                  <div>
-                    <div className="text-gray-600">Gable Area</div>
-                    <div className="text-xl font-bold text-gray-800">{results.areas.totalGable.toFixed(0)} sq ft</div>
-                  </div>
-                  <div>
-                    <div className="text-gray-600">Deductions</div>
-                    <div className="text-xl font-bold text-gray-800">-{results.areas.deductions.toFixed(0)} sq ft</div>
-                  </div>
-                  <div>
-                    <div className="text-gray-600">Net Area</div>
-                    <div className="text-xl font-bold text-gray-800">{results.areas.netArea.toFixed(0)} sq ft</div>
-                  </div>
-                </div>
+              <SectionCard title="Area Summary" variant="info">
+                <InputGrid columns={4}>
+                  <MaterialCard
+                    title="Wall Area"
+                    value={results.areas.totalWall.toFixed(0)}
+                    unit="sq ft"
+                    color="blue"
+                  />
+                  <MaterialCard
+                    title="Gable Area"
+                    value={results.areas.totalGable.toFixed(0)}
+                    unit="sq ft"
+                    color="green"
+                  />
+                  <MaterialCard
+                    title="Deductions"
+                    value={`-${results.areas.deductions.toFixed(0)}`}
+                    unit="sq ft"
+                    color="red"
+                  />
+                  <MaterialCard
+                    title="Net Area"
+                    value={results.areas.netArea.toFixed(0)}
+                    unit="sq ft"
+                    color="purple"
+                  />
+                </InputGrid>
                 <div className="mt-4 pt-4 border-t border-blue-300">
                   <div className="text-gray-600">Total With Waste ({(results.areas.wasteFactor * 100).toFixed(1)}% walls, 30% gables)</div>
                   <div className="text-2xl font-bold text-indigo-600">{results.areas.totalWithWaste.toFixed(0)} sq ft</div>
@@ -1165,178 +1126,174 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     = {(results.areas.totalWithWaste / 100).toFixed(2)} squares
                   </div>
                 </div>
-              </div>
+              </SectionCard>
 
               {/* Siding Materials */}
-              <div className="bg-white border border-gray-300 rounded-lg p-4">
-                <h3 className="text-lg font-semibold text-gray-800 mb-3">Primary Siding Materials</h3>
+              <SectionCard title="Primary Siding Materials" variant="default">
                 <div className="text-sm text-gray-600 mb-2">{results.siding.profileName}</div>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                    <span className="font-medium">Squares Needed</span>
-                    <span className="text-xl font-bold">{results.siding.squares}</span>
-                  </div>
+                <InputGrid columns={2}>
+                  <MaterialCard
+                    title="Squares Needed"
+                    value={results.siding.squares}
+                    color="indigo"
+                  />
                   {results.siding.boxes && (
-                    <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                      <span className="font-medium">Cartons/Boxes</span>
-                      <span className="text-xl font-bold">{results.siding.boxes}</span>
-                    </div>
+                    <MaterialCard
+                      title="Cartons/Boxes"
+                      value={results.siding.boxes}
+                      color="green"
+                    />
                   )}
                   {results.siding.pieces && (
-                    <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                      <span className="font-medium">Total Pieces</span>
-                      <span className="text-xl font-bold">{results.siding.pieces}</span>
-                    </div>
+                    <MaterialCard
+                      title="Total Pieces"
+                      value={results.siding.pieces}
+                      color="blue"
+                    />
                   )}
                   {results.siding.planks && (
-                    <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                      <span className="font-medium">Total Planks (12')</span>
-                      <span className="text-xl font-bold">{results.siding.planks}</span>
-                    </div>
+                    <MaterialCard
+                      title="Total Planks (12')"
+                      value={results.siding.planks}
+                      color="orange"
+                    />
                   )}
                   {results.siding.weight && (
-                    <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                      <span className="font-medium">Approximate Weight</span>
-                      <span className="text-xl font-bold">{results.siding.weight} lbs</span>
-                    </div>
+                    <MaterialCard
+                      title="Approximate Weight"
+                      value={results.siding.weight}
+                      unit="lbs"
+                      color="red"
+                    />
                   )}
                   {results.siding.boardFeet && (
-                    <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                      <span className="font-medium">Board Feet</span>
-                      <span className="text-xl font-bold">{results.siding.boardFeet}</span>
-                    </div>
+                    <MaterialCard
+                      title="Board Feet"
+                      value={results.siding.boardFeet}
+                      color="teal"
+                    />
                   )}
                   {results.siding.bundles && (
-                    <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                      <span className="font-medium">Bundles</span>
-                      <span className="text-xl font-bold">{results.siding.bundles}</span>
-                    </div>
+                    <MaterialCard
+                      title="Bundles"
+                      value={results.siding.bundles}
+                      color="purple"
+                    />
                   )}
-                </div>
-              </div>
+                </InputGrid>
+              </SectionCard>
 
               {/* Accessories */}
-              <div className="bg-white border border-gray-300 rounded-lg p-4">
-                <h3 className="text-lg font-semibold text-gray-800 mb-3">Accessories & Trim</h3>
-                <div className="space-y-3 text-sm">
-                  {results.accessories.starterStrip && (
-                    <div className="p-3 bg-gray-50 rounded">
-                      <div className="font-medium text-gray-800">Starter Strip</div>
-                      <div className="mt-1 text-gray-600">
-                        {results.accessories.starterStrip.linearFeet} linear feet | 
-                        {results.accessories.starterStrip.pieces} pieces (12.5' each) | 
-                        {results.accessories.starterStrip.cartons} cartons
-                      </div>
-                    </div>
-                  )}
-                  {results.accessories.jChannel && (
-                    <div className="p-3 bg-gray-50 rounded">
-                      <div className="font-medium text-gray-800">J-Channel</div>
-                      <div className="mt-1 text-gray-600">
-                        {results.accessories.jChannel.linearFeet} linear feet | 
-                        {results.accessories.jChannel.pieces} pieces (12.5' each) | 
-                        {results.accessories.jChannel.cartons} cartons
-                      </div>
-                    </div>
-                  )}
-                  {results.accessories.insideCorners && results.accessories.insideCorners.pieces > 0 && (
-                    <div className="p-3 bg-gray-50 rounded">
-                      <div className="font-medium text-gray-800">Inside Corner Posts</div>
-                      <div className="mt-1 text-gray-600">
-                        {results.accessories.insideCorners.pieces} pieces (10' each) | 
-                        {results.accessories.insideCorners.cartons} cartons
-                      </div>
-                    </div>
-                  )}
-                  {results.accessories.outsideCorners && results.accessories.outsideCorners.pieces > 0 && (
-                    <div className="p-3 bg-gray-50 rounded">
-                      <div className="font-medium text-gray-800">Outside Corner Posts</div>
-                      <div className="mt-1 text-gray-600">
-                        {results.accessories.outsideCorners.pieces} pieces (10' each) | 
-                        {results.accessories.outsideCorners.cartons} cartons
-                      </div>
-                    </div>
-                  )}
-                  {results.accessories.soffit && (
-                    <div className="p-3 bg-gray-50 rounded">
-                      <div className="font-medium text-gray-800">Soffit - {results.accessories.soffit.type}</div>
-                      <div className="mt-1 text-gray-600">
-                        {results.accessories.soffit.area} sq ft | 
-                        {results.accessories.soffit.panels} panels | 
-                        {results.accessories.soffit.cartons} cartons
-                      </div>
-                    </div>
-                  )}
-                  {results.accessories.fChannel && (
-                    <div className="p-3 bg-gray-50 rounded">
-                      <div className="font-medium text-gray-800">F-Channel (for soffit)</div>
-                      <div className="mt-1 text-gray-600">
-                        {results.accessories.fChannel.linearFeet} linear feet | 
-                        {results.accessories.fChannel.pieces} pieces (12.5' each) | 
-                        {results.accessories.fChannel.cartons} cartons
-                      </div>
-                    </div>
-                  )}
-                  {results.accessories.fascia && (
-                    <div className="p-3 bg-gray-50 rounded">
-                      <div className="font-medium text-gray-800">Fascia - {results.accessories.fascia.width} wide</div>
-                      <div className="mt-1 text-gray-600">
-                        {results.accessories.fascia.linearFeet} linear feet | 
-                        {results.accessories.fascia.pieces} pieces (12.5' each) | 
-                        {results.accessories.fascia.cartons} cartons
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
+              {Object.keys(results.accessories).length > 0 && (
+                <SectionCard title="Accessories & Trim" variant="default">
+                  <InputGrid columns={2}>
+                    {results.accessories.starterStrip && (
+                      <MaterialCard
+                        title="Starter Strip"
+                        value={results.accessories.starterStrip.pieces}
+                        unit="pieces"
+                        subtitle={`${results.accessories.starterStrip.linearFeet} linear feet`}
+                        color="blue"
+                      />
+                    )}
+                    {results.accessories.jChannel && (
+                      <MaterialCard
+                        title="J-Channel"
+                        value={results.accessories.jChannel.pieces}
+                        unit="pieces"
+                        subtitle={`${results.accessories.jChannel.linearFeet} linear feet`}
+                        color="green"
+                      />
+                    )}
+                    {results.accessories.insideCorners && results.accessories.insideCorners.pieces > 0 && (
+                      <MaterialCard
+                        title="Inside Corner Posts"
+                        value={results.accessories.insideCorners.pieces}
+                        unit="pieces"
+                        color="orange"
+                      />
+                    )}
+                    {results.accessories.outsideCorners && results.accessories.outsideCorners.pieces > 0 && (
+                      <MaterialCard
+                        title="Outside Corner Posts"
+                        value={results.accessories.outsideCorners.pieces}
+                        unit="pieces"
+                        color="red"
+                      />
+                    )}
+                    {results.accessories.soffit && (
+                      <MaterialCard
+                        title="Soffit Panels"
+                        value={results.accessories.soffit.panels}
+                        unit="panels"
+                        subtitle={results.accessories.soffit.type}
+                        color="purple"
+                      />
+                    )}
+                    {results.accessories.fChannel && (
+                      <MaterialCard
+                        title="F-Channel"
+                        value={results.accessories.fChannel.pieces}
+                        unit="pieces"
+                        subtitle={`${results.accessories.fChannel.linearFeet} linear feet`}
+                        color="teal"
+                      />
+                    )}
+                    {results.accessories.fascia && (
+                      <MaterialCard
+                        title="Fascia"
+                        value={results.accessories.fascia.pieces}
+                        unit="pieces"
+                        subtitle={`${results.accessories.fascia.width} wide`}
+                        color="indigo"
+                      />
+                    )}
+                  </InputGrid>
+                </SectionCard>
+              )}
 
               {/* Fasteners */}
-              <div className="bg-white border border-gray-300 rounded-lg p-4">
-                <h3 className="text-lg font-semibold text-gray-800 mb-3">Fasteners & Supplies</h3>
-                <div className="space-y-3 text-sm">
-                  {results.fasteners.nails && (
-                    <div className="p-3 bg-gray-50 rounded">
-                      <div className="font-medium text-gray-800">Nails</div>
-                      <div className="mt-1 text-gray-600">
-                        Quantity: {results.fasteners.nails.quantity} nails
-                        {results.fasteners.nails.pounds && ` (≈${results.fasteners.nails.pounds} lbs)`}
-                      </div>
-                      <div className="mt-1 text-gray-500 text-xs">
-                        Type: {results.fasteners.nails.type}
-                      </div>
-                    </div>
-                  )}
-                  {results.fasteners.caulk && (
-                    <div className="p-3 bg-gray-50 rounded">
-                      <div className="font-medium text-gray-800">Caulk/Sealant</div>
-                      <div className="mt-1 text-gray-600">
-                        {results.fasteners.caulk.tubes} tubes (10.1 oz each)
-                      </div>
-                      <div className="mt-1 text-gray-500 text-xs">
-                        Type: {results.fasteners.caulk.type}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
+              {results.fasteners && (
+                <SectionCard title="Fasteners & Supplies" variant="default">
+                  <InputGrid columns={2}>
+                    {results.fasteners.nails && (
+                      <MaterialCard
+                        title="Nails"
+                        value={results.fasteners.nails.quantity.toLocaleString()}
+                        unit="nails"
+                        subtitle={results.fasteners.nails.type}
+                        color="yellow"
+                      />
+                    )}
+                    {results.fasteners.caulk && (
+                      <MaterialCard
+                        title="Caulk/Sealant"
+                        value={results.fasteners.caulk.tubes}
+                        unit="tubes"
+                        subtitle={results.fasteners.caulk.type}
+                        color="blue"
+                      />
+                    )}
+                  </InputGrid>
+                </SectionCard>
+              )}
 
               {/* Underlayment */}
               {results.underlayment && (
-                <div className="bg-white border border-gray-300 rounded-lg p-4">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-3">Underlayment</h3>
-                  <div className="p-3 bg-gray-50 rounded">
-                    <div className="font-medium text-gray-800">{results.underlayment.type}</div>
-                    <div className="mt-1 text-gray-600">
-                      {results.underlayment.rolls} rolls ({results.underlayment.rollSize} | {results.underlayment.coverage} sq ft per roll)
-                    </div>
-                  </div>
-                </div>
+                <SectionCard title="Underlayment" variant="default">
+                  <MaterialCard
+                    title={results.underlayment.type}
+                    value={results.underlayment.rolls}
+                    unit="rolls"
+                    subtitle={`${results.underlayment.rollSize} | ${results.underlayment.coverage} sq ft per roll`}
+                    color="green"
+                  />
+                </SectionCard>
               )}
 
               {/* Important Notes */}
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">Important Notes</h3>
-                <ul className="text-sm text-gray-700 space-y-1 list-disc list-inside">
+              <SectionCard title="Important Notes" variant="warning">
+                <ul className="text-sm space-y-1 list-disc list-inside">
                   <li>All calculations include industry-standard waste factors</li>
                   <li>Verify product availability and specifications with your supplier</li>
                   <li>Building codes may require specific materials in your area</li>
@@ -1350,31 +1307,18 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     <li className="font-medium text-orange-700">Fiber cement requires 1-1/4" minimum overlap per building codes</li>
                   )}
                 </ul>
-             </div>
-              
-              {/* Copy Calculation Button */}
-<div className="bg-white rounded-lg shadow-lg p-6">
-  <div className="flex gap-3">
-    <button 
-      onClick={handleCopyCalculation}
-      className="copy-calc-btn flex-1"
-    >
-      {copyButtonText}
-    </button>
-    
-    {/* ADD THIS PRINT BUTTON */}
-    <button 
-      onClick={() => {
-  trackCalculatorInteraction.print('siding');
-  printCalculation('Siding Calculator');
-}}
-      className="copy-calc-btn flex-1"
-    >
-      🖨️ Print Results
-    </button>
-  </div>
-</div>
-              
+              </SectionCard>
+
+              <ValidationDisplay />
+
+              <ResultsButtons
+                onCopy={handleCopyCalculation}
+                onPrint={() => {
+                  trackCalculatorInteraction.print('siding');
+                  printCalculation('Siding Calculator');
+                }}
+                copyButtonText={copyButtonText}
+              />
             </div>
           )}
 
@@ -1402,32 +1346,25 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                 {!canCalculate() && (
                   <p className="text-sm text-red-600">Enter at least one wall section with dimensions to calculate</p>
                 )}
-
                 <ValidationDisplay />
-
                 <button
                   onClick={calculateMaterials}
                   disabled={!canCalculate()}
                   className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 cursor-pointer disabled:bg-gray-300 disabled:cursor-not-allowed"
->
-  Calculate Materials
-</button>
+                >
+                  Calculate Materials
+                </button>
               </div>
             )}
             {step === 5 && (
-              <button
-                onClick={() => {
-  trackCalculatorInteraction.startOver('siding');
-  setStep(1);
-  setResults(null);
-}}
-                className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 cursor-pointer"
-              >
-                New Calculation
-              </button>
+              <CalculateButtons
+                onCalculate={() => {}} // Not used in results step
+                onStartOver={handleStartOver}
+                showStartOver={true}
+              />
             )}
           </div>
-        </div>
+        </SectionCard>
       </div>
       <FAQSection calculatorId="siding-calculator" />
     </div>

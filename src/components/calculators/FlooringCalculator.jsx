@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { trackCalculation } from '@/utils/tracking';
 import { copyCalculation } from '@/utils/copyCalculation';
 import { printCalculation } from '@/utils/printCalculation';
@@ -8,6 +8,15 @@ import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
 import { FAQSection } from '@/components/FAQSection';
 import { trackCalculatorInteraction } from '@/utils/buttonTracking';
+import { 
+  NumberInput,
+  SelectInput,
+  MaterialCard,
+  SectionCard,
+  InputGrid,
+  CalculateButtons,
+  ResultsButtons
+} from '@/components/calculator';
 
 export default function FlooringCalculator() {
   const [selectedFlooringType, setSelectedFlooringType] = useState('');
@@ -26,48 +35,113 @@ export default function FlooringCalculator() {
   const [showResults, setShowResults] = useState(false);
   const [results, setResults] = useState(null);
   const [copyButtonText, setCopyButtonText] = useState('📋 Copy Calculation');
+  const resultsRef = useRef(null);
 
   const handleFlooringTypeSelect = (type) => {
     setSelectedFlooringType(type);
     setShowResults(false);
   };
 
+  const layoutPatternOptions = [
+    { value: 'straight', label: 'Straight' },
+    { value: 'diagonal', label: 'Diagonal' },
+    { value: 'herringbone', label: 'Herringbone' }
+  ];
+
+  const roomComplexityOptions = [
+    { value: 'simple', label: 'Simple' },
+    { value: 'moderate', label: 'Moderate' },
+    { value: 'complex', label: 'Complex' }
+  ];
+
+  const installerExpOptions = [
+    { value: 'professional', label: 'Professional' },
+    { value: 'diy', label: 'DIY' }
+  ];
+
+  const plankWidthOptions = [
+    { value: '1.5', label: '1.5" - Narrow strip' },
+    { value: '2.25', label: '2.25" - Standard strip' },
+    { value: '3', label: '3" - Wide strip' },
+    { value: '3.25', label: '3.25" - Extra wide strip' },
+    { value: '4', label: '4" - Narrow plank' },
+    { value: '5', label: '5" - Standard plank' },
+    { value: '6', label: '6" - Wide plank' },
+    { value: '7', label: '7" - Extra wide plank' },
+    { value: '8', label: '8" - Premium wide' },
+    { value: '10', label: '10" - Premium extra wide' },
+    { value: 'other', label: 'Other (custom width)' }
+  ];
+
+  const tileSizeOptions = [
+    { value: '4', label: '4"' },
+    { value: '6', label: '6"' },
+    { value: '8', label: '8"' },
+    { value: '12', label: '12"' },
+    { value: '13', label: '13"' },
+    { value: '16', label: '16"' },
+    { value: '18', label: '18"' },
+    { value: '20', label: '20"' },
+    { value: '24', label: '24"' },
+    { value: '30', label: '30"' },
+    { value: '36', label: '36"' },
+    { value: '48', label: '48"' }
+  ];
+
+  const groutWidthOptions = [
+    { value: '1/16', label: '1/16"' },
+    { value: '1/8', label: '1/8"' },
+    { value: '3/16', label: '3/16"' },
+    { value: '1/4', label: '1/4"' }
+  ];
+
+  const carpetWidthOptions = [
+    { value: '12', label: '12 ft (standard)' },
+    { value: '15', label: '15 ft' },
+    { value: '13.5', label: '13.5 ft' }
+  ];
+
+  const flooringTypes = [
+    { type: 'hardwood', icon: '🪵', label: 'Solid Hardwood' },
+    { type: 'engineered', icon: '🌳', label: 'Engineered Wood' },
+    { type: 'laminate', icon: '📏', label: 'Laminate' },
+    { type: 'vinyl', icon: '▭', label: 'Vinyl Plank' },
+    { type: 'tile', icon: '⬜', label: 'Ceramic Tile' },
+    { type: 'carpet', icon: '🧶', label: 'Carpet' },
+  ];
+
   const validationRules = {
-  roomLength: [
-    CommonRules.unrealistic(3, 100, 'Room length')
-  ],
-  roomWidth: [
-    CommonRules.unrealistic(3, 100, 'Room width')
-  ],
-  plankWidth: [
-    {
-      condition: (val) => val === 'other' && (parseFloat(customPlankWidth) < 1 || parseFloat(customPlankWidth) > 20),
-      message: 'Custom plank width should be between 1-20 inches',
-      type: ValidationTypes.ERROR
-    }
-  ],
-  tileWidth: [
-    CommonRules.unrealistic(4, 48, 'Tile width')
-  ],
-  tileLength: [
-    CommonRules.unrealistic(4, 48, 'Tile length')
-  ]
-};
+    roomLength: [
+      CommonRules.unrealistic(3, 100, 'Room length')
+    ],
+    roomWidth: [
+      CommonRules.unrealistic(3, 100, 'Room width')
+    ],
+    plankWidth: [
+      {
+        condition: (val) => val === 'other' && (parseFloat(customPlankWidth) < 1 || parseFloat(customPlankWidth) > 20),
+        message: 'Custom plank width should be between 1-20 inches',
+        type: ValidationTypes.ERROR
+      }
+    ],
+    tileWidth: [
+      CommonRules.unrealistic(4, 48, 'Tile width')
+    ],
+    tileLength: [
+      CommonRules.unrealistic(4, 48, 'Tile length')
+    ]
+  };
 
-const getValues = () => ({
-  roomLength,
-  roomWidth,
-  plankWidth,
-  customPlankWidth,
-  tileWidth,
-  tileLength
-});
+  const getValues = () => ({
+    roomLength,
+    roomWidth,
+    plankWidth,
+    customPlankWidth,
+    tileWidth,
+    tileLength
+  });
 
-const { validate, ValidationDisplay } = useValidation(validationRules);
-
-const preventScrollChange = (e) => {
-  e.target.blur();
-};
+  const { validate, ValidationDisplay } = useValidation(validationRules);
 
   const calculateMaterials = () => {
     const length = parseFloat(roomLength);
@@ -215,7 +289,6 @@ const preventScrollChange = (e) => {
         break;
     }
 
-
     setResults({
       area: Math.round(areaSquareFeet),
       waste: baseFactor.toFixed(1),
@@ -228,7 +301,7 @@ const preventScrollChange = (e) => {
     setShowResults(true);
 
     setTimeout(() => {
-      document.getElementById('results-section')?.scrollIntoView({ behavior: 'smooth' });
+      resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 100);
 
     // Track the calculation
@@ -280,7 +353,6 @@ const preventScrollChange = (e) => {
     trackCalculatorInteraction.copyResults('flooring');
     if (!showResults || !results) return;
     
-    // Prepare inputs
     const inputsData = {
       'Flooring type': selectedFlooringType.replace(/([A-Z])/g, ' $1').trim(),
       'Room size': `${roomLength}' × ${roomWidth}'`,
@@ -291,25 +363,23 @@ const preventScrollChange = (e) => {
     
     if (selectedFlooringType === 'hardwood') {
       inputsData['Plank width'] = plankWidth === 'other' ? `${customPlankWidth}"` : `${plankWidth}"`;
-    } else if (selectedFlooringType === 'tile' || selectedFlooringType === 'lvp') {
+    } else if (selectedFlooringType === 'tile') {
       inputsData['Tile size'] = `${tileWidth}" × ${tileLength}"`;
     } else if (selectedFlooringType === 'carpet') {
       inputsData['Carpet width'] = `${carpetWidth} feet`;
       if (patternMatch) inputsData['Pattern match'] = 'Yes';
     }
     
-    // Prepare outputs
     const outputs = {
-      'Room area': `${results.roomArea} sq ft`,
-      'Material needed': `${results.materialNeeded} sq ft`,
-      'Waste factor': `${results.wasteFactor}%`,
-      'Total with waste': `${results.totalWithWaste} sq ft`
+      'Room area': `${results.area} sq ft`,
+      'Material needed': `${results.total} sq ft`,
+      'Waste factor': `${results.waste}%`,
+      'Total with waste': `${results.total} sq ft`
     };
     
-    if (results.boxes) outputs['Boxes/Cartons'] = results.boxes;
-    if (results.planks) outputs['Planks'] = results.planks;
-    if (results.tiles) outputs['Tiles'] = results.tiles;
-    if (results.rolls) outputs['Carpet rolls'] = results.rolls;
+    if (results.boxes) {
+      outputs[selectedFlooringType === 'carpet' ? 'Square yards' : 'Boxes'] = results.boxes;
+    }
     
     const note = `Per ${selectedFlooringType === 'hardwood' ? 'NWFA' : selectedFlooringType === 'tile' ? 'TCNA' : selectedFlooringType === 'carpet' ? 'CRI' : 'industry'} standards. Includes waste factor for cuts and mistakes.`;
     
@@ -358,28 +428,6 @@ const preventScrollChange = (e) => {
           font-weight: 500;
         }
 
-        .section {
-          margin-bottom: 56px;
-        }
-
-        .section-header {
-          margin-bottom: 24px;
-        }
-
-        .section-header h2 {
-          font-size: 24px;
-          font-weight: 700;
-          color: #0f0f0f;
-          margin-bottom: 8px;
-          letter-spacing: -0.02em;
-        }
-
-        .section-header p {
-          font-size: 15px;
-          color: #737373;
-          font-weight: 500;
-        }
-
         .flooring-grid {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -422,77 +470,6 @@ const preventScrollChange = (e) => {
           color: #0f0f0f;
         }
 
-        .form-grid {
-          display: grid;
-          gap: 20px;
-        }
-
-        .form-grid-2 {
-          grid-template-columns: repeat(2, 1fr);
-        }
-
-        .form-grid-3 {
-          grid-template-columns: repeat(3, 1fr);
-        }
-
-        @media (max-width: 768px) {
-          .form-grid-2,
-          .form-grid-3 {
-            grid-template-columns: 1fr;
-          }
-        }
-
-        .form-group {
-          display: flex;
-          flex-direction: column;
-        }
-
-        .form-label {
-          font-size: 13px;
-          font-weight: 600;
-          color: #0f0f0f;
-          margin-bottom: 8px;
-          letter-spacing: -0.01em;
-        }
-
-        .form-input,
-        .form-select {
-          background: white;
-          border-width: 2px;
-          border-style: solid;
-          border-radius: 10px;
-          padding: 12px 14px;
-          font-size: 15px;
-          font-weight: 500;
-          color: #0f0f0f;
-          font-family: 'Inter', sans-serif;
-          transition: all 0.2s;
-          outline: none;
-        }
-
-        .form-input::placeholder {
-          color: #a3a3a3;
-          font-weight: 400;
-        }
-
-        .form-input:hover,
-        .form-select:hover {
-          border-color: #d4d4d4;
-        }
-
-        .form-input:focus,
-        .form-select:focus {
-          border-color: #0f0f0f;
-          box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
-        }
-
-        .form-hint {
-          font-size: 13px;
-          color: #737373;
-          margin-top: 6px;
-          font-weight: 500;
-        }
-
         .checkbox-group {
           display: flex;
           align-items: center;
@@ -521,56 +498,6 @@ const preventScrollChange = (e) => {
           font-weight: 500;
           color: #0f0f0f;
           cursor: pointer;
-        }
-
-        .button-group {
-          display: flex;
-          gap: 12px;
-          margin-top: 32px;
-        }
-
-        .btn {
-          padding: 14px 24px;
-          border-radius: 10px;
-          font-size: 15px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.2s;
-          border: none;
-          font-family: 'Inter', sans-serif;
-          letter-spacing: -0.01em;
-        }
-
-        .btn-primary {
-          background: #0f0f0f;
-          color: white;
-          flex: 1;
-        }
-
-        .btn-primary:hover {
-          background: #2a2a2a;
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .btn-primary:active {
-          transform: translateY(0);
-        }
-
-        .btn-secondary {
-          background: white;
-          color: #0f0f0f;
-          border: 1.5px solid #e5e5e5;
-          padding: 13px 24px;
-        }
-
-        .btn-secondary:hover {
-          background: #fafafa;
-          border-color: #d4d4d4;
-        }
-
-        .results {
-          margin-top: 64px;
         }
 
         .stats-grid {
@@ -752,20 +679,9 @@ const preventScrollChange = (e) => {
         </div>
 
         {/* Step 1: Flooring Type */}
-        <div className="section">
-          <div className="section-header">
-            <h2>Select flooring type</h2>
-            <p>Choose the material you'll be installing</p>
-          </div>
+        <SectionCard title="Select flooring type" subtitle="Choose the material you'll be installing">
           <div className="flooring-grid">
-            {[
-              { type: 'hardwood', icon: '🪵', label: 'Solid Hardwood' },
-              { type: 'engineered', icon: '🌳', label: 'Engineered Wood' },
-              { type: 'laminate', icon: '📏', label: 'Laminate' },
-              { type: 'vinyl', icon: '▭', label: 'Vinyl Plank' },
-              { type: 'tile', icon: '⬜', label: 'Ceramic Tile' },
-              { type: 'carpet', icon: '🧶', label: 'Carpet' },
-            ].map((flooring) => (
+            {flooringTypes.map((flooring) => (
               <button
                 key={flooring.type}
                 className={`flooring-card ${selectedFlooringType === flooring.type ? 'selected' : ''}`}
@@ -776,308 +692,233 @@ const preventScrollChange = (e) => {
               </button>
             ))}
           </div>
-        </div>
+        </SectionCard>
 
         {/* Input Section */}
         {selectedFlooringType && (
           <div>
             {/* Room Dimensions */}
-            <div className="section">
-              <div className="section-header">
-                <h2>Room dimensions</h2>
-                <p>Enter your room measurements in feet</p>
-              </div>
-              <div className="form-grid form-grid-2">
-                <div className="form-group">
-                  <label className="form-label">Length (ft)</label>
-                  <input 
-                    type="number" 
-                    className={`form-input ${!roomLength ? 'border-orange-400' : 'border-gray-300'}`}
-                    value={roomLength} 
-                    onChange={(e) => { setRoomLength(e.target.value); setTimeout(() => validate(getValues()), 100); }} 
-                    onWheel={preventScrollChange}
-                  />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Width (ft)</label>
-                  <input 
-                    type="number" 
-                    className={`form-input ${!roomWidth ? 'border-orange-400' : 'border-gray-300'}`}
-                    value={roomWidth} 
-                    onChange={(e) => { setRoomWidth(e.target.value); setTimeout(() => validate(getValues()), 100); }} 
-                    onWheel={preventScrollChange}
-                  />
-                </div>
-              </div>
-            </div>
+            <SectionCard title="Room dimensions" subtitle="Enter your room measurements in feet">
+              <InputGrid columns={2}>
+                <NumberInput
+                  label="Length"
+                  value={roomLength}
+                  onChange={(value) => {
+                    setRoomLength(value);
+                    setTimeout(() => validate(getValues()), 100);
+                  }}
+                  unit="feet"
+                  required={true}
+                  fieldName="roomLength"
+                />
+                <NumberInput
+                  label="Width"
+                  value={roomWidth}
+                  onChange={(value) => {
+                    setRoomWidth(value);
+                    setTimeout(() => validate(getValues()), 100);
+                  }}
+                  unit="feet"
+                  required={true}
+                  fieldName="roomWidth"
+                />
+              </InputGrid>
+            </SectionCard>
 
             {/* Installation Details */}
-            <div className="section">
-              <div className="section-header">
-                <h2>Installation details</h2>
-                <p>Specify how the flooring will be installed</p>
-              </div>
-              <div className="form-grid form-grid-3">
-  {selectedFlooringType !== 'carpet' && (
-    <div className="form-group">
-      <label className="form-label">Layout pattern</label>
-      <select className="form-select border-yellow-400" value={layoutPattern} onChange={(e) => setLayoutPattern(e.target.value)}>
-        <option value="straight">Straight</option>
-        <option value="diagonal">Diagonal</option>
-        <option value="herringbone">Herringbone</option>
-      </select>
-      <span className="form-hint">Diagonal and herringbone patterns require significantly more material</span>
-    </div>
-  )}
-  
-  <div className="form-group">
-    <label className="form-label">Room complexity</label>
-                  <select className="form-select border-yellow-400" value={roomComplexity} onChange={(e) => setRoomComplexity(e.target.value)}>
-                    <option value="simple">Simple</option>
-                    <option value="moderate">Moderate</option>
-                    <option value="complex">Complex</option>
-                  </select>
-                  <span className="form-hint">Complex rooms with angles, closets, or obstacles need extra material</span>
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Experience level</label>
-                  <select className="form-select border-yellow-400" value={installerExp} onChange={(e) => setInstallerExp(e.target.value)}>
-                    <option value="professional">Professional</option>
-                    <option value="diy">DIY</option>
-                  </select>
-                  <span className="form-hint">DIY installs add 5% waste factor for learning curve and cutting practice</span>
-                </div>
-              </div>
+            <SectionCard title="Installation details" subtitle="Specify how the flooring will be installed">
+              <InputGrid columns={3}>
+                {selectedFlooringType !== 'carpet' && (
+                  <SelectInput
+                    label="Layout pattern"
+                    value={layoutPattern}
+                    onChange={setLayoutPattern}
+                    options={layoutPatternOptions}
+                  />
+                )}
+                
+                <SelectInput
+                  label="Room complexity"
+                  value={roomComplexity}
+                  onChange={setRoomComplexity}
+                  options={roomComplexityOptions}
+                />
+                
+                <SelectInput
+                  label="Experience level"
+                  value={installerExp}
+                  onChange={setInstallerExp}
+                  options={installerExpOptions}
+                />
+              </InputGrid>
 
               {/* Material-specific */}
               {selectedFlooringType === 'hardwood' && (
-                <div style={{ marginTop: '20px' }}>
-                  <div className="form-group">
-                    <label className="form-label">Plank width (inches)</label>
-                    <select 
-                      className="form-select border-yellow-400" 
-                      style={{ maxWidth: '280px' }} 
-                      value={plankWidth} 
-                      onChange={(e) => { setPlankWidth(e.target.value); setTimeout(() => validate(getValues()), 100); }}
-                    >
-                      <option value="1.5">1.5" - Narrow strip</option>
-                      <option value="2.25">2.25" - Standard strip</option>
-                      <option value="3">3" - Wide strip</option>
-                      <option value="3.25">3.25" - Extra wide strip</option>
-                      <option value="4">4" - Narrow plank</option>
-                      <option value="5">5" - Standard plank</option>
-                      <option value="6">6" - Wide plank</option>
-                      <option value="7">7" - Extra wide plank</option>
-                      <option value="8">8" - Premium wide</option>
-                      <option value="10">10" - Premium extra wide</option>
-                      <option value="other">Other (custom width)</option>
-                    </select>
-                    {plankWidth === 'other' && (
-                      <div className="custom-width-input">
-                        <input
-                          type="number"
-                          className={`form-input ${!customPlankWidth ? 'border-orange-400' : 'border-gray-300'}`}
-                          placeholder="Enter width in inches"
-                          step="0.25"
-                          min="1"
-                          max="20"
-                          style={{ maxWidth: '280px' }}
-                          value={customPlankWidth}
-                          onWheel={preventScrollChange}
-                          onChange={(e) => { setCustomPlankWidth(e.target.value); setTimeout(() => validate(getValues()), 100); }}
-                        />
-                      </div>
-                    )}
-                    <span className="form-hint">Wide planks (5"+) require higher waste factors</span>
-                  </div>
+                <div className="mt-6">
+                  <SelectInput
+                    label="Plank width"
+                    value={plankWidth}
+                    onChange={(value) => {
+                      setPlankWidth(value);
+                      setTimeout(() => validate(getValues()), 100);
+                    }}
+                    options={plankWidthOptions}
+                  />
+                  {plankWidth === 'other' && (
+                    <div className="custom-width-input">
+                      <NumberInput
+                        label="Custom plank width"
+                        value={customPlankWidth}
+                        onChange={(value) => {
+                          setCustomPlankWidth(value);
+                          setTimeout(() => validate(getValues()), 100);
+                        }}
+                        unit="inches"
+                        required={true}
+                        fieldName="customPlankWidth"
+                        placeholder="Enter width in inches"
+                        min="1"
+                        max="20"
+                        step="0.25"
+                      />
+                    </div>
+                  )}
+                  <p className="text-xs text-gray-500 mt-2">Wide planks (5"+) require higher waste factors</p>
                 </div>
               )}
 
               {selectedFlooringType === 'tile' && (
-                <div style={{ marginTop: '20px' }}>
-                  <div className="form-grid form-grid-3">
-                    <div className="form-group">
-                      <label className="form-label">Tile width (inches)</label>
-                      <select 
-                        className="form-select border-yellow-400" 
-                        value={tileWidth} 
-                        onChange={(e) => { setTileWidth(e.target.value); setTimeout(() => validate(getValues()), 100); }}
-                      >
-                        <option value="4">4"</option>
-                        <option value="6">6"</option>
-                        <option value="8">8"</option>
-                        <option value="12">12"</option>
-                        <option value="13">13"</option>
-                        <option value="16">16"</option>
-                        <option value="18">18"</option>
-                        <option value="20">20"</option>
-                        <option value="24">24"</option>
-                        <option value="30">30"</option>
-                        <option value="36">36"</option>
-                        <option value="48">48"</option>
-                      </select>
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label">Tile length (inches)</label>
-                      <select 
-                        className="form-select border-yellow-400" 
-                        value={tileLength} 
-                        onChange={(e) => { setTileLength(e.target.value); setTimeout(() => validate(getValues()), 100); }}
-                      >
-                        <option value="4">4"</option>
-                        <option value="6">6"</option>
-                        <option value="8">8"</option>
-                        <option value="12">12"</option>
-                        <option value="13">13"</option>
-                        <option value="16">16"</option>
-                        <option value="18">18"</option>
-                        <option value="20">20"</option>
-                        <option value="24">24"</option>
-                        <option value="30">30"</option>
-                        <option value="36">36"</option>
-                        <option value="48">48"</option>
-                      </select>
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label">Grout width</label>
-                      <select 
-                        className="form-select border-yellow-400" 
-                        value={groutWidth} 
-                        onChange={(e) => setGroutWidth(e.target.value)}
-                      >
-                        <option value="1/16">1/16"</option>
-                        <option value="1/8">1/8"</option>
-                        <option value="3/16">3/16"</option>
-                        <option value="1/4">1/4"</option>
-                      </select>
-                    </div>
-                  </div>
+                <div className="mt-6">
+                  <InputGrid columns={3}>
+                    <SelectInput
+                      label="Tile width"
+                      value={tileWidth}
+                      onChange={(value) => {
+                        setTileWidth(value);
+                        setTimeout(() => validate(getValues()), 100);
+                      }}
+                      options={tileSizeOptions}
+                    />
+                    <SelectInput
+                      label="Tile length"
+                      value={tileLength}
+                      onChange={(value) => {
+                        setTileLength(value);
+                        setTimeout(() => validate(getValues()), 100);
+                      }}
+                      options={tileSizeOptions}
+                    />
+                    <SelectInput
+                      label="Grout width"
+                      value={groutWidth}
+                      onChange={setGroutWidth}
+                      options={groutWidthOptions}
+                    />
+                  </InputGrid>
                 </div>
               )}
 
               {selectedFlooringType === 'carpet' && (
-                <div style={{ marginTop: '20px' }}>
-                  <div className="form-grid form-grid-2">
-                    <div className="form-group">
-                      <label className="form-label">Carpet width (feet)</label>
-                      <select 
-                        className="form-select border-yellow-400" 
-                        value={carpetWidth} 
-                        onChange={(e) => setCarpetWidth(e.target.value)}
-                      >
-                        <option value="12">12 ft (standard)</option>
-                        <option value="15">15 ft</option>
-                        <option value="13.5">13.5 ft</option>
-                      </select>
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label" style={{ opacity: 0 }}>
-                        Checkbox
-                      </label>
+                <div className="mt-6">
+                  <InputGrid columns={2}>
+                    <SelectInput
+                      label="Carpet width"
+                      value={carpetWidth}
+                      onChange={setCarpetWidth}
+                      options={carpetWidthOptions}
+                    />
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Pattern matching</label>
                       <div className="checkbox-group border-yellow-400">
-                        <input type="checkbox" id="pattern-match" checked={patternMatch} onChange={(e) => setPatternMatch(e.target.checked)} />
+                        <input 
+                          type="checkbox" 
+                          id="pattern-match" 
+                          checked={patternMatch} 
+                          onChange={(e) => setPatternMatch(e.target.checked)} 
+                        />
                         <label htmlFor="pattern-match">Pattern match required</label>
                       </div>
-                      <span className="form-hint">Patterned carpets need extra material to align designs at seams (adds 10%)</span>
+                      <p className="text-xs text-gray-500 mt-2">Patterned carpets need extra material to align designs at seams (adds 10%)</p>
                     </div>
-                  </div>
+                  </InputGrid>
                 </div>
               )}
-            </div>
-<ValidationDisplay />
-            <div className="button-group">
-              <button className="btn btn-primary" onClick={calculateMaterials}>
-                Calculate materials
-              </button>
-              <button className="btn btn-secondary" onClick={handleReset}>
-                Reset
-              </button>
-            </div>
+            </SectionCard>
+
+            <ValidationDisplay />
+            
+            <CalculateButtons
+              onCalculate={calculateMaterials}
+              onStartOver={handleReset}
+              showStartOver={showResults}
+            />
           </div>
         )}
 
         {/* Results */}
         {showResults && results && (
-          <div id="results-section" className="results">
-            <div className="section-header">
-              <h2>Material requirements</h2>
-              <p>Based on your specifications</p>
-            </div>
+          <div ref={resultsRef} className="results">
+            <SectionCard title="Material requirements" subtitle="Based on your specifications">
+              <div className="stats-grid">
+                <div className="stat-card">
+                  <div className="stat-label">Area</div>
+                  <div className="stat-value">{results.area}</div>
+                  <div className="stat-unit">sq ft</div>
+                </div>
+                <div className="stat-card">
+                  <div className="stat-label">Waste</div>
+                  <div className="stat-value accent">{results.waste}%</div>
+                  <div className="stat-unit">buffer</div>
+                </div>
+                <div className="stat-card">
+                  <div className="stat-label">Total</div>
+                  <div className="stat-value">{results.total}</div>
+                  <div className="stat-unit">sq ft</div>
+                </div>
+                <div className="stat-card">
+                  <div className="stat-label">{selectedFlooringType === 'carpet' ? 'Yards' : 'Boxes'}</div>
+                  <div className="stat-value accent">{results.boxes}</div>
+                  <div className="stat-unit">{selectedFlooringType === 'carpet' ? 'square yards' : `${results.boxCoverage} sq ft/box`}</div>
+                </div>
+              </div>
 
-            <div className="stats-grid">
-              <div className="stat-card">
-                <div className="stat-label">Area</div>
-                <div className="stat-value">{results.area}</div>
-                <div className="stat-unit">sq ft</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-label">Waste</div>
-                <div className="stat-value accent">{results.waste}%</div>
-                <div className="stat-unit">buffer</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-label">Total</div>
-                <div className="stat-value">{results.total}</div>
-                <div className="stat-unit">sq ft</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-label">{selectedFlooringType === 'carpet' ? 'Yards' : 'Boxes'}</div>
-                <div className="stat-value accent">{results.boxes}</div>
-                <div className="stat-unit">{selectedFlooringType === 'carpet' ? 'square yards' : `${results.boxCoverage} sq ft/box`}</div>
-              </div>
-            </div>
-
-            <div className="materials-card">
-              <h3 className="card-title">Additional materials</h3>
-              <div>
-                {results.additionalMaterials.map((material, index) => (
-                  <div key={index} className="material-item">
-                    <div className="material-info">
-                      <div className="material-name">{material.name}</div>
-                      <div className="material-note">{material.note}</div>
+              <div className="materials-card">
+                <h3 className="card-title">Additional materials</h3>
+                <div>
+                  {results.additionalMaterials.map((material, index) => (
+                    <div key={index} className="material-item">
+                      <div className="material-info">
+                        <div className="material-name">{material.name}</div>
+                        <div className="material-note">{material.note}</div>
+                      </div>
+                      <div className="material-qty">{material.qty}</div>
                     </div>
-                    <div className="material-qty">{material.qty}</div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
 
-            <div className="notes-card">
-              <h3 className="card-title">Installation notes</h3>
-              <div>
-                {results.recommendations.map((rec, index) => (
-                  <div key={index} className="note-item">
-                    <span className="note-bullet">•</span>
-                    <span>{rec}</span>
-                  </div>
-                ))}
+              <div className="notes-card">
+                <h3 className="card-title">Installation notes</h3>
+                <div>
+                  {results.recommendations.map((rec, index) => (
+                    <div key={index} className="note-item">
+                      <span className="note-bullet">•</span>
+                      <span>{rec}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="note-highlight">
+                  <span className="note-highlight-icon">💡</span>
+                  <span className="note-highlight-text">Order 5-10% extra material beyond installation needs for future repairs and batch matching</span>
+                </div>
+                
+                <ResultsButtons
+                  onCopy={handleCopyCalculation}
+                  onPrint={() => printCalculation('Flooring Calculator')}
+                  copyButtonText={copyButtonText}
+                />
               </div>
-              <div className="note-highlight">
-                <span className="note-highlight-icon">💡</span>
-                <span className="note-highlight-text">Order 5-10% extra material beyond installation needs for future repairs and batch matching</span>
-              </div>
-              
-              {/* Copy Calculation Button */}
-<div className="bg-white rounded-lg shadow-lg p-6">
-  <div className="flex gap-3">
-    <button 
-      onClick={handleCopyCalculation}
-      className="copy-calc-btn flex-1"
-    >
-      {copyButtonText}
-    </button>
-    
-    {/* ADD THIS PRINT BUTTON */}
-    <button 
-      onClick={() => printCalculation('Flooring Calculator')}
-      className="copy-calc-btn flex-1"
-    >
-      🖨️ Print Results
-    </button>
-  </div>
-</div>
-              
-            </div>
+            </SectionCard>
           </div>
         )}
 

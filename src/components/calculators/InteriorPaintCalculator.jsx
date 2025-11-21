@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Calculator, Info } from 'lucide-react';
 import { trackCalculation } from '@/utils/tracking';
 import { trackCalculatorInteraction } from '@/utils/buttonTracking';
@@ -9,6 +9,15 @@ import { printCalculation } from '@/utils/printCalculation';
 import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
 import { FAQSection } from '@/components/FAQSection';
+import { 
+  NumberInput,
+  SelectInput,
+  MaterialCard,
+  SectionCard,
+  InputGrid,
+  CalculateButtons,
+  ResultsButtons
+} from '@/components/calculator';
 
 export default function PaintCalculator() {
   const [rooms, setRooms] = useState([{ 
@@ -16,12 +25,12 @@ export default function PaintCalculator() {
     length: '', 
     width: '', 
     height: '', 
-    doors: [{ id: 1, size: 'standard' }], // Array of individual doors
-    windows: [{ id: 1, size: 'standard' }, { id: 2, size: 'standard' }], // Array of individual windows
-    customDoorArea: '', // optional override for all doors
-    customWindowArea: '', // optional override for all windows
-    useCustomDoorSizes: false, // toggle for custom door sizes
-    useCustomWindowSizes: false // toggle for custom window sizes
+    doors: [{ id: 1, size: 'standard' }],
+    windows: [{ id: 1, size: 'standard' }, { id: 2, size: 'standard' }],
+    customDoorArea: '',
+    customWindowArea: '',
+    useCustomDoorSizes: false,
+    useCustomWindowSizes: false
   }]);
   
   // Wall paint settings
@@ -41,6 +50,50 @@ export default function PaintCalculator() {
   const [copyButtonText, setCopyButtonText] = useState('📋 Copy Calculation');
   
   const [showResults, setShowResults] = useState(false);
+  const resultsRef = useRef(null);
+
+  // Options arrays for SelectInput components
+  const coatOptions = [
+    { value: '1', label: '1 Coat' },
+    { value: '2', label: '2 Coats (Recommended)' },
+    { value: '3', label: '3 Coats' }
+  ];
+
+  const paintTypeOptions = [
+    { value: 'economy', label: 'Economy (350 sq ft/gal)' },
+    { value: 'standard', label: 'Standard (375 sq ft/gal)' },
+    { value: 'premium', label: 'Premium (400 sq ft/gal)' }
+  ];
+
+  const textureOptions = [
+    { value: 'smooth', label: 'Smooth (Standard)' },
+    { value: 'light', label: 'Light Texture (-15%)' },
+    { value: 'heavy', label: 'Heavy Texture (-25%)' },
+    { value: 'stucco', label: 'Interior Stucco (-50%)' }
+  ];
+
+  const conditionOptions = [
+    { value: 'painted', label: 'Previously Painted (no primer)' },
+    { value: 'unpainted', label: 'Unpainted/New Drywall (needs primer)' }
+  ];
+
+  const applicationOptions = [
+    { value: 'roller', label: 'Roller (Standard)' },
+    { value: 'spray', label: 'Spray (+33% paint)' }
+  ];
+
+  const doorSizeOptions = [
+    { value: 'small', label: 'Small/Closet - 15 sq ft' },
+    { value: 'standard', label: 'Standard - 20 sq ft' },
+    { value: 'large', label: 'Large/Double - 25 sq ft' }
+  ];
+
+  const windowSizeOptions = [
+    { value: 'small', label: 'Small - 10 sq ft' },
+    { value: 'standard', label: 'Standard - 15 sq ft' },
+    { value: 'large', label: 'Large - 25 sq ft' },
+    { value: 'xlarge', label: 'XLarge/Bay - 40 sq ft' }
+  ];
 
   const addRoom = () => {
     setRooms([...rooms, { 
@@ -304,8 +357,54 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
     };
 };
 
+  const handleCalculate = () => {
+    setShowResults(true);
+    
+    // Auto-scroll to results
+    setTimeout(() => {
+      resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+
+    // Track the calculation
+    const results = calculatePaint();
+    trackCalculation('interior-paint', {
+      rooms: rooms.map(room => ({
+        length: room.length,
+        width: room.width,
+        height: room.height,
+        doorsCount: room.doors.length,
+        windowsCount: room.windows.length,
+        useCustomDoorSizes: room.useCustomDoorSizes,
+        useCustomWindowSizes: room.useCustomWindowSizes
+      })),
+      paintWalls: paintWalls,
+      wallCoats: wallCoats,
+      wallSurfaceTexture: wallSurfaceTexture,
+      wallSurfaceCondition: wallSurfaceCondition,
+      wallApplicationMethod: wallApplicationMethod,
+      wallPaintType: wallPaintType,
+      paintCeiling: paintCeiling,
+      ceilingCoats: ceilingCoats,
+      ceilingSurfaceCondition: ceilingSurfaceCondition,
+      ceilingApplicationMethod: ceilingApplicationMethod,
+      ceilingPaintType: ceilingPaintType
+    }, {
+      totalWallArea: results.totalWallArea,
+      totalCeilingArea: results.totalCeilingArea,
+      wallGallons: results.walls ? results.walls.gallonsNeeded : 0,
+      wallPrimerGallons: results.walls ? results.walls.primerGallons : 0,
+      ceilingGallons: results.ceiling ? results.ceiling.gallonsNeeded : 0,
+      ceilingPrimerGallons: results.ceiling ? results.ceiling.primerGallons : 0,
+      totalGallons: (results.walls ? results.walls.gallonsNeeded : 0) + 
+                  (results.ceiling ? results.ceiling.gallonsNeeded : 0),
+      totalPrimerGallons: (results.walls ? results.walls.primerGallons : 0) + 
+                        (results.ceiling ? results.ceiling.primerGallons : 0),
+      roomCount: rooms.length
+    }); 
+    trackCalculatorInteraction.calculate('interior-paint', true);
+  };
+
   const handleReset = () => {
-    // Track Start Over button click
     trackCalculatorInteraction.startOver('interior-paint');
     
     // Reset all state to defaults
@@ -339,18 +438,13 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
     
     // Clear results
     setShowResults(false);
-    setResults(null);
   };
-
-  // Prevent scroll from changing number inputs
-  const preventScrollChange = (e) => {
-  e.target.blur();
-};
-
 
   const handleCopyCalculation = async () => {
     trackCalculatorInteraction.copyResults('interior-paint');
-    if (!showResults || !results) return;
+    if (!showResults) return;
+    
+    const results = calculatePaint();
     
     // Prepare inputs
     const inputsData = {
@@ -433,14 +527,9 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
           </div>
 
           {/* Room Measurements */}
-          <div className="space-y-6 mb-6">
-            <h2 className="text-xl font-semibold text-gray-700 flex items-center gap-2">
-              Room Measurements
-              <span className="text-sm font-normal text-gray-500">(in feet)</span>
-            </h2>
-            
+          <SectionCard title="Room Measurements" subtitle="Enter room dimensions in feet">
             {rooms.map((room, index) => (
-              <div key={room.id} className="bg-gray-50 p-4 rounded-lg border-2 border-gray-200">
+              <div key={room.id} className="bg-gray-50 p-4 rounded-lg border-2 border-gray-200 mb-4">
                 <div className="flex justify-between items-center mb-3">
                   <h3 className="font-semibold text-gray-700">Room {index + 1}</h3>
                   {rooms.length > 1 && (
@@ -453,50 +542,44 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                   )}
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Length</label>
-                    <input
-                      type="number"
-                      value={room.length}
-                      onWheel={preventScrollChange}
-                      onChange={(e) => { updateRoom(room.id, 'length', e.target.value); setTimeout(() => validate(getValues()), 100); }}
-                      className={`w-full px-3 py-2 border-2 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
-                        !room.length ? 'border-orange-400' : 'border-gray-300'
-                      }`}
-                      min="0"
-                      step="0.5"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Width</label>
-                    <input
-                      type="number"
-                      value={room.width}
-                      onWheel={preventScrollChange}
-                      onChange={(e) => { updateRoom(room.id, 'width', e.target.value); setTimeout(() => validate(getValues()), 100); }}
-                      className={`w-full px-3 py-2 border-2 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
-                        !room.width ? 'border-orange-400' : 'border-gray-300'
-                      }`}
-                      min="0"
-                      step="0.5"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Height</label>
-                    <input
-                      type="number"
-                      value={room.height}
-                      onWheel={preventScrollChange}
-                      onChange={(e) => updateRoom(room.id, 'height', e.target.value)}
-                      className={`w-full px-3 py-2 border-2 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
-                        !room.height ? 'border-orange-400' : 'border-gray-300'
-                      }`}
-                      min="0"
-                      step="0.5"
-                    />
-                  </div>
-                </div>
+                <InputGrid columns={3}>
+                  <NumberInput
+                    label="Length"
+                    value={room.length}
+                    onChange={(value) => {
+                      updateRoom(room.id, 'length', value);
+                      setTimeout(() => validate(getValues()), 100);
+                    }}
+                    unit="feet"
+                    required={true}
+                    fieldName={`room${index}-length`}
+                    min="0"
+                    step="0.5"
+                  />
+                  <NumberInput
+                    label="Width"
+                    value={room.width}
+                    onChange={(value) => {
+                      updateRoom(room.id, 'width', value);
+                      setTimeout(() => validate(getValues()), 100);
+                    }}
+                    unit="feet"
+                    required={true}
+                    fieldName={`room${index}-width`}
+                    min="0"
+                    step="0.5"
+                  />
+                  <NumberInput
+                    label="Height"
+                    value={room.height}
+                    onChange={(value) => updateRoom(room.id, 'height', value)}
+                    unit="feet"
+                    required={true}
+                    fieldName={`room${index}-height`}
+                    min="0"
+                    step="0.5"
+                  />
+                </InputGrid>
                 
                 {/* Doors Section */}
                 <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
@@ -528,15 +611,12 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       {room.doors.map((door, doorIndex) => (
                         <div key={door.id} className="flex gap-2 items-center">
                           <span className="text-xs text-gray-500 w-16">Door {doorIndex + 1}</span>
-                          <select
+                          <SelectInput
                             value={door.size}
-                            onChange={(e) => updateDoor(room.id, door.id, e.target.value)}
-                            className="flex-1 px-3 py-2 text-sm border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                          >
-                            <option value="small">Small/Closet - 15 sq ft</option>
-                            <option value="standard">Standard - 20 sq ft</option>
-                            <option value="large">Large/Double - 25 sq ft</option>
-                          </select>
+                            onChange={(value) => updateDoor(room.id, door.id, value)}
+                            options={doorSizeOptions}
+                            size="sm"
+                          />
                           {room.doors.length > 1 && (
                             <button
                               onClick={() => removeDoor(room.id, door.id)}
@@ -550,17 +630,16 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     </div>
                   ) : (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Total Door Area (sq ft)
-                      </label>
-                      <input
-                        type="number"
+                      <NumberInput
+                        label="Total Door Area"
                         value={room.customDoorArea}
-                        onWheel={preventScrollChange}
-                        onChange={(e) => { updateRoom(room.id, 'customDoorArea', e.target.value); setTimeout(() => validate(getValues()), 100); }}
-                        className={`w-full px-3 py-2 border-2 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
-                          !room.customDoorArea ? 'border-orange-400' : 'border-gray-300'
-                        }`}
+                        onChange={(value) => {
+                          updateRoom(room.id, 'customDoorArea', value);
+                          setTimeout(() => validate(getValues()), 100);
+                        }}
+                        unit="sq ft"
+                        required={true}
+                        fieldName="customDoorArea"
                         placeholder="e.g., 45"
                         min="0"
                         step="0.5"
@@ -600,16 +679,12 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       {room.windows.map((window, windowIndex) => (
                         <div key={window.id} className="flex gap-2 items-center">
                           <span className="text-xs text-gray-500 w-16">Window {windowIndex + 1}</span>
-                          <select
+                          <SelectInput
                             value={window.size}
-                            onChange={(e) => updateWindow(room.id, window.id, e.target.value)}
-                            className="flex-1 px-3 py-2 text-sm border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                          >
-                            <option value="small">Small - 10 sq ft</option>
-                            <option value="standard">Standard - 15 sq ft</option>
-                            <option value="large">Large - 25 sq ft</option>
-                            <option value="xlarge">XLarge/Bay - 40 sq ft</option>
-                          </select>
+                            onChange={(value) => updateWindow(room.id, window.id, value)}
+                            options={windowSizeOptions}
+                            size="sm"
+                          />
                           {room.windows.length > 0 && (
                             <button
                               onClick={() => removeWindow(room.id, window.id)}
@@ -623,17 +698,16 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     </div>
                   ) : (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Total Window Area (sq ft)
-                      </label>
-                      <input
-                        type="number"
+                      <NumberInput
+                        label="Total Window Area"
                         value={room.customWindowArea}
-                        onWheel={preventScrollChange}
-                        onChange={(e) => { updateRoom(room.id, 'customWindowArea', e.target.value); setTimeout(() => validate(getValues()), 100); }}
-                        className={`w-full px-3 py-2 border-2 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
-                          !room.customWindowArea ? 'border-orange-400' : 'border-gray-300'
-                        }`}
+                        onChange={(value) => {
+                          updateRoom(room.id, 'customWindowArea', value);
+                          setTimeout(() => validate(getValues()), 100);
+                        }}
+                        unit="sq ft"
+                        required={true}
+                        fieldName="customWindowArea"
                         placeholder="e.g., 60"
                         min="0"
                         step="0.5"
@@ -651,14 +725,12 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
             >
               + Add Another Room
             </button>
-          </div>
+          </SectionCard>
 
           {/* Paint Options */}
-          <div className="space-y-6 mb-6">
-            <h2 className="text-xl font-semibold text-gray-700">Paint Specifications</h2>
-            
+          <SectionCard title="Paint Specifications">
             {/* Wall Paint Section */}
-            <div className="border-2 border-gray-200 rounded-lg p-4">
+            <div className="border-2 border-gray-200 rounded-lg p-4 mb-4">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-800">Wall Paint</h3>
                 <div className="flex items-center gap-2 p-3 border-2 border-yellow-400 rounded-lg">
@@ -680,76 +752,38 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     </p>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Number of Coats</label>
-                    <select
-                      value={wallCoats}
-                      onChange={(e) => setWallCoats(parseInt(e.target.value))}
-                      className="w-full px-3 py-2 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                    >
-                      <option value="1">1 Coat</option>
-                      <option value="2">2 Coats (Recommended)</option>
-                      <option value="3">3 Coats</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Paint Quality</label>
-                    <select
+                  <InputGrid columns={2}>
+                    <SelectInput
+                      label="Number of Coats"
+                      value={wallCoats.toString()}
+                      onChange={(value) => setWallCoats(parseInt(value))}
+                      options={coatOptions}
+                    />
+                    <SelectInput
+                      label="Paint Quality"
                       value={wallPaintType}
-                      onChange={(e) => setWallPaintType(e.target.value)}
-                      className="w-full px-3 py-2 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                    >
-                      <option value="economy">Economy (350 sq ft/gal)</option>
-                      <option value="standard">Standard (375 sq ft/gal)</option>
-                      <option value="premium">Premium (400 sq ft/gal)</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Surface Texture</label>
-                    <select
+                      onChange={setWallPaintType}
+                      options={paintTypeOptions}
+                    />
+                    <SelectInput
+                      label="Surface Texture"
                       value={wallSurfaceTexture}
-                      onChange={(e) => setWallSurfaceTexture(e.target.value)}
-                      className="w-full px-3 py-2 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                    >
-                      <option value="smooth">Smooth (Standard)</option>
-                      <option value="light">Light Texture (-15%)</option>
-                      <option value="heavy">Heavy Texture (-25%)</option>
-                      <option value="stucco">Interior Stucco (-50%)</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Surface Condition
-                      <a href="#" className="ml-2 text-xs text-indigo-600 hover:text-indigo-800 underline">
-                        Learn more
-                      </a>
-                    </label>
-                    <select
+                      onChange={setWallSurfaceTexture}
+                      options={textureOptions}
+                    />
+                    <SelectInput
+                      label="Surface Condition"
                       value={wallSurfaceCondition}
-                      onChange={(e) => setWallSurfaceCondition(e.target.value)}
-                      className="w-full px-3 py-2 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                    >
-                      <option value="painted">Previously Painted (no primer)</option>
-                      <option value="unpainted">Unpainted/New Drywall (needs primer)</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Application Method</label>
-                    <select
+                      onChange={setWallSurfaceCondition}
+                      options={conditionOptions}
+                    />
+                    <SelectInput
+                      label="Application Method"
                       value={wallApplicationMethod}
-                      onChange={(e) => setWallApplicationMethod(e.target.value)}
-                      className="w-full px-3 py-2 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                    >
-                      <option value="roller">Roller (Standard)</option>
-                      <option value="spray">Spray (+33% paint)</option>
-                    </select>
-                  </div>
-                </div>
+                      onChange={setWallApplicationMethod}
+                      options={applicationOptions}
+                    />
+                  </InputGrid>
                 </>
               )}
             </div>
@@ -777,144 +811,74 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     </p>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Number of Coats</label>
-                    <select
-                      value={ceilingCoats}
-                      onChange={(e) => setCeilingCoats(parseInt(e.target.value))}
-                      className="w-full px-3 py-2 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                    >
-                      <option value="1">1 Coat</option>
-                      <option value="2">2 Coats (Recommended)</option>
-                      <option value="3">3 Coats</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Paint Quality</label>
-                    <select
+                  <InputGrid columns={2}>
+                    <SelectInput
+                      label="Number of Coats"
+                      value={ceilingCoats.toString()}
+                      onChange={(value) => setCeilingCoats(parseInt(value))}
+                      options={coatOptions}
+                    />
+                    <SelectInput
+                      label="Paint Quality"
                       value={ceilingPaintType}
-                      onChange={(e) => setCeilingPaintType(e.target.value)}
-                      className="w-full px-3 py-2 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                    >
-                      <option value="economy">Economy (350 sq ft/gal)</option>
-                      <option value="standard">Standard (375 sq ft/gal)</option>
-                      <option value="premium">Premium (400 sq ft/gal)</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Surface Condition
-                      <a href="#" className="ml-2 text-xs text-indigo-600 hover:text-indigo-800 underline">
-                        Learn more
-                      </a>
-                    </label>
-                    <select
+                      onChange={setCeilingPaintType}
+                      options={paintTypeOptions}
+                    />
+                    <SelectInput
+                      label="Surface Condition"
                       value={ceilingSurfaceCondition}
-                      onChange={(e) => setCeilingSurfaceCondition(e.target.value)}
-                      className="w-full px-3 py-2 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                    >
-                      <option value="painted">Previously Painted (no primer)</option>
-                      <option value="unpainted">Unpainted/New Drywall (needs primer)</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Application Method</label>
-                    <select
+                      onChange={setCeilingSurfaceCondition}
+                      options={conditionOptions}
+                    />
+                    <SelectInput
+                      label="Application Method"
                       value={ceilingApplicationMethod}
-                      onChange={(e) => setCeilingApplicationMethod(e.target.value)}
-                      className="w-full px-3 py-2 border-2 border-yellow-400 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                    >
-                      <option value="roller">Roller (Standard)</option>
-                      <option value="spray">Spray (+33% paint)</option>
-                    </select>
-                  </div>
-                </div>
+                      onChange={setCeilingApplicationMethod}
+                      options={applicationOptions}
+                    />
+                  </InputGrid>
                 </>
               )}
             </div>
-          </div>
-<ValidationDisplay />
-          {/* Calculate Button */}
-          <button
-            onClick={() => {
-              setShowResults(true);
-              
-              // Track the calculation
-              const results = calculatePaint();
-              trackCalculation('interior-paint', {
-                rooms: rooms.map(room => ({
-                  length: room.length,
-                  width: room.width,
-                  height: room.height,
-                  doorsCount: room.doors.length,
-                  windowsCount: room.windows.length,
-                  useCustomDoorSizes: room.useCustomDoorSizes,
-                  useCustomWindowSizes: room.useCustomWindowSizes
-                })),
-                paintWalls: paintWalls,
-                wallCoats: wallCoats,
-                wallSurfaceTexture: wallSurfaceTexture,
-                wallSurfaceCondition: wallSurfaceCondition,
-                wallApplicationMethod: wallApplicationMethod,
-                wallPaintType: wallPaintType,
-                paintCeiling: paintCeiling,
-                ceilingCoats: ceilingCoats,
-                ceilingSurfaceCondition: ceilingSurfaceCondition,
-                ceilingApplicationMethod: ceilingApplicationMethod,
-                ceilingPaintType: ceilingPaintType
-              }, {
-                totalWallArea: results.totalWallArea,
-                totalCeilingArea: results.totalCeilingArea,
-                wallGallons: results.walls ? results.walls.gallonsNeeded : 0,
-                wallPrimerGallons: results.walls ? results.walls.primerGallons : 0,
-                ceilingGallons: results.ceiling ? results.ceiling.gallonsNeeded : 0,
-                ceilingPrimerGallons: results.ceiling ? results.ceiling.primerGallons : 0,
-                totalGallons: (results.walls ? results.walls.gallonsNeeded : 0) + 
-                            (results.ceiling ? results.ceiling.gallonsNeeded : 0),
-                totalPrimerGallons: (results.walls ? results.walls.primerGallons : 0) + 
-                                  (results.ceiling ? results.ceiling.primerGallons : 0),
-                roomCount: rooms.length
-              }); trackCalculatorInteraction.calculate('interior-paint', true);
-            }}
-            disabled={!paintWalls && !paintCeiling}
-            className={`w-full py-3 rounded-lg transition-colors font-semibold text-lg shadow-lg ${
-              !paintWalls && !paintCeiling
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-indigo-600 text-white hover:bg-indigo-700'
-            }`}
-          >
-            {!paintWalls && !paintCeiling 
+          </SectionCard>
+
+          <ValidationDisplay />
+          
+          <CalculateButtons
+            onCalculate={handleCalculate}
+            onStartOver={handleReset}
+            showStartOver={showResults}
+            calculateDisabled={!paintWalls && !paintCeiling}
+            calculateText={!paintWalls && !paintCeiling 
               ? 'Select Walls or Ceiling to Calculate' 
               : 'Calculate Paint Needed'}
-          </button>
+          />
 
           {/* Results */}
           {showResults && results && (
-            <div className="mt-6 space-y-4">
+            <div ref={resultsRef} className="space-y-4">
               {/* Wall Paint Results */}
               {results.walls && (
-                <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-6 rounded-xl border-2 border-indigo-200">
-                  <h2 className="text-2xl font-bold text-indigo-900 mb-4">🎨 Wall Paint Estimate</h2>
-                  
+                <SectionCard title="🎨 Wall Paint Estimate" variant="info">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div className="bg-white p-4 rounded-lg shadow">
-                      <p className="text-sm text-gray-600">Wall Surface Area</p>
-                      <p className="text-2xl font-bold text-gray-800">{results.walls.area} sq ft</p>
-                    </div>
-                    
-                    <div className="bg-white p-4 rounded-lg shadow">
-                      <p className="text-sm text-gray-600">Coverage Rate</p>
-                      <p className="text-2xl font-bold text-gray-800">{results.walls.coverageRate} sq ft/gal</p>
-                    </div>
-
-                    <div className="bg-white p-4 rounded-lg shadow">
-                      <p className="text-sm text-gray-600">Coats Applied</p>
-                      <p className="text-2xl font-bold text-gray-800">{results.walls.coats} coat{results.walls.coats > 1 ? 's' : ''}</p>
-                    </div>
+                    <MaterialCard
+                      title="Wall Surface Area"
+                      value={results.walls.area}
+                      unit="sq ft"
+                      color="indigo"
+                    />
+                    <MaterialCard
+                      title="Coverage Rate"
+                      value={results.walls.coverageRate}
+                      unit="sq ft/gal"
+                      color="indigo"
+                    />
+                    <MaterialCard
+                      title="Coats Applied"
+                      value={results.walls.coats}
+                      unit={`coat${results.walls.coats > 1 ? 's' : ''}`}
+                      color="indigo"
+                    />
                   </div>
 
                   <div className="bg-indigo-600 text-white p-6 rounded-lg shadow-lg mb-4">
@@ -955,29 +919,31 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       </div>
                     </div>
                   </div>
-                </div>
+                </SectionCard>
               )}
 
               {/* Ceiling Paint Results */}
               {results.ceiling && (
-                <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-xl border-2 border-purple-200">
-                  <h2 className="text-2xl font-bold text-purple-900 mb-4">🏠 Ceiling Paint Estimate</h2>
-                  
+                <SectionCard title="🏠 Ceiling Paint Estimate" variant="info">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div className="bg-white p-4 rounded-lg shadow">
-                      <p className="text-sm text-gray-600">Ceiling Surface Area</p>
-                      <p className="text-2xl font-bold text-gray-800">{results.ceiling.area} sq ft</p>
-                    </div>
-                    
-                    <div className="bg-white p-4 rounded-lg shadow">
-                      <p className="text-sm text-gray-600">Coverage Rate</p>
-                      <p className="text-2xl font-bold text-gray-800">{results.ceiling.coverageRate} sq ft/gal</p>
-                    </div>
-
-                    <div className="bg-white p-4 rounded-lg shadow">
-                      <p className="text-sm text-gray-600">Coats Applied</p>
-                      <p className="text-2xl font-bold text-gray-800">{results.ceiling.coats} coat{results.ceiling.coats > 1 ? 's' : ''}</p>
-                    </div>
+                    <MaterialCard
+                      title="Ceiling Surface Area"
+                      value={results.ceiling.area}
+                      unit="sq ft"
+                      color="purple"
+                    />
+                    <MaterialCard
+                      title="Coverage Rate"
+                      value={results.ceiling.coverageRate}
+                      unit="sq ft/gal"
+                      color="purple"
+                    />
+                    <MaterialCard
+                      title="Coats Applied"
+                      value={results.ceiling.coats}
+                      unit={`coat${results.ceiling.coats > 1 ? 's' : ''}`}
+                      color="purple"
+                    />
                   </div>
 
                   <div className="bg-purple-600 text-white p-6 rounded-lg shadow-lg mb-4">
@@ -1015,30 +981,29 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       </div>
                     </div>
                   </div>
-                </div>
+                </SectionCard>
               )}
 
               {/* Summary if both are painted */}
               {results.walls && results.ceiling && (
-                <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-xl border-2 border-green-300">
-                  <h3 className="text-xl font-bold text-green-900 mb-3">📋 Shopping List Summary</h3>
+                <SectionCard title="📋 Shopping List Summary" variant="success">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="bg-white p-4 rounded-lg shadow">
-                      <p className="text-sm text-gray-600 mb-1">Total Wall Paint</p>
-                      <p className="text-3xl font-bold text-indigo-700">{results.walls.gallonsNeeded} gal</p>
-                      {results.walls.primerGallons > 0 && (
-                        <p className="text-sm text-gray-600 mt-2">+ {results.walls.primerGallons} gal primer</p>
-                      )}
-                    </div>
-                    <div className="bg-white p-4 rounded-lg shadow">
-                      <p className="text-sm text-gray-600 mb-1">Total Ceiling Paint</p>
-                      <p className="text-3xl font-bold text-purple-700">{results.ceiling.gallonsNeeded} gal</p>
-                      {results.ceiling.primerGallons > 0 && (
-                        <p className="text-sm text-gray-600 mt-2">+ {results.ceiling.primerGallons} gal primer</p>
-                      )}
-                    </div>
+                    <MaterialCard
+                      title="Total Wall Paint"
+                      value={results.walls.gallonsNeeded}
+                      unit="gal"
+                      color="indigo"
+                      subtitle={results.walls.primerGallons > 0 ? `+ ${results.walls.primerGallons} gal primer` : ''}
+                    />
+                    <MaterialCard
+                      title="Total Ceiling Paint"
+                      value={results.ceiling.gallonsNeeded}
+                      unit="gal"
+                      color="purple"
+                      subtitle={results.ceiling.primerGallons > 0 ? `+ ${results.ceiling.primerGallons} gal primer` : ''}
+                    />
                   </div>
-                </div>
+                </SectionCard>
               )}
 
               <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
@@ -1065,65 +1030,46 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
             <div className="p-4 bg-indigo-50 rounded-lg border border-indigo-200">
               <h3 className="font-semibold text-gray-700 mb-2 text-sm">📚 Helpful Guides:</h3>
               <ul className="space-y-2">
-  <li>
-    <Link href="/blog/measure-room-square-footage" className="text-indigo-600 hover:text-indigo-800 underline">
-      How to Measure Your Room & Calculate Square Footage (Start here!)
-    </Link>
-  </li>
-  <li>
-    <Link href="/blog/when-you-need-primer" className="text-indigo-600 hover:text-indigo-800 underline">
-      When You Actually Need Primer
-    </Link>
-  </li>
-  <li>
-    <Link href="/blog/dark-to-light-painting" className="text-indigo-600 hover:text-indigo-800 underline">
-      Dark to Light Color Changes
-    </Link>
-  </li>
-  <li>
-    <Link href="/blog/paint-sheen-guide" className="text-indigo-600 hover:text-indigo-800 underline">
-      Choosing the Right Paint Sheen
-    </Link>
-  </li>
-  <li>
-    <Link href="/blog/textured-wall-painting" className="text-indigo-600 hover:text-indigo-800 underline">
-      Textured Wall Painting Tips
-    </Link>
-  </li>
-  <li>
-    <Link href="/blog/interior-painting-guide" className="text-indigo-600 hover:text-indigo-800 underline">
-      Complete Interior Painting Guide
-    </Link>
-  </li>
-</ul>
+                <li>
+                  <Link href="/blog/measure-room-square-footage" className="text-indigo-600 hover:text-indigo-800 underline">
+                    How to Measure Your Room & Calculate Square Footage (Start here!)
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/blog/when-you-need-primer" className="text-indigo-600 hover:text-indigo-800 underline">
+                    When You Actually Need Primer
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/blog/dark-to-light-painting" className="text-indigo-600 hover:text-indigo-800 underline">
+                    Dark to Light Color Changes
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/blog/paint-sheen-guide" className="text-indigo-600 hover:text-indigo-800 underline">
+                    Choosing the Right Paint Sheen
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/blog/textured-wall-painting" className="text-indigo-600 hover:text-indigo-800 underline">
+                    Textured Wall Painting Tips
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/blog/interior-painting-guide" className="text-indigo-600 hover:text-indigo-800 underline">
+                    Complete Interior Painting Guide
+                  </Link>
+                </li>
+              </ul>
             </div>
             
-           {/* Action Buttons */}
-<div className="bg-white rounded-lg shadow-lg p-6">
-  <div className="flex gap-3">
-    <button 
-      onClick={handleCopyCalculation}
-      className="copy-calc-btn flex-1"
-    >
-      {copyButtonText}
-    </button>
-    
-    <button 
-      onClick={() => printCalculation('Interior Paint Calculator')}
-      className="copy-calc-btn flex-1"
-    >
-      🖨️ Print Results
-    </button>
-    
-    <button 
-      onClick={handleReset}
-      className="copy-calc-btn flex-1"
-    >
-      🔄 Start Over
-    </button>
-  </div>
-</div>
-            
+            <ResultsButtons
+              onCopy={handleCopyCalculation}
+              onPrint={() => printCalculation('Interior Paint Calculator')}
+              onStartOver={handleReset}
+              copyButtonText={copyButtonText}
+              showStartOver={true}
+            />
           </div>
         </div>
       </div>

@@ -1,6 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import { 
+  NumberInput,        
+  SelectInput,        
+  MaterialCard,       
+  SectionCard,        
+  InputGrid,          
+  CalculateButtons,   
+  ResultsButtons      
+} from '@/components/calculator';
 import { trackCalculation } from '@/utils/tracking';
 import { trackCalculatorInteraction } from '@/utils/buttonTracking';
 import { copyCalculation } from '@/utils/copyCalculation';
@@ -8,7 +17,6 @@ import { printCalculation } from '@/utils/printCalculation';
 import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
 import { FAQSection } from '@/components/FAQSection';
-
 
 const RoofingMaterialsCalculator = () => {
   // State for all inputs
@@ -27,10 +35,134 @@ const RoofingMaterialsCalculator = () => {
   const [includeRakeStarter, setIncludeRakeStarter] = useState(true);
   const [showResults, setShowResults] = useState(false);
   const [copyButtonText, setCopyButtonText] = useState('📋 Copy Calculation');
+  const resultsRef = useRef(null);
+
+  // Pitch multipliers table
+  const pitchMultipliers = {
+    1: 1.003, 2: 1.014, 3: 1.031, 4: 1.054, 5: 1.083,
+    6: 1.118, 7: 1.158, 8: 1.202, 9: 1.250, 10: 1.302,
+    11: 1.357, 12: 1.414, 13: 1.474, 14: 1.537, 15: 1.601,
+    16: 1.667, 18: 1.803, 20: 1.941, 24: 2.236
+  };
+
+  // Waste factors by complexity
+  const wasteFactors = {
+    simple: 0.10,
+    gable: 0.10,
+    hip: 0.15,
+    complex: 0.15,
+    highly_complex: 0.20
+  };
+
+  // Format options helper
+  const formatOptions = (optionsObj) => {
+    return Object.entries(optionsObj).map(([value, data]) => ({
+      value,
+      label: data.name || data
+    }));
+  };
+
+  // Roof complexity options
+  const complexityOptions = [
+    { value: 'simple', label: 'Simple Gable (10% waste)' },
+    { value: 'gable', label: 'Standard Gable with Valleys (10% waste)' },
+    { value: 'hip', label: 'Hip Roof (15% waste)' },
+    { value: 'complex', label: 'Complex Hip/Valley (15% waste)' },
+    { value: 'highly_complex', label: 'Highly Complex (20% waste)' }
+  ];
+
+  // Shingle type options
+  const shingleOptions = [
+    { value: '3-tab', label: '3-Tab Shingles (3 bundles/sq)' },
+    { value: 'architectural', label: 'Architectural Shingles (3 bundles/sq)' },
+    { value: 'luxury-belmont', label: 'Luxury - CertainTeed Belmont (4 bundles/sq)' },
+    { value: 'luxury-grand-manor', label: 'Luxury - Grand Manor (5 bundles/sq)' }
+  ];
+
+  // Underlayment options
+  const underlaymentOptions = [
+    { value: 'felt15', label: '#15 Felt (400 sq ft/roll)' },
+    { value: 'felt30', label: '#30 Felt (200 sq ft/roll)' },
+    { value: 'synthetic', label: 'Synthetic (1,000 sq ft/roll)' }
+  ];
+
+  // Wind zone options
+  const windZoneOptions = [
+    { value: 'standard', label: 'Standard (<110 mph) - 4 nails/shingle' },
+    { value: 'high', label: 'High Wind (≥110 mph) - 6 nails/shingle' }
+  ];
+
+  // Pitch options
+  const pitchOptions = Object.keys(pitchMultipliers).map(pitch => ({
+    value: pitch,
+    label: `${pitch}/12 (Multiplier: ${pitchMultipliers[pitch]})`
+  }));
+
+  const validationRules = {
+    roofLength: [
+      CommonRules.unrealistic(10, 200, 'Roof length')
+    ],
+    roofWidth: [
+      CommonRules.unrealistic(10, 200, 'Roof width')
+    ],
+    roofPitch: [
+      {
+        condition: (val) => parseFloat(val) < 2,
+        message: 'Pitch <2:12 requires special low-slope roofing materials',
+        type: ValidationTypes.WARNING
+      },
+      {
+        condition: (val) => parseFloat(val) > 18,
+        message: 'Steep pitch (>18:12) - consider safety equipment and access',
+        type: ValidationTypes.INFO
+      }
+    ],
+    ridgeLength: [
+      {
+        condition: (val, allVals) => {
+          const ridge = parseFloat(val);
+          const length = parseFloat(allVals.roofLength);
+          return ridge > 0 && ridge > length * 1.5;
+        },
+        message: 'Ridge length exceeds roof length - please verify',
+        type: ValidationTypes.WARNING
+      }
+    ],
+    atticArea: [
+      CommonRules.unrealistic(100, 10000, 'Attic area'),
+      {
+        condition: (val, allVals) => {
+          const attic = parseFloat(val);
+          const footprint = parseFloat(allVals.roofLength) * parseFloat(allVals.roofWidth);
+          return attic > 0 && attic > footprint * 2;
+        },
+        message: 'Attic area exceeds roof footprint significantly - verify measurement',
+        type: ValidationTypes.WARNING
+      }
+    ]
+  };
+
+  const getValues = () => ({
+    roofLength,
+    roofWidth,
+    roofPitch,
+    ridgeLength,
+    atticArea
+  });
+
+  const { validate, ValidationDisplay } = useValidation(validationRules);
 
   // Handler functions
   const handleCalculate = () => {
     setShowResults(true);
+    
+    // Auto-scroll to results
+    setTimeout(() => {
+      resultsRef.current?.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+      });
+    }, 100);
     
     // Track the calculation
     trackCalculation('roofing', {
@@ -70,62 +202,8 @@ const RoofingMaterialsCalculator = () => {
     trackCalculatorInteraction.calculate('roofing', true);
   };
 
-  const validationRules = {
-  roofLength: [
-    CommonRules.unrealistic(10, 200, 'Roof length')
-  ],
-  roofWidth: [
-    CommonRules.unrealistic(10, 200, 'Roof width')
-  ],
-  roofPitch: [
-    {
-      condition: (val) => parseFloat(val) < 2,
-      message: 'Pitch <2:12 requires special low-slope roofing materials',
-      type: ValidationTypes.WARNING
-    },
-    {
-      condition: (val) => parseFloat(val) > 18,
-      message: 'Steep pitch (>18:12) - consider safety equipment and access',
-      type: ValidationTypes.INFO
-    }
-  ],
-  ridgeLength: [
-    {
-      condition: (val, allVals) => {
-        const ridge = parseFloat(val);
-        const length = parseFloat(allVals.roofLength);
-        return ridge > 0 && ridge > length * 1.5;
-      },
-      message: 'Ridge length exceeds roof length - please verify',
-      type: ValidationTypes.WARNING
-    }
-  ],
-  atticArea: [
-    CommonRules.unrealistic(100, 10000, 'Attic area'),
-    {
-      condition: (val, allVals) => {
-        const attic = parseFloat(val);
-        const footprint = parseFloat(allVals.roofLength) * parseFloat(allVals.roofWidth);
-        return attic > 0 && attic > footprint * 2;
-      },
-      message: 'Attic area exceeds roof footprint significantly - verify measurement',
-      type: ValidationTypes.WARNING
-    }
-  ]
-};
-
-const getValues = () => ({
-  roofLength,
-  roofWidth,
-  roofPitch,
-  ridgeLength,
-  atticArea
-});
-
-const { validate, ValidationDisplay } = useValidation(validationRules);
-
   const handleStartOver = () => {
-    trackCalculatorInteraction.startOver('roofing');  // ✅ Moved inside!
+    trackCalculatorInteraction.startOver('roofing');
     setRoofLength(40);
     setRoofWidth(30);
     setRoofPitch(6);
@@ -140,7 +218,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
     setValleyLength(0);
     setIncludeRakeStarter(true);
     setShowResults(false);
-};  
+  };  
 
   const handleCopyCalculation = async () => {
     trackCalculatorInteraction.copyResults('roofing');
@@ -191,29 +269,6 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
       alert('Unable to copy. Please copy results manually.');
     }
   };
-
-  // Pitch multipliers table
-  const pitchMultipliers = {
-    1: 1.003, 2: 1.014, 3: 1.031, 4: 1.054, 5: 1.083,
-    6: 1.118, 7: 1.158, 8: 1.202, 9: 1.250, 10: 1.302,
-    11: 1.357, 12: 1.414, 13: 1.474, 14: 1.537, 15: 1.601,
-    16: 1.667, 18: 1.803, 20: 1.941, 24: 2.236
-  };
-
-  // Waste factors by complexity
-  const wasteFactors = {
-    simple: 0.10,
-    gable: 0.10,
-    hip: 0.15,
-    complex: 0.15,
-    highly_complex: 0.20
-  };
-
-
-  // Prevent scroll from changing number inputs
-const preventScrollChange = (e) => {
-  e.target.blur();
-};
 
   // Calculate roof area
   const footprint = roofLength * roofWidth;
@@ -320,161 +375,97 @@ const preventScrollChange = (e) => {
           <div className={`grid gap-6 p-6 ${showResults ? 'md:grid-cols-2' : 'md:grid-cols-1 max-w-3xl mx-auto'}`}>
             {/* Left Column - Inputs */}
             <div className="space-y-6">
-              <div className="bg-slate-50 rounded-lg p-5 border border-slate-200">
-                <h2 className="text-xl font-bold text-slate-800 mb-4 flex items-center">
-                  <span className="bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm">1</span>
-                  Roof Dimensions
-                </h2>
-                
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
-                      Length (feet)
-                    </label>
-                    <input
-                      type="number"
-                      value={roofLength}
-                      onWheel={preventScrollChange}
-                      onChange={(e) => {
-                        const newLength = Number(e.target.value);
-                        setRoofLength(newLength);
-                        setTimeout(() => validate(getValues()), 100);
-                        // Auto-update ridge length for convenience (user can override)
-                        if (ridgeLength === 0 || ridgeLength === roofLength) {
-                          setRidgeLength(newLength);
-                        }
-                        // Auto-update attic area to match footprint
-                        const newFootprint = newLength * roofWidth;
-                        if (atticArea === 0 || atticArea === roofLength * roofWidth) {
-                          setAtticArea(newFootprint);
-                        }
-                      }}
-                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                        !roofLength ? 'border-orange-400' : 'border-gray-300'
-                      }`}
-                    />
-                  </div>
+              <SectionCard title="Roof Dimensions" variant="info">
+                <InputGrid columns={1}>
+                  <NumberInput
+                    label="Length (feet)"
+                    value={roofLength}
+                    onChange={(value) => {
+                      const newLength = Number(value);
+                      setRoofLength(newLength);
+                      setTimeout(() => validate(getValues()), 100);
+                      // Auto-update ridge length for convenience (user can override)
+                      if (ridgeLength === 0 || ridgeLength === roofLength) {
+                        setRidgeLength(newLength);
+                      }
+                      // Auto-update attic area to match footprint
+                      const newFootprint = newLength * roofWidth;
+                      if (atticArea === 0 || atticArea === roofLength * roofWidth) {
+                        setAtticArea(newFootprint);
+                      }
+                    }}
+                    unit="feet"
+                    required={true}
+                    fieldName="roofLength"
+                  />
 
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
-                      Width (feet)
-                    </label>
-                    <input
-                      type="number"
-                      value={roofWidth}
-                      onWheel={preventScrollChange}
-                      onChange={(e) => {
-                        const newWidth = Number(e.target.value);
-                        setRoofWidth(newWidth);
-                        setTimeout(() => validate(getValues()), 100);
-                        // Auto-update attic area to match footprint (user can override)
-                        const newFootprint = roofLength * newWidth;
-                        if (atticArea === 0 || atticArea === roofLength * roofWidth) {
-                          setAtticArea(newFootprint);
-                        }
-                      }}
-                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                        !roofWidth ? 'border-orange-400' : 'border-gray-300'
-                      }`}
-                    />
-                  </div>
+                  <NumberInput
+                    label="Width (feet)"
+                    value={roofWidth}
+                    onChange={(value) => {
+                      const newWidth = Number(value);
+                      setRoofWidth(newWidth);
+                      setTimeout(() => validate(getValues()), 100);
+                      // Auto-update attic area to match footprint (user can override)
+                      const newFootprint = roofLength * newWidth;
+                      if (atticArea === 0 || atticArea === roofLength * roofWidth) {
+                        setAtticArea(newFootprint);
+                      }
+                    }}
+                    unit="feet"
+                    required={true}
+                    fieldName="roofWidth"
+                  />
 
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
-                      Roof Pitch (X/12)
-                    </label>
-                    <select
-                      value={roofPitch}
-                      onChange={(e) => { setRoofPitch(Number(e.target.value)); setTimeout(() => validate(getValues()), 100); }}
-                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      {Object.keys(pitchMultipliers).map(pitch => (
-                        <option key={pitch} value={pitch}>{pitch}/12 (Multiplier: {pitchMultipliers[pitch]})</option>
-                      ))}
-                    </select>
-                  </div>
+                  <SelectInput
+                    label="Roof Pitch (X/12)"
+                    value={roofPitch}
+                    onChange={(value) => { setRoofPitch(Number(value)); setTimeout(() => validate(getValues()), 100); }}
+                    options={pitchOptions}
+                  />
 
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
-                      Roof Complexity
-                    </label>
-                    <select
-                      value={roofComplexity}
-                      onChange={(e) => {
-                        const newComplexity = e.target.value;
-                        setRoofComplexity(newComplexity);
-                        // Reset hip length if switching to a roof type without hips
-                        if (newComplexity === 'simple' || newComplexity === 'gable') {
-                          setHipLength(0);
-                        }
-                        // Reset valley length if switching to simple gable (no valleys)
-                        if (newComplexity === 'simple') {
-                          setValleyLength(0);
-                        }
-                      }}
-                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="simple">Simple Gable (10% waste)</option>
-                      <option value="gable">Standard Gable with Valleys (10% waste)</option>
-                      <option value="hip">Hip Roof (15% waste)</option>
-                      <option value="complex">Complex Hip/Valley (15% waste)</option>
-                      <option value="highly_complex">Highly Complex (20% waste)</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
+                  <SelectInput
+                    label="Roof Complexity"
+                    value={roofComplexity}
+                    onChange={(value) => {
+                      const newComplexity = value;
+                      setRoofComplexity(newComplexity);
+                      // Reset hip length if switching to a roof type without hips
+                      if (newComplexity === 'simple' || newComplexity === 'gable') {
+                        setHipLength(0);
+                      }
+                      // Reset valley length if switching to simple gable (no valleys)
+                      if (newComplexity === 'simple') {
+                        setValleyLength(0);
+                      }
+                    }}
+                    options={complexityOptions}
+                  />
+                </InputGrid>
+              </SectionCard>
 
-              <div className="bg-slate-50 rounded-lg p-5 border border-slate-200">
-                <h2 className="text-xl font-bold text-slate-800 mb-4 flex items-center">
-                  <span className="bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm">2</span>
-                  Material Specifications
-                </h2>
-                
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
-                      Shingle Type
-                    </label>
-                    <select
-                      value={shingleType}
-                      onChange={(e) => setShingleType(e.target.value)}
-                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="3-tab">3-Tab Shingles (3 bundles/sq)</option>
-                      <option value="architectural">Architectural Shingles (3 bundles/sq)</option>
-                      <option value="luxury-belmont">Luxury - CertainTeed Belmont (4 bundles/sq)</option>
-                      <option value="luxury-grand-manor">Luxury - Grand Manor (5 bundles/sq)</option>
-                    </select>
-                  </div>
+              <SectionCard title="Material Specifications" variant="info">
+                <InputGrid columns={1}>
+                  <SelectInput
+                    label="Shingle Type"
+                    value={shingleType}
+                    onChange={setShingleType}
+                    options={shingleOptions}
+                  />
 
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
-                      Underlayment Type
-                    </label>
-                    <select
-                      value={underlaymentType}
-                      onChange={(e) => setUnderlaymentType(e.target.value)}
-                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="felt15">#15 Felt (400 sq ft/roll)</option>
-                      <option value="felt30">#30 Felt (200 sq ft/roll)</option>
-                      <option value="synthetic">Synthetic (1,000 sq ft/roll)</option>
-                    </select>
-                  </div>
+                  <SelectInput
+                    label="Underlayment Type"
+                    value={underlaymentType}
+                    onChange={setUnderlaymentType}
+                    options={underlaymentOptions}
+                  />
 
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
-                      Wind Zone
-                    </label>
-                    <select
-                      value={windZone}
-                      onChange={(e) => setWindZone(e.target.value)}
-                      className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="standard">Standard (&lt;110 mph) - 4 nails/shingle</option>
-                      <option value="high">High Wind (≥110 mph) - 6 nails/shingle</option>
-                    </select>
-                  </div>
+                  <SelectInput
+                    label="Wind Zone"
+                    value={windZone}
+                    onChange={setWindZone}
+                    options={windZoneOptions}
+                  />
 
                   <div className="flex items-center gap-2 p-3 border border-yellow-400 rounded-lg">
                     <input
@@ -499,122 +490,73 @@ const preventScrollChange = (e) => {
                       Include Starter Strip at Rakes
                     </label>
                   </div>
-                </div>
-              </div>
+                </InputGrid>
+              </SectionCard>
 
-              <div className="bg-slate-50 rounded-lg p-5 border border-slate-200">
-                <h2 className="text-xl font-bold text-slate-800 mb-4 flex items-center">
-                  <span className="bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm">3</span>
-                  Ventilation (Required)
-                </h2>
-                
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
-                      Attic Floor Area (sq ft) <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="number"
-                      value={atticArea}
-                      onWheel={preventScrollChange}
-                      onChange={(e) => { setAtticArea(Number(e.target.value)); setTimeout(() => validate(getValues()), 100); }}
-                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                        !atticArea ? 'border-orange-400' : 'border-gray-300'
-                      }`}
-                    />
-                    <p className="text-xs text-slate-500 mt-1">Required for IRC ventilation compliance. Typically equals footprint (length × width).</p>
-                  </div>
-                </div>
-              </div>
+              <SectionCard title="Ventilation (Required)" variant="info">
+                <InputGrid columns={1}>
+                  <NumberInput
+                    label="Attic Floor Area (sq ft)"
+                    value={atticArea}
+                    onChange={(value) => { setAtticArea(Number(value)); setTimeout(() => validate(getValues()), 100); }}
+                    unit="sq ft"
+                    required={true}
+                    fieldName="atticArea"
+                  />
+                </InputGrid>
+                <p className="text-xs text-slate-500 mt-2">Required for IRC ventilation compliance. Typically equals footprint (length × width).</p>
+              </SectionCard>
 
-              <div className="bg-slate-50 rounded-lg p-5 border border-slate-200">
-                <h2 className="text-xl font-bold text-slate-800 mb-4 flex items-center">
-                  <span className="bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm">4</span>
-                  {roofComplexity === 'simple' ? 'Ridge Details' : 'Ridge, Hip & Valley Details'}
-                </h2>
-                
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
-                      Ridge Length (feet) <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="number"
-                      value={ridgeLength}
-                      onWheel={preventScrollChange}
-                      onChange={(e) => { setRidgeLength(Number(e.target.value)); setTimeout(() => validate(getValues()), 100); }}
-                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                        !ridgeLength ? 'border-orange-400' : 'border-gray-300'
-                      }`}
-                    />
-                    <p className="text-xs text-slate-500 mt-1">All roofs have a ridge. For simple gable roofs, typically equals roof length.</p>
-                  </div>
+              <SectionCard title={roofComplexity === 'simple' ? 'Ridge Details' : 'Ridge, Hip & Valley Details'} variant="info">
+                <InputGrid columns={1}>
+                  <NumberInput
+                    label="Ridge Length (feet)"
+                    value={ridgeLength}
+                    onChange={(value) => { setRidgeLength(Number(value)); setTimeout(() => validate(getValues()), 100); }}
+                    unit="feet"
+                    required={true}
+                    fieldName="ridgeLength"
+                  />
+                  <p className="text-xs text-slate-500 -mt-2">All roofs have a ridge. For simple gable roofs, typically equals roof length.</p>
 
                   {/* Only show hip length for hip, complex, and highly complex roofs */}
                   {(roofComplexity === 'hip' || roofComplexity === 'complex' || roofComplexity === 'highly_complex') && (
-                    <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-2">
-                        Hip Length (feet) <span className="text-slate-400 text-xs">Optional</span>
-                      </label>
-                      <input
-                        type="number"
-                        value={hipLength}
-                        onChange={(e) => setHipLength(Number(e.target.value))}
-                        onWheel={preventScrollChange}
-                        className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                      <p className="text-xs text-slate-500 mt-1">For hip roofs - enter total length of all hips</p>
-                    </div>
+                    <NumberInput
+                      label="Hip Length (feet) - Optional"
+                      value={hipLength}
+                      onChange={(value) => setHipLength(Number(value))}
+                      unit="feet"
+                      required={false}
+                      fieldName="hipLength"
+                    />
                   )}
 
                   {/* Only show valley length for roofs with valleys (not simple gable) */}
                   {roofComplexity !== 'simple' && (
-                    <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-2">
-                        Valley Length (feet) <span className="text-slate-400 text-xs">Optional</span>
-                      </label>
-                      <input
-                        type="number"
-                        value={valleyLength}
-                        onChange={(e) => setValleyLength(Number(e.target.value))}
-                        onWheel={preventScrollChange}
-                        className="w-full px-4 py-2 border border-yellow-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                      <p className="text-xs text-slate-500 mt-1">Enter total length of all valleys on your roof</p>
-                    </div>
+                    <NumberInput
+                      label="Valley Length (feet) - Optional"
+                      value={valleyLength}
+                      onChange={(value) => setValleyLength(Number(value))}
+                      unit="feet"
+                      required={false}
+                      fieldName="valleyLength"
+                    />
                   )}
-                </div>
-              </div>
+                </InputGrid>
+              </SectionCard>
 
-              {/* Action Buttons */}
-              <div className="flex gap-4">
-                <button
-                  onClick={handleCalculate}
-                  className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold py-4 px-6 rounded-lg hover:from-blue-700 hover:to-blue-800 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
-                >
-                  Calculate Materials
-                </button>
-                
-                <button
-                  onClick={handleStartOver}
-                  className="flex-1 bg-slate-500 text-white font-bold py-4 px-6 rounded-lg hover:bg-slate-600 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
-                >
-                  <span className="flex items-center justify-center">
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                    Start Over
-                  </span>
-                </button>
-              </div>
+              <CalculateButtons
+                onCalculate={handleCalculate}
+                onStartOver={handleStartOver}
+                showStartOver={showResults}
+              />
             </div>
 
             {/* Right Column - Results */}
             {showResults ? (
-              <div className="space-y-6">
-                <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-5 border-2 border-blue-300">
-                  <h2 className="text-xl font-bold text-blue-900 mb-4">Calculation Summary</h2>
-                  
+              <div ref={resultsRef} className="space-y-6">
+                {/* Calculation Summary */}
+                <SectionCard title="Calculation Summary" variant="info">
                   <div className="space-y-3 text-sm">
                     <div className="flex justify-between py-2 border-b border-blue-200">
                       <span className="font-semibold text-slate-700">Footprint Area:</span>
@@ -637,205 +579,110 @@ const preventScrollChange = (e) => {
                       <span className="text-blue-900">{totalWithWaste.toFixed(0)} sq ft</span>
                     </div>
                   </div>
-                </div>
+                </SectionCard>
 
-                <div className="bg-white rounded-lg p-5 border-2 border-slate-300 shadow-lg">
-                  <h2 className="text-2xl font-bold text-slate-800 mb-6 pb-3 border-b-2 border-slate-200">
-                    Materials Required
-                  </h2>
+                {/* Materials Required */}
+                <SectionCard title="Materials Required" variant="default">
+                  <InputGrid columns={2}>
+                    <MaterialCard
+                      title="Shingles"
+                      value={squares.toFixed(2)}
+                      unit="squares"
+                      subtitle={`${totalBundles} bundles`}
+                      note={`${bundlesPerSquare} bundles per square`}
+                      color="green"
+                    />
 
-                  <div className="space-y-5">
-                    {/* Shingles */}
-                    <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
-                      <h3 className="font-bold text-lg text-slate-800 mb-3 flex items-center">
-                        <span className="bg-green-500 w-3 h-3 rounded-full mr-2"></span>
-                        Shingles
-                      </h3>
-                      <div className="grid grid-cols-2 gap-3 text-sm">
-                        <div>
-                          <div className="text-slate-600 font-medium">Squares</div>
-                          <div className="text-2xl font-bold text-green-700">{squares.toFixed(2)}</div>
-                        </div>
-                        <div>
-                          <div className="text-slate-600 font-medium">Bundles</div>
-                          <div className="text-2xl font-bold text-green-700">{totalBundles}</div>
-                        </div>
-                      </div>
-                      <div className="mt-2 text-xs text-slate-500">
-                        {bundlesPerSquare} bundles per square
-                      </div>
-                    </div>
+                    <MaterialCard
+                      title="Underlayment"
+                      value={underlaymentRolls}
+                      unit="rolls"
+                      subtitle={`${underlaymentCoverage} sq ft/roll`}
+                      note="Includes 10% waste for overlaps"
+                      color="purple"
+                    />
 
-                    {/* Underlayment */}
-                    <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
-                      <h3 className="font-bold text-lg text-slate-800 mb-3 flex items-center">
-                        <span className="bg-purple-500 w-3 h-3 rounded-full mr-2"></span>
-                        Underlayment
-                      </h3>
-                      <div className="text-sm">
-                        <div className="text-slate-600 font-medium">Rolls</div>
-                        <div className="text-2xl font-bold text-purple-700">{underlaymentRolls}</div>
-                      </div>
-                      <div className="mt-2 text-xs text-slate-500">
-                        {underlaymentCoverage} sq ft per roll (includes 10% waste for overlaps)
-                      </div>
-                    </div>
+                    <MaterialCard
+                      title="Starter Strips"
+                      value={starterBundles}
+                      unit="bundles"
+                      subtitle={`${perimeterLength.toFixed(0)} linear ft`}
+                      note={includeRakeStarter ? 'eaves + rakes' : 'eaves only'}
+                      color="orange"
+                    />
 
-                    {/* Starter Strips */}
-                    <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
-                      <h3 className="font-bold text-lg text-slate-800 mb-3 flex items-center">
-                        <span className="bg-orange-500 w-3 h-3 rounded-full mr-2"></span>
-                        Starter Strips
-                      </h3>
-                      <div className="text-sm">
-                        <div className="text-slate-600 font-medium">Bundles</div>
-                        <div className="text-2xl font-bold text-orange-700">{starterBundles}</div>
-                      </div>
-                      <div className="mt-2 text-xs text-slate-500">
-                        {perimeterLength.toFixed(0)} linear feet needed ({includeRakeStarter ? 'eaves + rakes' : 'eaves only'})
-                      </div>
-                    </div>
+                    <MaterialCard
+                      title="Ridge Cap"
+                      value={ridgeCapBundles}
+                      unit="bundles"
+                      subtitle={`${totalRidgeHip.toFixed(0)} linear ft`}
+                      note="ridge + hip + valley"
+                      color="red"
+                    />
 
-                    {/* Ridge Cap */}
-                    <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
-                      <h3 className="font-bold text-lg text-slate-800 mb-3 flex items-center">
-                        <span className="bg-red-500 w-3 h-3 rounded-full mr-2"></span>
-                        Ridge Cap
-                      </h3>
-                      <div className="text-sm">
-                        <div className="text-slate-600 font-medium">Bundles</div>
-                        <div className="text-2xl font-bold text-red-700">{ridgeCapBundles}</div>
-                      </div>
-                      <div className="mt-2 text-xs text-slate-500">
-                        {totalRidgeHip.toFixed(0)} linear feet (ridge + hip + valley)
-                      </div>
-                    </div>
-
-                    {/* Ice & Water Shield */}
                     {coldClimate && (
-                      <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
-                        <h3 className="font-bold text-lg text-slate-800 mb-3 flex items-center">
-                          <span className="bg-blue-500 w-3 h-3 rounded-full mr-2"></span>
-                          Ice & Water Shield
-                        </h3>
-                        <div className="text-sm">
-                          <div className="text-slate-600 font-medium">Rolls</div>
-                          <div className="text-2xl font-bold text-blue-700">{iceWaterRolls}</div>
-                        </div>
-                        <div className="mt-2 text-xs text-slate-500">
-                          225 sq ft per roll (eaves{valleyLength > 0 ? ' + valleys' : ''})
-                        </div>
-                      </div>
+                      <MaterialCard
+                        title="Ice & Water Shield"
+                        value={iceWaterRolls}
+                        unit="rolls"
+                        subtitle="225 sq ft per roll"
+                        note={`eaves${valleyLength > 0 ? ' + valleys' : ''}`}
+                        color="blue"
+                      />
                     )}
 
-                    {/* Drip Edge */}
-                    <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
-                      <h3 className="font-bold text-lg text-slate-800 mb-3 flex items-center">
-                        <span className="bg-teal-500 w-3 h-3 rounded-full mr-2"></span>
-                        Drip Edge
-                      </h3>
-                      <div className="text-sm">
-                        <div className="text-slate-600 font-medium">Pieces (10 ft each)</div>
-                        <div className="text-2xl font-bold text-teal-700">{dripEdgePieces}</div>
-                      </div>
-                      <div className="mt-2 text-xs text-slate-500">
-                        {totalPerimeter.toFixed(0)} linear feet total perimeter
-                      </div>
-                    </div>
+                    <MaterialCard
+                      title="Drip Edge"
+                      value={dripEdgePieces}
+                      unit="pieces"
+                      subtitle="10 ft each"
+                      note={`${totalPerimeter.toFixed(0)} linear ft total`}
+                      color="teal"
+                    />
 
-                    {/* Fasteners */}
-                    <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
-                      <h3 className="font-bold text-lg text-slate-800 mb-3 flex items-center">
-                        <span className="bg-yellow-500 w-3 h-3 rounded-full mr-2"></span>
-                        Fasteners
-                      </h3>
-                      <div className="space-y-2 text-sm">
-                        <div>
-                          <div className="text-slate-600 font-medium">Roofing Nails (boxes)</div>
-                          <div className="text-xl font-bold text-yellow-700">{nailBoxes}</div>
-                          <div className="text-xs text-slate-500">
-                            {totalShingleNails.toLocaleString()} nails ({nailsPerSquare}/sq) · 7,200/box
-                          </div>
-                        </div>
-                        <div>
-                          <div className="text-slate-600 font-medium">Cap Nails</div>
-                          <div className="text-xl font-bold text-yellow-700">{totalCapNails.toLocaleString()}</div>
-                          <div className="text-xs text-slate-500">
-                            For underlayment ({capNailsPerSquare}/sq)
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    <MaterialCard
+                      title="Roofing Nails"
+                      value={nailBoxes}
+                      unit="boxes"
+                      subtitle={`${totalShingleNails.toLocaleString()} nails`}
+                      note={`${nailsPerSquare}/sq · 7,200/box`}
+                      color="yellow"
+                    />
 
-                    {/* Ventilation */}
-                    <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
-                      <h3 className="font-bold text-lg text-slate-800 mb-3 flex items-center">
-                        <span className="bg-indigo-500 w-3 h-3 rounded-full mr-2"></span>
-                        Ventilation (IRC 1:150)
-                      </h3>
-                      <div className="space-y-2 text-sm">
-                        <div>
-                          <div className="text-slate-600 font-medium">Ridge Vent Needed</div>
-                          <div className="text-xl font-bold text-indigo-700">{adjustedRidgeVent} linear feet</div>
-                          <div className="text-xs text-slate-500">
-                            {exhaustNFA.toFixed(0)} sq in exhaust NFA required
-                          </div>
-                        </div>
-                        <div>
-                          <div className="text-slate-600 font-medium">Soffit Vent Required</div>
-                          <div className="text-xl font-bold text-indigo-700">{intakeNFA.toFixed(0)} sq in</div>
-                          <div className="text-xs text-slate-500">
-                            Must equal or exceed exhaust
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                    <MaterialCard
+                      title="Ridge Vent"
+                      value={adjustedRidgeVent}
+                      unit="linear ft"
+                      subtitle={`${exhaustNFA.toFixed(0)} sq in NFA`}
+                      note="IRC 1:150 ratio required"
+                      color="indigo"
+                    />
+                  </InputGrid>
+                </SectionCard>
 
                 {/* Technical Notes */}
-                <div className="bg-amber-50 rounded-lg p-4 border border-amber-300">
-                  <h3 className="font-bold text-amber-900 mb-2 flex items-center">
-                    <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd"/>
-                    </svg>
-                    Technical Notes
-                  </h3>
-                  <ul className="text-xs text-amber-900 space-y-1 ml-7">
-                    <li>• All calculations comply with IRC/IBC building codes</li>
-                    <li>• Waste factors based on roof complexity per NRCA guidelines</li>
-                    <li>• High wind zones (≥110 mph) require 6-nail pattern + hand-sealing</li>
-                    <li>• Ice & water shield extends 24" inside exterior wall per IRC R905.2.8.2</li>
-                    <li>• Ridge vent assumes 18 sq in NFA per linear foot (industry standard)</li>
-                    <li>• Ventilation calculations assume 1:150 ratio per IRC R806</li>
+                <SectionCard title="Technical Notes" variant="warning">
+                  <ul className="text-sm space-y-1 list-disc list-inside">
+                    <li>All calculations comply with IRC/IBC building codes</li>
+                    <li>Waste factors based on roof complexity per NRCA guidelines</li>
+                    <li>High wind zones (≥110 mph) require 6-nail pattern + hand-sealing</li>
+                    <li>Ice & water shield extends 24" inside exterior wall per IRC R905.2.8.2</li>
+                    <li>Ridge vent assumes 18 sq in NFA per linear foot (industry standard)</li>
+                    <li>Ventilation calculations assume 1:150 ratio per IRC R806</li>
                   </ul>
-                </div>
-              
-<ValidationDisplay />
-              {/* Copy Calculation Button */}
-<div className="bg-white rounded-lg shadow-lg p-6">
-  <div className="flex gap-3">
-    <button 
-      onClick={handleCopyCalculation}
-      className="copy-calc-btn flex-1"
-    >
-      {copyButtonText}
-    </button>
-    
-    {/* ADD THIS PRINT BUTTON */}
-    <button 
-      onClick={() => {
-  trackCalculatorInteraction.print('roofing');
-  printCalculation('Roofing Calculator');
-}}
-      className="copy-calc-btn flex-1"
-    >
-      🖨️ Print Results
-    </button>
-  </div>
-</div>
+                </SectionCard>
+
+                <ValidationDisplay />
+
+                <ResultsButtons
+                  onCopy={handleCopyCalculation}
+                  onPrint={() => {
+                    trackCalculatorInteraction.print('roofing');
+                    printCalculation('Roofing Calculator');
+                  }}
+                  copyButtonText={copyButtonText}
+                />
               </div>
-              
             ) : (
               <div className="flex items-center justify-center h-full">
                 <div className="text-center p-8">
