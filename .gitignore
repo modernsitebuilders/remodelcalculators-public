@@ -39,3 +39,17 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# PROPRIETARY CALCULATOR LOGIC - Private repo only
+src/components/calculators/
+src/app/concrete-calculator/
+src/app/drywall-calculator/
+src/app/roofing-calculator/
+src/app/exterior-paint-calculator/
+src/app/interior-paint-calculator/
+src/app/deck-stain-calculator/
+src/app/flooring-calculator/
+src/app/mulch-calculator/
+src/app/fence-calculator/
+src/app/siding-calculator/
+src/data/calculatorData.js
