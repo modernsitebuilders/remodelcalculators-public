@@ -492,7 +492,7 @@ const MulchCalculator = () => {
                       <MaterialCard
                         title="Bags Required"
                         value={bagsNeeded.toString()}
-                        subtitle="bags"
+                        unit="bags"
                         note={`${bagSize} cu ft bags`}
                         color="green"
                       />
@@ -501,7 +501,7 @@ const MulchCalculator = () => {
                     <MaterialCard
                       title="Estimated Weight"
                       value={estimatedWeight.toLocaleString()}
-                      subtitle="lbs"
+                      unit="lbs"
                       note={`${(estimatedWeight / 2000).toFixed(2)} tons`}
                       color="green"
                     />
