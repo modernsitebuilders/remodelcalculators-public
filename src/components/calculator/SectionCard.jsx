@@ -18,7 +18,9 @@ export function SectionCard({
   children,
   variant = 'default',
   collapsible = false,
-  defaultExpanded = true
+  defaultExpanded = true,
+  style,
+  className
 }) {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
 
@@ -37,7 +39,7 @@ export function SectionCard({
   );
 
   return (
-    <div className={`${variantClasses[variant]} rounded-lg p-6`}>
+    <div className={`${variantClasses[variant]} rounded-lg p-6 ${className || ''}`} style={style}>
       {collapsible ? (
         <>
           <button

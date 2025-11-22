@@ -20,6 +20,8 @@ import { useValidation } from '@/hooks/useValidation';
 import { FAQSection } from '@/components/FAQSection';
 
 const SidingCalculator = () => {
+    console.log("SIDING CALCULATOR LOADED - FILE IS CORRECT");  // ADD THIS LINE
+
   const [step, setStep] = useState(1);
   const [projectData, setProjectData] = useState({
     // Project Info
@@ -766,7 +768,7 @@ const SidingCalculator = () => {
         </SectionCard>
 
         {/* Main Content */}
-        <SectionCard variant="default">
+        <SectionCard variant="default" className="!overflow-visible">
           {/* Step 1: Project Information */}
           {step === 1 && (
             <div className="space-y-6">
@@ -1321,50 +1323,49 @@ const SidingCalculator = () => {
               />
             </div>
           )}
-
-          {/* Navigation Buttons */}
-          <div className="flex justify-between mt-8 pt-6 border-t border-gray-200">
+        </SectionCard>  {/* This closes the MAIN content SectionCard */}
+        
+        {/* Navigation Buttons - Absolutely positioned to guarantee visibility */}
+        <div style={{
+          position: 'relative',
+          height: '80px',
+          marginTop: '20px'
+        }}>
+          <button
+            onClick={() => setStep(Math.max(1, step - 1))}
+            disabled={step === 1}
+            style={{
+              position: 'absolute',
+              left: '0',
+              padding: '10px 20px',
+              background: step === 1 ? '#ccc' : '#6b7280',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: step === 1 ? 'not-allowed' : 'pointer'
+            }}
+          >
+            ← Previous
+          </button>
+          
+          {step < 4 && (
             <button
-              onClick={() => setStep(Math.max(1, step - 1))}
-              disabled={step === 1}
-              className="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 disabled:bg-gray-200 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
+              onClick={() => setStep(step + 1)}
+              style={{
+                position: 'absolute',
+                right: '0',
+                padding: '10px 20px',
+                background: '#4f46e5',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer'
+              }}
             >
-              <ChevronLeft className="w-4 h-4" />
-              Previous
+              Next →
             </button>
-            {step < 4 && (
-              <button
-                onClick={() => setStep(step + 1)}
-                className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 cursor-pointer flex items-center gap-2"
-              >
-                Next
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            )}
-            {step === 4 && (
-              <div className="flex flex-col items-end gap-2">
-                {!canCalculate() && (
-                  <p className="text-sm text-red-600">Enter at least one wall section with dimensions to calculate</p>
-                )}
-                <ValidationDisplay />
-                <button
-                  onClick={calculateMaterials}
-                  disabled={!canCalculate()}
-                  className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 cursor-pointer disabled:bg-gray-300 disabled:cursor-not-allowed"
-                >
-                  Calculate Materials
-                </button>
-              </div>
-            )}
-            {step === 5 && (
-              <CalculateButtons
-                onCalculate={() => {}} // Not used in results step
-                onStartOver={handleStartOver}
-                showStartOver={true}
-              />
-            )}
-          </div>
-        </SectionCard>
+          )}
+        </div>
       </div>
       <FAQSection calculatorId="siding-calculator" />
     </div>
