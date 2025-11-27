@@ -9,18 +9,21 @@ export default function PageViewTracker() {
   const pathname = usePathname()
   
   useEffect(() => {
-    fetch(TRACKING_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        siteId: 'construction-calcs',
-        type: 'view',
-        pageUrl: window.location.href,
-        pagePath: pathname
-      })
-    }).catch(err => console.error('Tracking error:', err))
+    const data = {
+      siteId: 'construction-calcs',
+      type: 'view',
+      pageUrl: window.location.href,
+      pagePath: pathname
+    };
+    
+    const params = new URLSearchParams({
+      data: JSON.stringify(data)
+    });
+    
+    fetch(`${TRACKING_URL}?${params}`, {
+      method: 'GET',
+      mode: 'no-cors'
+    }).catch(err => console.error('Tracking error:', err));
   }, [pathname])
   
   return null
