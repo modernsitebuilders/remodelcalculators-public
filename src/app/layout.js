@@ -50,6 +50,7 @@ export default function RootLayout({ children }) {
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}>
         <GoogleAnalytics measurementId={SITE_CONFIG.analytics.measurementId} />
+        <PageViewTracker />
         <Header />
         <main className="flex-grow">
           {children}
