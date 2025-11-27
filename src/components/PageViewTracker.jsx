@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 
-const TRACKING_URL = 'https://script.google.com/macros/s/AKfycbxYGxHPw4K_3HqdkhWWSM4dluNjSDi5z1o8saJItfXUESSSSWgMQy8VVzOy4pWijwBB9/exec';
+const TRACKING_URL = 'https://script.google.com/macros/s/AKfycbzPrWZStk68IH2GAUyAawa97mN7OCPdo9Ly5ZSM-B6Y4qpJpqusDmyAZ1npR1VUXxs3/exec';
 
 export default function PageViewTracker() {
   const pathname = usePathname()
