@@ -5,6 +5,7 @@ import Footer from '@/components/layout/Footer';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import SiteSchema from '@/components/SiteSchema';
 import { SITE_CONFIG } from '@/data/siteConfig';
+import PageViewTracker from '@/components/PageViewTracker'
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -57,4 +58,15 @@ export default function RootLayout({ children }) {
       </body>
     </html>
   );
+}
+
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body>
+        <PageViewTracker />
+        {children}
+      </body>
+    </html>
+  )
 }
