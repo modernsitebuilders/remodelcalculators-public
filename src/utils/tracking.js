@@ -3,8 +3,8 @@
  * Tracks to both Google Sheets and Google Analytics 4
  */
 
-// REPLACE WITH YOUR DEPLOYED APPS SCRIPT URL
-const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzG6EphsB_DShdNMO3K7Zh3PZ8y6g_hNEesYw_7Vh4s_JbkCDlvpE5yh3vpJPqDXJHJ/exec';
+// UPDATED WITH NEW DEPLOYMENT URL
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzPrWZStk68IH2GAUyAawa97mN7OCPdo9Ly5ZSM-B6Y4qpJpqusDmyAZ1npR1VUXxs3/exec';
 
 /**
  * Track calculation to both Google Sheets and GA4
@@ -18,7 +18,8 @@ export async function trackCalculation(calculatorType, inputs, result) {
   
   // Build the tracking payload for Sheets
   const trackingData = {
-    siteId: 'job-calculators',
+    siteId: 'construction-calcs',
+    type: 'calculation', // NEW: Distinguishes from page views
     calculatorType: calculatorType || 'unknown',
     inputs: inputs || {},
     result: result || {},
@@ -45,13 +46,14 @@ async function trackToSheets(trackingData) {
   try {
     console.log('📤 Sending to Google Sheets...');
     
-    await fetch(SHEETS_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(trackingData),
-      mode: 'no-cors' // Required for Apps Script
+    // Use GET with URL parameters to avoid CORS issues
+    const params = new URLSearchParams({
+      data: JSON.stringify(trackingData)
+    });
+    
+    await fetch(`${SHEETS_URL}?${params}`, {
+      method: 'GET',
+      mode: 'no-cors'
     });
     
     console.log('✅ Sheets tracking sent successfully');
@@ -115,7 +117,7 @@ if (typeof window !== 'undefined') {
     );
     
     console.log('✅ Test complete!');
-    console.log('📋 Check your Google Sheet: "Calculator Tracking" tab');
+    console.log('📋 Check your Google Sheet: "construction-calcs" tab');
     console.log('📊 Check GA4: Realtime → Events');
     return result;
   };
