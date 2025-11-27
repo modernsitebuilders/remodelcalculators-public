@@ -59,14 +59,3 @@ export default function RootLayout({ children }) {
     </html>
   );
 }
-
-export default function RootLayout({ children }) {
-  return (
-    <html>
-      <body>
-        <PageViewTracker />
-        {children}
-      </body>
-    </html>
-  )
-}
