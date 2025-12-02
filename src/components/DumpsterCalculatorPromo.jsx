@@ -10,7 +10,7 @@ export default function DumpsterCalculatorPromo() {
           <p className="text-gray-700 text-sm">
             After calculating materials, plan for debris disposal with our{' '}
             <a 
-              href="https://dumpster-size-calculator.com" 
+              href="https://rightdumpster.com" 
               target="_blank" 
               rel="noopener noreferrer"
               className="text-blue-600 font-bold hover:text-blue-800 hover:underline transition-colors"

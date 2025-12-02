@@ -36,7 +36,7 @@ export default function Footer() {
                   Need to plan for waste disposal?
                 </p>
                 <a 
-                  href="https://dumpster-size-calculator.com" 
+                  href="https://rightdumpster.com" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-orange-400 hover:text-orange-300 transition-colors font-semibold inline-flex items-center gap-2 group"
