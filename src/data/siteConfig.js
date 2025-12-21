@@ -1,6 +1,6 @@
 export const SITE_CONFIG = {
-  name: 'Job Calculators',
-  baseUrl: 'https://jobcalculators.com',
+  name: 'Remodel Calculators',
+  baseUrl: 'https://remodelcalculators.com',
   analytics: {
     measurementId: 'G-KZBWPC3X69'
   },
@@ -11,7 +11,7 @@ export const SITE_CONFIG = {
 
 export const METADATA_DEFAULTS = {
   openGraph: {
-    siteName: 'Job Calculators',
+    siteName: 'Remodel Calculators',
     locale: 'en_US',
     type: 'website',
     imageDimensions: {

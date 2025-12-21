@@ -4,7 +4,7 @@ import { blogPosts } from '@/data/blogPosts';
 export const metadata = {
   title: 'Construction Guides & Resources | Construction Calculators',
   description: 'Expert guides on concrete, drywall, roofing, paint, flooring, and more. Industry standards and professional specifications for contractors and DIY builders.',
-  alternates: { canonical: 'https://jobcalculators.com/blog' },
+  alternates: { canonical: 'https://remodelcalculators.com/blog' },
 };
 
 export default function BlogPage() {

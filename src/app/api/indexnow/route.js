@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 const INDEXNOW_KEY = '85d27a70d7aa4d84a8eed19e81147a90';
-const SITE_URL = 'https://jobcalculators.com';
+const SITE_URL = 'https://remodelcalculators.com';
 
 export async function POST(request) {
   try {
@@ -18,7 +18,7 @@ export async function POST(request) {
 
     // Prepare the payload for IndexNow
     const payload = {
-      host: 'jobcalculators.com',
+      host: 'remodelcalculators.com',
       key: INDEXNOW_KEY,
       keyLocation: `${SITE_URL}/${INDEXNOW_KEY}.txt`,
     };

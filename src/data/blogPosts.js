@@ -124,7 +124,7 @@ export const blogPosts = [
   title: 'How to Measure Your Room & Calculate Square Footage',
   description: 'Professional measurement techniques for accurate paint material calculations.',
   date: '2025-11-05',
-  author: 'Job Calculators',
+  author: 'Remodel Calculators',
   category: 'Painting',
   keywords: ['room measurement', 'square footage calculator', 'wall measurement', 'paint calculation', 'measuring for paint']
 },
@@ -133,7 +133,7 @@ export const blogPosts = [
   title: 'When You Need Primer: Drywall, Wood & Bare Surface Guide',
   description: 'Industry guidelines on primer requirements with no marketing BS.',
   date: '2025-11-05',
-  author: 'Job Calculators',
+  author: 'Remodel Calculators',
   category: 'Painting',
   keywords: ['primer', 'paint primer', 'when to use primer', 'primer requirements', 'painting prep']
 },
@@ -142,7 +142,7 @@ export const blogPosts = [
   title: 'Dark to Light Color Changes: Professional Guide',
   description: 'Industry-standard methods for covering dark paint with light colors.',
   date: '2025-11-05',
-  author: 'Job Calculators',
+  author: 'Remodel Calculators',
   category: 'Painting',
   keywords: ['dark to light paint', 'covering dark paint', 'painting over dark colors', 'tinted primer', 'paint color change']
 },
@@ -151,7 +151,7 @@ export const blogPosts = [
   title: 'Choosing the Right Paint Sheen',
   description: 'Professional guide to paint finishes - flat, eggshell, satin, semi-gloss, and gloss.',
   date: '2025-11-05',
-  author: 'Job Calculators',
+  author: 'Remodel Calculators',
   category: 'Painting',
   keywords: ['paint sheen', 'paint finish', 'flat paint', 'eggshell paint', 'satin paint', 'semi-gloss paint']
 },
@@ -160,7 +160,7 @@ export const blogPosts = [
   title: 'Textured Wall Painting: Coverage Rates for Stucco & Popcorn',
   description: 'Professional techniques for painting knockdown, orange peel, and popcorn textures.',
   date: '2025-11-05',
-  author: 'Job Calculators',
+  author: 'Remodel Calculators',
   category: 'Painting',
   keywords: ['textured walls', 'knockdown texture', 'orange peel texture', 'popcorn ceiling', 'painting texture']
 },
@@ -169,7 +169,7 @@ export const blogPosts = [
   title: 'Complete Interior Painting Guide',
   description: 'Professional start-to-finish guide for interior painting projects.',
   date: '2025-11-05',
-  author: 'Job Calculators',
+  author: 'Remodel Calculators',
   category: 'Painting',
   keywords: ['interior painting', 'painting guide', 'how to paint', 'painting tips', 'professional painting']
 }

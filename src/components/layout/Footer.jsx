@@ -10,7 +10,7 @@ export default function Footer() {
           {/* Brand Section */}
           <div className="col-span-1 md:col-span-1">
             <h3 className="text-white text-xl font-bold mb-4">
-              Job Calculators
+              Remodel Calculators
             </h3>
             <p className="text-sm text-gray-400 mb-4 leading-relaxed">
               Free, accurate construction calculators for contractors, builders, and DIY enthusiasts.
@@ -181,7 +181,7 @@ export default function Footer() {
         <div className="border-t border-gray-800 mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-sm text-gray-500 text-center md:text-left">
-              © {currentYear} Job Calculators. All rights reserved.
+              © {currentYear} Remodel Calculators. All rights reserved.
               <span className="block md:inline md:ml-2 mt-2 md:mt-0 text-gray-600">
                 A Modern Site Builders Production
               </span>

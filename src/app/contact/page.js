@@ -1,7 +1,7 @@
 export const metadata = {
-  title: 'Contact Job Calculators - Construction Calculator Support',
-  description: 'Get in touch with Job Calculators for questions, feedback, or support.',
-  alternates: { canonical: 'https://jobcalculators.com/contact' },
+  title: 'Contact Remodel Calculators - Construction Calculator Support',
+  description: 'Get in touch with Remodel Calculators for questions, feedback, or support.',
+  alternates: { canonical: 'https://remodelcalculators.com/contact' },
 };
 
 export default function Contact() {
@@ -28,10 +28,10 @@ export default function Contact() {
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">Website</h3>
                 <a 
-                  href="https://jobcalculators.com" 
+                  href="https://remodelcalculators.com" 
                   className="text-blue-600 hover:text-blue-700 hover:underline"
                 >
-                  jobcalculators.com
+                  remodelcalculators.com
                 </a>
               </div>
 
@@ -105,7 +105,7 @@ export default function Contact() {
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-8 text-center">
           <h2 className="text-2xl font-semibold text-gray-900 mb-4">We Value Your Feedback</h2>
           <p className="text-gray-700 mb-6 max-w-2xl mx-auto">
-            Help us improve Job Calculators by sharing your experience, reporting issues, or suggesting new features. Your input helps us build better tools for the construction community.
+            Help us improve Remodel Calculators by sharing your experience, reporting issues, or suggesting new features. Your input helps us build better tools for the construction community.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <div className="bg-white px-6 py-3 rounded-lg shadow">

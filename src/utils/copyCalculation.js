@@ -28,7 +28,7 @@ MATERIALS NEEDED:
 ${outputsText}
 ${note ? 'Note: ' + note : ''}
 
-Calculated at jobcalculators.com
+Calculated at remodelcalculators.com
   `.trim();
 
   // Copy to clipboard

@@ -1,7 +1,7 @@
 /**
  * Calculator Shared Components
  * 
- * Reusable UI components for all jobcalculators.com calculators
+ * Reusable UI components for all remodelcalculators.com calculators
  * Ensures consistency, reduces duplication, maintains dry fact-based standards
  */
 

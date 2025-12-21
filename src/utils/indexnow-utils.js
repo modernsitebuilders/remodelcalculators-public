@@ -3,11 +3,11 @@
  * Instantly notify search engines when content changes
  */
 
-const SITE_URL = 'https://jobcalculators.com';
+const SITE_URL = 'https://remodelcalculators.com';
 
 /**
  * Submit a single URL to IndexNow
- * @param {string} url - Full URL to submit (e.g., 'https://jobcalculators.com/concrete-calculator')
+ * @param {string} url - Full URL to submit (e.g., 'https://remodelcalculators.com/concrete-calculator')
  */
 export async function submitToIndexNow(url) {
   try {

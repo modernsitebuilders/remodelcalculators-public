@@ -1,7 +1,7 @@
 import { blogPosts } from '@/data/blogPosts';
 
 export default function sitemap() {
-  const baseUrl = 'https://jobcalculators.com';
+  const baseUrl = 'https://remodelcalculators.com';
   
   // Static pages
   const staticPages = [

@@ -18,7 +18,7 @@ export function generateCalculatorSchema(calculatorData) {
 
 // Generate BreadcrumbList schema for calculator pages
 export function generateCalculatorBreadcrumbSchema(calculatorData) {
-  const baseUrl = 'https://jobcalculators.com';
+  const baseUrl = 'https://remodelcalculators.com';
   
   return {
   '@context': 'https://schema.org',

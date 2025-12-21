@@ -33,7 +33,7 @@ export async function generateMetadata() {
       title: data.openGraph.title,
       description: data.openGraph.description,
       url: data.openGraph.url,
-      siteName: 'Job Calculators',
+      siteName: 'Remodel Calculators',
       images: [{ url: data.openGraph.image, width: 1200, height: 630, alt: data.name }],
       locale: 'en_US',
       type: 'website',

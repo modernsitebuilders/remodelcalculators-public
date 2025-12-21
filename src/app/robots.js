@@ -9,6 +9,6 @@ export default function robots() {
       ],
       // DO NOT block /_next/static/ - Google needs this
     },
-    sitemap: 'https://jobcalculators.com/sitemap.xml',
+    sitemap: 'https://remodelcalculators.com/sitemap.xml',
   };
 }

@@ -1,7 +1,7 @@
 export const metadata = {
-  title: 'About Job Calculators - Construction Material Estimators',
-  description: 'Learn about Job Calculators - free construction material calculators for contractors, builders, and DIY enthusiasts.',
-  alternates: { canonical: 'https://jobcalculators.com/about' },
+  title: 'About Remodel Calculators - Construction Material Estimators',
+  description: 'Learn about Remodel Calculators - free construction material calculators for contractors, builders, and DIY enthusiasts.',
+  alternates: { canonical: 'https://remodelcalculators.com/about' },
 };
 
 export default function About() {
@@ -11,7 +11,7 @@ export default function About() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            About Job Calculators
+            About Remodel Calculators
           </h1>
           <p className="text-xl text-gray-600">
             Professional construction calculators, completely free
@@ -24,7 +24,7 @@ export default function About() {
           <section className="mb-10">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">Our Mission</h2>
             <p className="text-gray-700 leading-relaxed mb-4">
-              Job Calculators provides accurate, industry-standard construction material calculators to help contractors, builders, and DIY enthusiasts estimate project materials with confidence.
+              Remodel Calculators provides accurate, industry-standard construction material calculators to help contractors, builders, and DIY enthusiasts estimate project materials with confidence.
             </p>
             <p className="text-gray-700 leading-relaxed">
               We believe that accurate material estimation saves time, reduces waste, and helps projects stay on budget. Our calculators are designed to be simple, accurate, and accessible to everyone—no sign-up required, completely free.
@@ -135,7 +135,7 @@ export default function About() {
         <div className="text-center bg-gray-900 text-white rounded-xl p-8">
           <h2 className="text-2xl font-semibold mb-4">Built By Modern Site Builders</h2>
           <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
-            Job Calculators is built and maintained by Modern Site Builders, a web development company focused on creating practical tools for the construction industry.
+            Remodel Calculators is built and maintained by Modern Site Builders, a web development company focused on creating practical tools for the construction industry.
           </p>
           <a 
             href="https://modernsitebuilders.com" 

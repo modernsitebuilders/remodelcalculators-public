@@ -7,7 +7,7 @@
  */
 
 const INDEXNOW_KEY = '85d27a70d7aa4d84a8eed19e81147a90';
-const SITE_URL = 'https://jobcalculators.com';
+const SITE_URL = 'https://remodelcalculators.com';
 
 // Import your sitemap function (if running from project root)
 // This requires the script to be run with proper module resolution
@@ -65,7 +65,7 @@ async function submitToIndexNow(urls) {
   }
 
   const payload = {
-    host: 'jobcalculators.com',
+    host: 'remodelcalculators.com',
     key: INDEXNOW_KEY,
     keyLocation: `${SITE_URL}/${INDEXNOW_KEY}.txt`,
     urlList: urls,
@@ -183,7 +183,7 @@ async function main() {
       const customUrl = process.argv[3];
       if (!customUrl) {
         console.error('✗ Error: Please provide a URL');
-        console.log('Usage: node scripts/submit-indexnow.js url https://jobcalculators.com/page');
+        console.log('Usage: node scripts/submit-indexnow.js url https://remodelcalculators.com/page');
         process.exit(1);
       }
       console.log('Mode: Submit single URL');
@@ -225,7 +225,7 @@ async function main() {
       console.log('\nExamples:');
       console.log('  node scripts/submit-indexnow.js all');
       console.log('  node scripts/submit-indexnow.js blog');
-      console.log('  node scripts/submit-indexnow.js url https://jobcalculators.com/concrete-calculator');
+      console.log('  node scripts/submit-indexnow.js url https://remodelcalculators.com/concrete-calculator');
       break;
   }
 }

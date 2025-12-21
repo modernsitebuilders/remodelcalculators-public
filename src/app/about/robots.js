@@ -5,6 +5,6 @@ export default function robots() {
       allow: '/',
       disallow: [],
     },
-    sitemap: 'https://jobcalculators.com/sitemap.xml',
+    sitemap: 'https://remodelcalculators.com/sitemap.xml',
   };
 }

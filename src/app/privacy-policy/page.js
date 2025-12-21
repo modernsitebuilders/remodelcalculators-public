@@ -1,9 +1,9 @@
 import { SITE_CONFIG } from '@/data/siteConfig';
 
 export const metadata = {
-  title: 'Privacy Policy | Job Calculators',
-  description: 'Privacy policy for Job Calculators - how we handle user data and protect your privacy.',
-  alternates: { canonical: 'https://jobcalculators.com/privacy-policy' },
+  title: 'Privacy Policy | Remodel Calculators',
+  description: 'Privacy policy for Remodel Calculators - how we handle user data and protect your privacy.',
+  alternates: { canonical: 'https://remodelcalculators.com/privacy-policy' },
 };
 
 export default function PrivacyPolicy() {
@@ -21,7 +21,7 @@ export default function PrivacyPolicy() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">Introduction</h2>
             <p className="text-gray-700 mb-4">
-              Job Calculators ("we," "our," or "us") operates jobcalculators.com. This Privacy Policy explains how we collect, use, and protect information when you use our construction calculator tools.
+              Remodel Calculators ("we," "our," or "us") operates remodelcalculators.com. This Privacy Policy explains how we collect, use, and protect information when you use our construction calculator tools.
             </p>
             <p className="text-gray-700">
               Our calculators log the measurements and calculations you enter for analysis and improvement purposes. We do not require user accounts or collect personal identifiers such as names, email addresses, or IP addresses.
@@ -171,8 +171,8 @@ export default function PrivacyPolicy() {
               If you have questions about this Privacy Policy or our privacy practices, contact us:
             </p>
             <div className="bg-gray-50 p-4 rounded-lg text-gray-700">
-              <p className="font-semibold">Job Calculators</p>
-              <p>Website: <a href="https://jobcalculators.com" className="text-blue-600 hover:underline">jobcalculators.com</a></p>
+              <p className="font-semibold">Remodel Calculators</p>
+              <p>Website: <a href="https://remodelcalculators.com" className="text-blue-600 hover:underline">remodelcalculators.com</a></p>
               <p>Built by Modern Site Builders</p>
             </div>
           </section>

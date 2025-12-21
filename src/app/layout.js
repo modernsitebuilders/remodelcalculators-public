@@ -31,7 +31,7 @@ export const metadata = {
       url: `${SITE_CONFIG.baseUrl}/og-image.jpg`,
       width: 1200,
       height: 630,
-      alt: 'Job Calculators - Construction Material Calculators'
+      alt: 'Remodel Calculators - Construction Material Calculators'
     }]
   },
   twitter: {
