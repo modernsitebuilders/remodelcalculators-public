@@ -27,8 +27,7 @@ export default function Header() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 font-bold text-xl text-gray-900 hover:text-blue-600 transition-colors">
             <Calculator className="w-6 h-6 text-blue-600" />
-            <span>Job<span className="text-blue-600">Calculators</span></span>
-          </Link>
+<span>Remodel<span className="text-blue-600">Calculators</span></span>          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6">
