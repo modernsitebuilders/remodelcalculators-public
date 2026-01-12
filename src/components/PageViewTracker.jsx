@@ -9,6 +9,7 @@ export default function PageViewTracker() {
   const pathname = usePathname()
   
   useEffect(() => {
+    // Track to Google Sheets
     const data = {
       siteId: 'construction-calcs',
       type: 'view',
@@ -24,6 +25,15 @@ export default function PageViewTracker() {
       method: 'GET',
       mode: 'no-cors'
     }).catch(err => console.error('Tracking error:', err));
+
+    // Track to Google Analytics
+    if (typeof window.gtag !== 'undefined') {
+      window.gtag('event', 'page_view', {
+        page_path: pathname,
+        page_title: document.title,
+      });
+      console.log('📊 GA4 Page View:', pathname);
+    }
   }, [pathname])
   
   return null
