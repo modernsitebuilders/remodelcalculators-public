@@ -18,6 +18,22 @@ const nextConfig = {
     removeConsole: process.env.NODE_ENV === 'production',
   },
   
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'host',
+            value: 'www.remodelcalculators.com',
+          },
+        ],
+        destination: 'https://remodelcalculators.com/:path*',
+        permanent: true,
+      },
+    ];
+  },
+  
   // Enhanced security headers
   async headers() {
     return [
