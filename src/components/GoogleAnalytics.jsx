@@ -41,9 +41,10 @@ export default function GoogleAnalytics({ measurementId }) {
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
             gtag('config', '${measurementId}', {
-              page_path: window.location.pathname,
-              send_page_view: true
-            });
+     debug_mode: true,  // ADD THIS
+     page_path: window.location.pathname,
+     send_page_view: true
+   });
             console.log('✅ GA4 initialized with ID: ${measurementId}');
           `,
         }}
