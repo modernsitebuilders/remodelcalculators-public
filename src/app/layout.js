@@ -2,10 +2,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import GoogleAnalytics from '@/components/GoogleAnalytics';
 import SiteSchema from '@/components/SiteSchema';
 import { SITE_CONFIG } from '@/data/siteConfig';
-import PageViewTracker from '@/components/PageViewTracker'
+import { GoogleAnalytics } from '@next/third-parties/google';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -49,13 +48,12 @@ export default function RootLayout({ children }) {
         <SiteSchema />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}>
-        <GoogleAnalytics measurementId={SITE_CONFIG.analytics.measurementId} />
-        <PageViewTracker />
         <Header />
         <main className="flex-grow">
           {children}
         </main>
         <Footer />
+        <GoogleAnalytics gaId="G-KZBWPC3X69" />
       </body>
     </html>
   );
