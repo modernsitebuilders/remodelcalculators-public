@@ -8,6 +8,7 @@ import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
 import { FAQSection } from '@/components/FAQSection';
 import { trackCalculatorInteraction } from '@/utils/buttonTracking';
+import { useCalculatorTracking, useCalculatorFlow } from '@/utils/tracking-hooks';
 import { 
   NumberInput,
   SelectInput,
@@ -40,6 +41,8 @@ export default function FenceInstallationCalculator() {
   const [hasCalculated, setHasCalculated] = useState(false);
   const [copyButtonText, setCopyButtonText] = useState('📋 Copy Calculation');
   const resultsRef = useRef(null);
+  const { trackField, trackAction } = useCalculatorTracking('fence-calculator');
+useCalculatorFlow('fence-calculator');
 
   const fenceTypes = {
     'standard-privacy': { name: 'Standard Privacy (Wood)', postSpacing: 8, railsPerHeight: 3, needsWood: true },
@@ -335,130 +338,137 @@ export default function FenceInstallationCalculator() {
     }
     
     const materialsData = {
-      posts: { 
-        post4x4: post4x4Count, 
-        post6x6: post6x6Count, 
-        total: totalPosts, 
-        length: postLength, 
-        spacing: postSpacing,
-        post6x6Breakdown: post6x6Breakdown 
-      },
-      concrete: { bags: concreteBags, depth: requiredDepth },
-      gravel: { bags: gravelBags, cubicFeet: gravelCubicFeet },
-      pickets: { count: pickets, boardFeet: boardFeet, width: boardWidth, spacing: boardSpacing },
-      rails: { count: rails, totalLength: totalRailLength },
-      hardware: { fasteners: totalFasteners, postCaps: postCaps, gates: gateHardware },
-      panels: panels,
-      chainLink: { rolls: chainLinkRolls, fabric: meshFabric }
-    };
+  posts: { 
+    post4x4: post4x4Count, 
+    post6x6: post6x6Count, 
+    total: totalPosts, 
+    length: postLength, 
+    spacing: postSpacing,
+    post6x6Breakdown: post6x6Breakdown 
+  },
+  concrete: { bags: concreteBags, depth: requiredDepth },
+  gravel: { bags: gravelBags, cubicFeet: gravelCubicFeet },
+  pickets: { count: pickets, boardFeet: boardFeet, width: boardWidth, spacing: boardSpacing },
+  rails: { count: rails, totalLength: totalRailLength },
+  hardware: { fasteners: totalFasteners, postCaps: postCaps, gates: gateHardware },
+  panels: panels,
+  chainLink: { rolls: chainLinkRolls, fabric: meshFabric }
+};
 
-    setTimeout(() => {
-      resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 100);
+setTimeout(() => {
+  resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}, 100);
 
-    setMaterials(materialsData);
-    setHasCalculated(true);
-    
-    trackCalculation('fence', {
-      linearFeet: linearFt,
-      fenceType: fenceType,
-      height: height,
-      boardWidth: boardWidth,
-      boardSpacing: boardSpacing,
-      railLength: railLength,
-      terrain: terrain,
-      slopeMethod: slopeMethod,
-      frostDepth: frostDepth,
-      gates3ft: gates3ft,
-      gates4ft: gates4ft,
-      gates6ft: gates6ft,
-      gates10ft: gates10ft,
-      gates12ft: gates12ft,
-      corners: cornersCount,
-      fenceLayout: fenceLayout
-    }, {
-      totalPosts: totalPosts,
-      post4x4: post4x4Count,
-      post6x6: post6x6Count,
-      postLength: postLength,
-      postSpacing: postSpacing,
-      concreteBags: concreteBags,
-      gravelBags: gravelBags,
-      gravelCubicFeet: gravelCubicFeet,
-      pickets: pickets,
-      boardFeet: boardFeet,
-      rails: rails,
-      totalRailLength: totalRailLength,
-      totalFasteners: totalFasteners,
-      postCaps: postCaps,
-      gateHardware: gateHardware,
-      panels: panels,
-      chainLinkRolls: chainLinkRolls,
-      meshFabric: meshFabric,
-      fenceTypeName: fenceTypes[fenceType].name
-    });
-    trackCalculatorInteraction.calculate('fence', true);
-  };  
+setMaterials(materialsData);
+setHasCalculated(true);
+
+// ✅ Your existing tracking - KEEP THIS
+trackCalculation('fence', {
+  linearFeet: linearFt,
+  fenceType: fenceType,
+  height: height,
+  boardWidth: boardWidth,
+  boardSpacing: boardSpacing,
+  railLength: railLength,
+  terrain: terrain,
+  slopeMethod: slopeMethod,
+  frostDepth: frostDepth,
+  gates3ft: gates3ft,
+  gates4ft: gates4ft,
+  gates6ft: gates6ft,
+  gates10ft: gates10ft,
+  gates12ft: gates12ft,
+  corners: cornersCount,
+  fenceLayout: fenceLayout
+}, {
+  totalPosts: totalPosts,
+  post4x4: post4x4Count,
+  post6x6: post6x6Count,
+  postLength: postLength,
+  postSpacing: postSpacing,
+  concreteBags: concreteBags,
+  gravelBags: gravelBags,
+  gravelCubicFeet: gravelCubicFeet,
+  pickets: pickets,
+  boardFeet: boardFeet,
+  rails: rails,
+  totalRailLength: totalRailLength,
+  totalFasteners: totalFasteners,
+  postCaps: postCaps,
+  gateHardware: gateHardware,
+  panels: panels,
+  chainLinkRolls: chainLinkRolls,
+  meshFabric: meshFabric,
+  fenceTypeName: fenceTypes[fenceType].name
+});
+trackCalculatorInteraction.calculate('fence', true);
+};  
+
+const handleCopyCalculation = async () => {
+  // ✅ Your existing tracking - KEEP THIS
+  trackCalculatorInteraction.copyResults('fence');
   
-  const handleCopyCalculation = async () => {
-    trackCalculatorInteraction.copyResults('fence');
-    if (!hasCalculated || !materials || !materials.posts) return;
-    
-    const inputs = {
-      'Fence length': `${linearFeet} linear feet`,
-      'Fence type': fenceTypes[fenceType].name,
-      'Height': `${height} feet`,
-      'Post spacing': `${fenceTypes[fenceType].postSpacing} feet`,
-      'Terrain': terrain
-    };
-    
-    const totalGates = parseInt(gates3ft || 0) + parseInt(gates4ft || 0) + parseInt(gates6ft || 0) + parseInt(gates10ft || 0) + parseInt(gates12ft || 0);
-    if (totalGates > 0) {
-      const gateList = [];
-      if (gates3ft > 0) gateList.push(`${gates3ft}×3ft`);
-      if (gates4ft > 0) gateList.push(`${gates4ft}×4ft`);
-      if (gates6ft > 0) gateList.push(`${gates6ft}×6ft`);
-      if (gates10ft > 0) gateList.push(`${gates10ft}×10ft`);
-      if (gates12ft > 0) gateList.push(`${gates12ft}×12ft`);
-      inputs['Gates'] = `${totalGates} gates (${gateList.join(', ')})`;
-    }
-    
-    const outputs = {
-      'Total posts': `${materials.posts.total} posts`,
-      'Concrete needed': `${materials.concrete.bags} bags (80lb)`,
-      'Gravel needed': `${materials.gravel.bags} bags`
-    };
-    
-    if (materials.posts.post4x4 > 0) {
-      outputs['4×4 Posts'] = `${materials.posts.post4x4} posts (${materials.posts.length.toFixed(1)}ft each)`;
-    }
-    if (materials.posts.post6x6 > 0) {
-      outputs['6×6 Posts'] = `${materials.posts.post6x6} posts (${materials.posts.length.toFixed(1)}ft each)`;
-    }
-    if (materials.rails && materials.rails.totalLength > 0) {
-      outputs['Rails needed'] = `${materials.rails.totalLength} linear feet`;
-    }
-    if (materials.pickets && materials.pickets.count > 0) {
-      outputs['Pickets needed'] = `${materials.pickets.count} pickets`;
-    }
-    if (materials.panels > 0) {
-      outputs['Panels needed'] = `${materials.panels} panels`;
-    }
-    
-    const note = `Post depth: ${frostDepth}" (1/3 rule). IRC standard post spacing. ${materials.posts.post6x6 > 0 ? '6×6 posts for corners, gates, and tall fences.' : ''}`;
-    
-    const success = await copyCalculation('Fence Calculator', inputs, outputs, note);
-    
-    if (success) {
-      setCopyButtonText('✓ Copied!');
-      setTimeout(() => setCopyButtonText('📋 Copy Calculation'), 2000);
-    } else {
-      alert('Unable to copy. Please copy results manually.');
-    }
+  // ⭐ ADD THIS NEW LINE
+  trackAction('copy');
+  
+  if (!hasCalculated || !materials || !materials.posts) return;
+  
+  const inputs = {
+    'Fence length': `${linearFeet} linear feet`,
+    'Fence type': fenceTypes[fenceType].name,
+    'Height': `${height} feet`,
+    'Post spacing': `${fenceTypes[fenceType].postSpacing} feet`,
+    'Terrain': terrain
   };
+  
+  const totalGates = parseInt(gates3ft || 0) + parseInt(gates4ft || 0) + parseInt(gates6ft || 0) + parseInt(gates10ft || 0) + parseInt(gates12ft || 0);
+  if (totalGates > 0) {
+    const gateList = [];
+    if (gates3ft > 0) gateList.push(`${gates3ft}×3ft`);
+    if (gates4ft > 0) gateList.push(`${gates4ft}×4ft`);
+    if (gates6ft > 0) gateList.push(`${gates6ft}×6ft`);
+    if (gates10ft > 0) gateList.push(`${gates10ft}×10ft`);
+    if (gates12ft > 0) gateList.push(`${gates12ft}×12ft`);
+    inputs['Gates'] = `${totalGates} gates (${gateList.join(', ')})`;
+  }
+  
+  const outputs = {
+    'Total posts': `${materials.posts.total} posts`,
+    'Concrete needed': `${materials.concrete.bags} bags (80lb)`,
+    'Gravel needed': `${materials.gravel.bags} bags`
+  };
+  
+  if (materials.posts.post4x4 > 0) {
+    outputs['4×4 Posts'] = `${materials.posts.post4x4} posts (${materials.posts.length.toFixed(1)}ft each)`;
+  }
+  if (materials.posts.post6x6 > 0) {
+    outputs['6×6 Posts'] = `${materials.posts.post6x6} posts (${materials.posts.length.toFixed(1)}ft each)`;
+  }
+  if (materials.rails && materials.rails.totalLength > 0) {
+    outputs['Rails needed'] = `${materials.rails.totalLength} linear feet`;
+  }
+  if (materials.pickets && materials.pickets.count > 0) {
+    outputs['Pickets needed'] = `${materials.pickets.count} pickets`;
+  }
+  if (materials.panels > 0) {
+    outputs['Panels needed'] = `${materials.panels} panels`;
+  }
+  
+  const note = `Post depth: ${frostDepth}" (1/3 rule). IRC standard post spacing. ${materials.posts.post6x6 > 0 ? '6×6 posts for corners, gates, and tall fences.' : ''}`;
+  
+  const success = await copyCalculation('Fence Calculator', inputs, outputs, note);
+  
+  if (success) {
+    setCopyButtonText('✓ Copied!');
+    setTimeout(() => setCopyButtonText('📋 Copy Calculation'), 2000);
+  } else {
+    alert('Unable to copy. Please copy results manually.');
+  }
+};
 
   const handleReset = () => {
     trackCalculatorInteraction.startOver('fence');
+    trackAction('reset');
     
     setLinearFeet('');
     setFenceType('picket');
@@ -507,6 +517,7 @@ export default function FenceInstallationCalculator() {
                   value={linearFeet}
                   onChange={(value) => {
                     setLinearFeet(value);
+                    trackField('linearFeet', value);
                     setTimeout(() => validate(getValues()), 100);
                   }}
                   unit="feet"
@@ -520,6 +531,7 @@ export default function FenceInstallationCalculator() {
                   value={height.toString()}
                   onChange={(value) => {
                     setHeight(parseInt(value));
+                    trackField('height', value);
                     setTimeout(() => validate(getValues()), 100);
                   }}
                   options={heightOptions}
@@ -530,6 +542,7 @@ export default function FenceInstallationCalculator() {
                   value={corners}
                   onChange={(value) => {
                     setCorners(value);
+                    trackField('corners', value);
                     setTimeout(() => validate(getValues()), 100);
                   }}
                   required={true}
@@ -540,7 +553,10 @@ export default function FenceInstallationCalculator() {
                 <SelectInput
                   label="Fence Layout"
                   value={fenceLayout}
-                  onChange={setFenceLayout}
+                  onChange={(value) => {
+  setFenceLayout(value);      // ← Correct function
+  trackField('fenceLayout', value);
+}}
                   options={fenceLayoutOptions}
                 />
                 <p className="text-xs text-gray-500 -mt-2">Open-ended fences require stronger terminal posts</p>
@@ -552,7 +568,10 @@ export default function FenceInstallationCalculator() {
                 <SelectInput
                   label="Fence Style"
                   value={fenceType}
-                  onChange={setFenceType}
+                  onChange={(value) => {
+  setFenceType(value);
+  trackField('fenceType', value);
+}}
                   options={formatOptions(fenceTypes)}
                 />
                 <p className="text-xs text-gray-500 -mt-2">
@@ -795,10 +814,13 @@ export default function FenceInstallationCalculator() {
               </SectionCard>
               
               <ResultsButtons
-                onCopy={handleCopyCalculation}
-                onPrint={() => printCalculation('Fence Calculator')}
-                copyButtonText={copyButtonText}
-              />
+  onCopy={handleCopyCalculation}
+  onPrint={() => {
+    printCalculation('Fence Calculator');  // ← Use the imported function
+    trackAction('print');                   // ← Add tracking
+  }}
+  copyButtonText={copyButtonText}
+/>
               </>
             )}
           </div>
