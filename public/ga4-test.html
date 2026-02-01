@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>GA4 Test</title>
+  
+  <!-- Direct GA4 injection -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KZBWPC3X69"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-KZBWPC3X69', {
+      debug_mode: true
+    });
+    
+    console.log('GA4 Test Page Loaded');
+    
+    // Send test event after 1 second
+    setTimeout(() => {
+      gtag('event', 'test_page_loaded', {
+        test: 'direct_html'
+      });
+      console.log('Test event sent');
+    }, 1000);
+  </script>
+</head>
+<body>
+  <h1>GA4 Test Page</h1>
+  <p>Open console and check Network tab</p>
+  <p>Check Real-time in GA4</p>
+  
+  <button onclick="gtag('event', 'button_click', {test: 'manual'}); console.log('Manual event sent')">
+    Send Test Event
+  </button>
+</body>
+</html>
