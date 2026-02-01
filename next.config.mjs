@@ -1,81 +1,60 @@
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
-import SiteSchema from '@/components/SiteSchema';
-import { SITE_CONFIG } from '@/data/siteConfig';
-import TrackingInitializer from '@/components/TrackingInitializer';
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-export const metadata = {
-  title: "Free Construction Calculators | Concrete, Drywall, Roofing & More",
-  description: "Professional construction material calculators for contractors and DIY builders. Calculate concrete, drywall, roofing, paint, flooring, and more using industry-standard formulas.",
-  keywords: "construction calculator, concrete calculator, drywall calculator, roofing calculator, material calculator, building calculator",
-  openGraph: {
-    title: "Free Construction Calculators | Concrete, Drywall, Roofing & More",
-    description: "Professional construction material calculators for contractors and DIY builders. Calculate concrete, drywall, roofing, paint, flooring, and more.",
-    url: SITE_CONFIG.baseUrl,
-    siteName: SITE_CONFIG.name,
-    type: 'website',
-    images: [{
-      url: `${SITE_CONFIG.baseUrl}/og-image.jpg`,
-      width: 1200,
-      height: 630,
-      alt: 'Remodel Calculators - Construction Material Calculators'
-    }]
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  compress: true,
+  poweredByHeader: false,
+  
+  images: {
+    formats: ['image/avif', 'image/webp'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    minimumCacheTTL: 31536000,
   },
-  twitter: {
-    card: 'summary_large_image',
-    title: "Free Construction Calculators | Concrete, Drywall, Roofing & More",
-    description: "Professional construction material calculators for contractors and DIY builders.",
-    images: [`${SITE_CONFIG.baseUrl}/og-image.jpg`]
+  
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'host',
+            value: 'www.remodelcalculators.com',
+          },
+        ],
+        destination: 'https://remodelcalculators.com/:path*',
+        permanent: true,
+      },
+    ];
+  },
+  
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'X-DNS-Prefetch-Control',
+            value: 'on'
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'SAMEORIGIN'
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff'
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin'
+          }
+        ],
+      }
+    ]
   }
 };
 
-export default function RootLayout({ children }) {
-  return (
-    <html lang="en">
-      <head>
-        <SiteSchema />
-        {/* Google Tag Manager */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-              new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-              j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-              'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-              })(window,document,'script','dataLayer','GTM-WQVB3MX9');
-            `
-          }}
-        />
-      </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}>
-        {/* Google Tag Manager (noscript) */}
-        <noscript>
-          <iframe
-            src="https://www.googletagmanager.com/ns.html?id=GTM-WQVB3MX9"
-            height="0"
-            width="0"
-            style={{ display: 'none', visibility: 'hidden' }}
-          />
-        </noscript>
-        <TrackingInitializer />
-        <Header />
-        <main className="flex-grow">
-          {children}
-        </main>
-        <Footer />
-      </body>
-    </html>
-  );
-}
+export default nextConfig;
