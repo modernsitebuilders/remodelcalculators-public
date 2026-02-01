@@ -55,6 +55,7 @@ export default function RootLayout({ children }) {
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
               gtag('config', 'G-KZBWPC3X69');
+              console.log('✅ GA4 initialized');
             `
           }}
         />
