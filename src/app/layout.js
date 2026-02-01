@@ -1,5 +1,4 @@
 import { Geist, Geist_Mono } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -47,28 +46,20 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <head>
         <SiteSchema />
-      </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}>
-        <Script
-          id="gtag-base"
-          strategy="afterInteractive"
+        {/* Direct GA4 injection - bypasses Next.js Script component */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-KZBWPC3X69"></script>
+        <script
           dangerouslySetInnerHTML={{
             __html: `
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
-              gtag('config', 'G-KZBWPC3X69', {
-                send_page_view: true,
-                debug_mode: true
-              });
-              console.log('✅ GA4 initialized');
+              gtag('config', 'G-KZBWPC3X69');
             `
           }}
         />
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-KZBWPC3X69"
-          strategy="afterInteractive"
-        />
+      </head>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}>
         <TrackingInitializer />
         <Header />
         <main className="flex-grow">
