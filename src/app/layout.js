@@ -5,6 +5,7 @@ import Footer from '@/components/layout/Footer';
 import SiteSchema from '@/components/SiteSchema';
 import { SITE_CONFIG } from '@/data/siteConfig';
 import TrackingInitializer from '@/components/TrackingInitializer';
+import { Analytics } from '@vercel/analytics/react';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -69,6 +70,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           {children}
         </main>
         <Footer />
+        <Analytics />
       </body>
     </html>
   );
