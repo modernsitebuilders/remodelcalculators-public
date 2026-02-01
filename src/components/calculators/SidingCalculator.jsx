@@ -18,9 +18,14 @@ import { printCalculation } from '@/utils/printCalculation';
 import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
 import { FAQSection } from '@/components/FAQSection';
+import { useCalculatorTracking, useCalculatorFlow } from '@/utils/tracking-hooks'; // ← ADDED
 
 const SidingCalculator = () => {
     console.log("SIDING CALCULATOR LOADED - FILE IS CORRECT");  // ADD THIS LINE
+
+  // ← ADDED THESE 2 LINES
+  const { trackField, trackAction } = useCalculatorTracking('siding-calculator');
+  useCalculatorFlow('siding-calculator');
 
   const [step, setStep] = useState(1);
   const [projectData, setProjectData] = useState({
@@ -368,6 +373,7 @@ const SidingCalculator = () => {
   };  
 
   const handleCopyCalculation = async () => {
+    trackAction('copy'); // ← ADDED
     if (!results) return;
 
     trackCalculatorInteraction.copyResults('siding');
@@ -425,6 +431,7 @@ const SidingCalculator = () => {
   };
 
   const handleStartOver = () => {
+    trackAction('reset'); // ← ADDED
     trackCalculatorInteraction.startOver('siding');
     setStep(1);
     setProjectData({
@@ -604,12 +611,20 @@ const SidingCalculator = () => {
       }
       return updated;
     });
+    // Track key fields
+    if (['complexity', 'sidingType', 'climate'].includes(field)) {
+      trackField(field, value); // ← ADDED
+    }
   };
 
   const updateWall = (index, field, value) => {
     const newWalls = [...projectData.walls];
     newWalls[index][field] = parseFloat(value) || 0;
     setProjectData(prev => ({ ...prev, walls: newWalls }));
+    // Track first wall dimensions
+    if (index === 0 && (field === 'width' || field === 'height')) {
+      trackField(`wall1_${field}`, value); // ← ADDED
+    }
   };
 
   const addWall = () => {
@@ -787,7 +802,10 @@ const SidingCalculator = () => {
                   ].map(option => (
                     <button
                       key={option.value}
-                      onClick={() => updateProjectData('complexity', option.value)}
+                      onClick={() => {
+                        updateProjectData('complexity', option.value);
+                        trackField('complexity', option.value); // ← ADDED
+                      }}
                       className={`p-4 border-2 rounded-lg text-left transition-all cursor-pointer ${
                         projectData.complexity === option.value
                           ? 'border-indigo-600 bg-indigo-50'
@@ -805,7 +823,10 @@ const SidingCalculator = () => {
               <SelectInput
                 label="Climate/Installation Conditions"
                 value={projectData.climate}
-                onChange={(value) => updateProjectData('climate', value)}
+                onChange={(value) => {
+                  updateProjectData('climate', value);
+                  trackField('climate', value); // ← ADDED
+                }}
                 options={climateOptions}
               />
             </div>
@@ -905,7 +926,10 @@ const SidingCalculator = () => {
                   ].map(option => (
                     <button
                       key={option.value}
-                      onClick={() => updateProjectData('sidingType', option.value)}
+                      onClick={() => {
+                        updateProjectData('sidingType', option.value);
+                        trackField('sidingType', option.value); // ← ADDED
+                      }}
                       className={`p-4 border-2 rounded-lg text-left transition-all cursor-pointer ${
                         projectData.sidingType === option.value
                           ? 'border-indigo-600 bg-indigo-50'
@@ -923,7 +947,10 @@ const SidingCalculator = () => {
                 <SelectInput
                   label="Vinyl Profile"
                   value={projectData.vinylProfile}
-                  onChange={(value) => updateProjectData('vinylProfile', value)}
+                  onChange={(value) => {
+                    updateProjectData('vinylProfile', value);
+                    trackField('vinylProfile', value); // ← ADDED
+                  }}
                   options={formatOptions(sidingSpecs.vinyl)}
                 />
               )}
@@ -932,7 +959,10 @@ const SidingCalculator = () => {
                 <SelectInput
                   label="Plank Width"
                   value={projectData.fiberCementWidth}
-                  onChange={(value) => updateProjectData('fiberCementWidth', value)}
+                  onChange={(value) => {
+                    updateProjectData('fiberCementWidth', value);
+                    trackField('fiberCementWidth', value); // ← ADDED
+                  }}
                   options={formatOptions(sidingSpecs.fiberCement)}
                 />
               )}
@@ -941,7 +971,10 @@ const SidingCalculator = () => {
                 <SelectInput
                   label="Wood Type and Size"
                   value={projectData.woodType}
-                  onChange={(value) => updateProjectData('woodType', value)}
+                  onChange={(value) => {
+                    updateProjectData('woodType', value);
+                    trackField('woodType', value); // ← ADDED
+                  }}
                   options={formatOptions(sidingSpecs.wood)}
                 />
               )}
@@ -1316,6 +1349,7 @@ const SidingCalculator = () => {
               <ResultsButtons
                 onCopy={handleCopyCalculation}
                 onPrint={() => {
+                  trackAction('print'); // ← ADDED
                   trackCalculatorInteraction.print('siding');
                   printCalculation('Siding Calculator');
                 }}

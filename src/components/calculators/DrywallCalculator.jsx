@@ -9,6 +9,7 @@ import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
 import { FAQSection } from '@/components/FAQSection';
 import { trackCalculatorInteraction } from '@/utils/buttonTracking';
+import { useCalculatorTracking, useCalculatorFlow } from '@/utils/tracking-hooks'; // ← ADDED
 import {
   NumberInput,
   SelectInput,
@@ -59,6 +60,10 @@ const formatOptions = (optionsObj) => {
 };
 
 export default function DrywallCalculator() {
+  // ← ADDED THESE 2 LINES
+  const { trackField, trackAction } = useCalculatorTracking('drywall-calculator');
+  useCalculatorFlow('drywall-calculator');
+  
   const [rooms, setRooms] = useState([
     { length: '', width: '', height: '8', includeCeiling: false, ceilingThickness: 'fiveEighth', deductions: '' }
   ]);
@@ -108,6 +113,11 @@ export default function DrywallCalculator() {
     const newRooms = [...rooms];
     newRooms[index][field] = value;
     setRooms(newRooms);
+    
+    // ← ADDED TRACKING FOR FIRST ROOM'S PRIMARY FIELDS
+    if (index === 0 && ['length', 'width'].includes(field)) {
+      trackField(`room0_${field}`, value);
+    }
   };
 
   const addRoom = () => {
@@ -260,6 +270,7 @@ export default function DrywallCalculator() {
   };
 
   const reset = () => {
+    trackAction('reset'); // ← ADDED
     trackCalculatorInteraction.startOver('drywall');
     setRooms([{ length: '', width: '', height: '8', includeCeiling: false, ceilingThickness: 'fiveEighth', deductions: '' }]);
     setSheetSize('4x8');
@@ -269,6 +280,7 @@ export default function DrywallCalculator() {
   };
 
   const handleCopyCalculation = async () => {
+    trackAction('copy'); // ← ADDED
     trackCalculatorInteraction.copyResults('drywall');
     if (!results) return;
     
@@ -344,7 +356,10 @@ export default function DrywallCalculator() {
                 <NumberInput
                   label="Length"
                   value={room.length}
-                  onChange={(value) => updateRoom(index, 'length', value)}
+                  onChange={(value) => {
+                    updateRoom(index, 'length', value);
+                    if (index === 0) trackField('room_length', value); // ← ADDED
+                  }}
                   unit="feet"
                   required={true}
                   fieldName={`room${index}-length`}
@@ -354,7 +369,10 @@ export default function DrywallCalculator() {
                 <NumberInput
                   label="Width"
                   value={room.width}
-                  onChange={(value) => updateRoom(index, 'width', value)}
+                  onChange={(value) => {
+                    updateRoom(index, 'width', value);
+                    if (index === 0) trackField('room_width', value); // ← ADDED
+                  }}
                   unit="feet"
                   required={true}
                   fieldName={`room${index}-width`}
@@ -393,7 +411,10 @@ export default function DrywallCalculator() {
                     type="checkbox"
                     id={`includeCeiling-${index}`}
                     checked={room.includeCeiling}
-                    onChange={(e) => updateRoom(index, 'includeCeiling', e.target.checked)}
+                    onChange={(e) => {
+                      updateRoom(index, 'includeCeiling', e.target.checked);
+                      if (index === 0) trackField('include_ceiling', e.target.checked); // ← ADDED
+                    }}
                     className="w-5 h-5 text-cyan-600 focus:ring-cyan-500 rounded"
                   />
                   <span className="font-semibold text-gray-700">
@@ -434,7 +455,10 @@ export default function DrywallCalculator() {
           <SelectInput
             label="Sheet Size"
             value={sheetSize}
-            onChange={setSheetSize}
+            onChange={(value) => {
+              setSheetSize(value);
+              trackField('sheet_size', value); // ← ADDED
+            }}
             options={formatOptions(SHEET_SIZES)}
             note="Longer sheets reduce butt seams and finishing labor"
           />
@@ -444,7 +468,10 @@ export default function DrywallCalculator() {
           <SelectInput
             label="Wall Drywall Thickness"
             value={thickness}
-            onChange={setThickness}
+            onChange={(value) => {
+              setThickness(value);
+              trackField('wall_thickness', value); // ← ADDED
+            }}
             options={formatOptions(THICKNESS_SPECS)}
             renderOption={(option) => (
               <div>
@@ -583,7 +610,10 @@ export default function DrywallCalculator() {
 
             <ResultsButtons
               onCopy={handleCopyCalculation}
-              onPrint={() => printCalculation('Drywall Calculator')}
+              onPrint={() => {
+                printCalculation('Drywall Calculator');
+                trackAction('print'); // ← ADDED
+              }}
               copyButtonText={copyButtonText}
             />
           </div>

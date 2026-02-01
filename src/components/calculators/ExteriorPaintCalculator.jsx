@@ -9,6 +9,7 @@ import { printCalculation } from '@/utils/printCalculation';
 import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
 import { FAQSection } from '@/components/FAQSection';
+import { useCalculatorTracking, useCalculatorFlow } from '@/utils/tracking-hooks'; // ← ADDED
 import {
   NumberInput,
   SelectInput,
@@ -20,6 +21,10 @@ import {
 } from '@/components/calculator';
 
 const ExteriorPaintCalculator = () => {
+  // ← ADDED THESE 2 LINES
+  const { trackField, trackAction } = useCalculatorTracking('exterior-paint-calculator');
+  useCalculatorFlow('exterior-paint-calculator');
+  
   const [inputs, setInputs] = useState({
     squareFeet: '',
     surfaceType: 'vinyl',
@@ -230,6 +235,7 @@ const ExteriorPaintCalculator = () => {
   const { validate, ValidationDisplay } = useValidation(validationRules);
 
   const handleReset = () => {
+    trackAction('reset'); // ← ADDED
     trackCalculatorInteraction.startOver('exterior-paint');
     setInputs({
       squareFeet: 2000,
@@ -243,6 +249,7 @@ const ExteriorPaintCalculator = () => {
   };  
 
   const handleCopyCalculation = async () => {
+    trackAction('copy'); // ← ADDED
     if (!showResults || !calculations) return;
     trackCalculatorInteraction.copyResults('exterior-paint');
     
@@ -302,6 +309,7 @@ const ExteriorPaintCalculator = () => {
                 value={inputs.squareFeet}
                 onChange={(value) => {
                   setInputs({...inputs, squareFeet: Number(value)});
+                  trackField('square_feet', value); // ← ADDED
                   setTimeout(() => validate(getValues()), 100);
                 }}
                 unit="sq ft"
@@ -314,7 +322,10 @@ const ExteriorPaintCalculator = () => {
               <SelectInput
                 label="Surface Type"
                 value={inputs.surfaceType}
-                onChange={(value) => setInputs({...inputs, surfaceType: value})}
+                onChange={(value) => {
+                  setInputs({...inputs, surfaceType: value});
+                  trackField('surface_type', value); // ← ADDED
+                }}
                 options={formatOptions(surfaceTypes)}
               />
               <p className="text-xs text-gray-600 -mt-4 bg-gray-50 p-2 rounded">
@@ -326,7 +337,10 @@ const ExteriorPaintCalculator = () => {
                 <SelectInput
                   label="Surface Status (After Prep)"
                   value={inputs.surfaceCondition}
-                  onChange={(value) => setInputs({...inputs, surfaceCondition: value})}
+                  onChange={(value) => {
+                    setInputs({...inputs, surfaceCondition: value});
+                    trackField('surface_condition', value); // ← ADDED
+                  }}
                   options={surfaceConditionOptions}
                   helperText="More exposed bare wood/masonry = more paint absorption"
                 />
@@ -336,7 +350,10 @@ const ExteriorPaintCalculator = () => {
               <SelectInput
                 label="Application Method"
                 value={inputs.applicationMethod}
-                onChange={(value) => setInputs({...inputs, applicationMethod: value})}
+                onChange={(value) => {
+                  setInputs({...inputs, applicationMethod: value});
+                  trackField('application_method', value); // ← ADDED
+                }}
                 options={applicationMethodOptions}
                 icon={Droplets}
               />
@@ -353,7 +370,10 @@ const ExteriorPaintCalculator = () => {
               <SelectInput
                 label="Number of Coats"
                 value={inputs.coats}
-                onChange={(value) => setInputs({...inputs, coats: Number(value)})}
+                onChange={(value) => {
+                  setInputs({...inputs, coats: Number(value)});
+                  trackField('coats', value); // ← ADDED
+                }}
                 options={coatsOptions}
                 helperText="Note: Exterior projects almost always require 2 coats for proper weather protection"
               />
@@ -363,7 +383,10 @@ const ExteriorPaintCalculator = () => {
                 <input
                   type="checkbox"
                   checked={inputs.needsPrimer}
-                  onChange={(e) => setInputs({...inputs, needsPrimer: e.target.checked})}
+                  onChange={(e) => {
+                    setInputs({...inputs, needsPrimer: e.target.checked});
+                    trackField('needs_primer', e.target.checked); // ← ADDED
+                  }}
                   className="w-5 h-5 text-blue-600"
                 />
                 <span className="text-sm font-semibold text-gray-700">
@@ -488,7 +511,10 @@ const ExteriorPaintCalculator = () => {
               {/* Copy and Print Buttons */}
               <ResultsButtons
                 onCopy={handleCopyCalculation}
-                onPrint={() => printCalculation('Exterior Paint Calculator')}
+                onPrint={() => {
+                  printCalculation('Exterior Paint Calculator');
+                  trackAction('print'); // ← ADDED
+                }}
                 copyButtonText={copyButtonText}
               />
             </div>

@@ -8,6 +8,7 @@ import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
 import { FAQSection } from '@/components/FAQSection';
 import { trackCalculatorInteraction } from '@/utils/buttonTracking';
+import { useCalculatorTracking, useCalculatorFlow } from '@/utils/tracking-hooks'; // ← ADDED
 import { 
   NumberInput,
   SelectInput,
@@ -19,6 +20,9 @@ import {
 } from '@/components/calculator';
 
 export default function FlooringCalculator() {
+  const { trackField, trackAction } = useCalculatorTracking('flooring-calculator'); // ← ADDED
+  useCalculatorFlow('flooring-calculator'); // ← ADDED
+
   const [selectedFlooringType, setSelectedFlooringType] = useState('');
   const [roomLength, setRoomLength] = useState('');
   const [roomWidth, setRoomWidth] = useState('');
@@ -39,6 +43,7 @@ export default function FlooringCalculator() {
 
   const handleFlooringTypeSelect = (type) => {
     setSelectedFlooringType(type);
+    trackField('flooringType', type); // ← ADDED
     setShowResults(false);
   };
 
@@ -331,6 +336,7 @@ export default function FlooringCalculator() {
   };
 
   const handleReset = () => {
+    trackAction('reset'); // ← ADDED
     trackCalculatorInteraction.startOver('flooring');
     setSelectedFlooringType('');
     setRoomLength('');
@@ -350,6 +356,7 @@ export default function FlooringCalculator() {
   };  
 
   const handleCopyCalculation = async () => {
+    trackAction('copy'); // ← ADDED
     trackCalculatorInteraction.copyResults('flooring');
     if (!showResults || !results) return;
     
@@ -705,6 +712,7 @@ export default function FlooringCalculator() {
                   value={roomLength}
                   onChange={(value) => {
                     setRoomLength(value);
+                    trackField('roomLength', value); // ← ADDED
                     setTimeout(() => validate(getValues()), 100);
                   }}
                   unit="feet"
@@ -716,6 +724,7 @@ export default function FlooringCalculator() {
                   value={roomWidth}
                   onChange={(value) => {
                     setRoomWidth(value);
+                    trackField('roomWidth', value); // ← ADDED
                     setTimeout(() => validate(getValues()), 100);
                   }}
                   unit="feet"
@@ -732,7 +741,10 @@ export default function FlooringCalculator() {
                   <SelectInput
                     label="Layout pattern"
                     value={layoutPattern}
-                    onChange={setLayoutPattern}
+                    onChange={(value) => {
+                      setLayoutPattern(value);
+                      trackField('layoutPattern', value); // ← ADDED
+                    }}
                     options={layoutPatternOptions}
                   />
                 )}
@@ -740,14 +752,20 @@ export default function FlooringCalculator() {
                 <SelectInput
                   label="Room complexity"
                   value={roomComplexity}
-                  onChange={setRoomComplexity}
+                  onChange={(value) => {
+                    setRoomComplexity(value);
+                    trackField('roomComplexity', value); // ← ADDED
+                  }}
                   options={roomComplexityOptions}
                 />
                 
                 <SelectInput
                   label="Experience level"
                   value={installerExp}
-                  onChange={setInstallerExp}
+                  onChange={(value) => {
+                    setInstallerExp(value);
+                    trackField('installerExperience', value); // ← ADDED
+                  }}
                   options={installerExpOptions}
                 />
               </InputGrid>
@@ -760,6 +778,7 @@ export default function FlooringCalculator() {
                     value={plankWidth}
                     onChange={(value) => {
                       setPlankWidth(value);
+                      trackField('plankWidth', value); // ← ADDED
                       setTimeout(() => validate(getValues()), 100);
                     }}
                     options={plankWidthOptions}
@@ -771,6 +790,7 @@ export default function FlooringCalculator() {
                         value={customPlankWidth}
                         onChange={(value) => {
                           setCustomPlankWidth(value);
+                          trackField('customPlankWidth', value); // ← ADDED
                           setTimeout(() => validate(getValues()), 100);
                         }}
                         unit="inches"
@@ -795,6 +815,7 @@ export default function FlooringCalculator() {
                       value={tileWidth}
                       onChange={(value) => {
                         setTileWidth(value);
+                        trackField('tileWidth', value); // ← ADDED
                         setTimeout(() => validate(getValues()), 100);
                       }}
                       options={tileSizeOptions}
@@ -804,6 +825,7 @@ export default function FlooringCalculator() {
                       value={tileLength}
                       onChange={(value) => {
                         setTileLength(value);
+                        trackField('tileLength', value); // ← ADDED
                         setTimeout(() => validate(getValues()), 100);
                       }}
                       options={tileSizeOptions}
@@ -824,7 +846,10 @@ export default function FlooringCalculator() {
                     <SelectInput
                       label="Carpet width"
                       value={carpetWidth}
-                      onChange={setCarpetWidth}
+                      onChange={(value) => {
+                        setCarpetWidth(value);
+                        trackField('carpetWidth', value); // ← ADDED
+                      }}
                       options={carpetWidthOptions}
                     />
                     <div>
@@ -914,7 +939,10 @@ export default function FlooringCalculator() {
                 
                 <ResultsButtons
                   onCopy={handleCopyCalculation}
-                  onPrint={() => printCalculation('Flooring Calculator')}
+                  onPrint={() => {
+                    printCalculation('Flooring Calculator');
+                    trackAction('print'); // ← ADDED
+                  }}
                   copyButtonText={copyButtonText}
                 />
               </div>

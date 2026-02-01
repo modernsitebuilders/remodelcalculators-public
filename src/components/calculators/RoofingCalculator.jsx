@@ -17,8 +17,13 @@ import { printCalculation } from '@/utils/printCalculation';
 import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
 import { FAQSection } from '@/components/FAQSection';
+import { useCalculatorTracking, useCalculatorFlow } from '@/utils/tracking-hooks'; // ← ADDED
 
 const RoofingMaterialsCalculator = () => {
+  // ← ADDED THESE 2 LINES
+  const { trackField, trackAction } = useCalculatorTracking('roofing-calculator');
+  useCalculatorFlow('roofing-calculator');
+
   // State for all inputs
   const [roofLength, setRoofLength] = useState(40);
   const [roofWidth, setRoofWidth] = useState(30);
@@ -203,6 +208,7 @@ const RoofingMaterialsCalculator = () => {
   };
 
   const handleStartOver = () => {
+    trackAction('reset'); // ← ADDED
     trackCalculatorInteraction.startOver('roofing');
     setRoofLength(40);
     setRoofWidth(30);
@@ -221,6 +227,7 @@ const RoofingMaterialsCalculator = () => {
   };  
 
   const handleCopyCalculation = async () => {
+    trackAction('copy'); // ← ADDED
     trackCalculatorInteraction.copyResults('roofing');
     if (!showResults) return;
     
@@ -383,6 +390,7 @@ const RoofingMaterialsCalculator = () => {
                     onChange={(value) => {
                       const newLength = Number(value);
                       setRoofLength(newLength);
+                      trackField('roofLength', newLength); // ← ADDED
                       setTimeout(() => validate(getValues()), 100);
                       // Auto-update ridge length for convenience (user can override)
                       if (ridgeLength === 0 || ridgeLength === roofLength) {
@@ -405,6 +413,7 @@ const RoofingMaterialsCalculator = () => {
                     onChange={(value) => {
                       const newWidth = Number(value);
                       setRoofWidth(newWidth);
+                      trackField('roofWidth', newWidth); // ← ADDED
                       setTimeout(() => validate(getValues()), 100);
                       // Auto-update attic area to match footprint (user can override)
                       const newFootprint = roofLength * newWidth;
@@ -420,7 +429,12 @@ const RoofingMaterialsCalculator = () => {
                   <SelectInput
                     label="Roof Pitch (X/12)"
                     value={roofPitch}
-                    onChange={(value) => { setRoofPitch(Number(value)); setTimeout(() => validate(getValues()), 100); }}
+                    onChange={(value) => { 
+                      const pitchValue = Number(value);
+                      setRoofPitch(pitchValue); 
+                      trackField('roofPitch', pitchValue); // ← ADDED
+                      setTimeout(() => validate(getValues()), 100); 
+                    }}
                     options={pitchOptions}
                   />
 
@@ -430,6 +444,7 @@ const RoofingMaterialsCalculator = () => {
                     onChange={(value) => {
                       const newComplexity = value;
                       setRoofComplexity(newComplexity);
+                      trackField('roofComplexity', newComplexity); // ← ADDED
                       // Reset hip length if switching to a roof type without hips
                       if (newComplexity === 'simple' || newComplexity === 'gable') {
                         setHipLength(0);
@@ -449,7 +464,10 @@ const RoofingMaterialsCalculator = () => {
                   <SelectInput
                     label="Shingle Type"
                     value={shingleType}
-                    onChange={setShingleType}
+                    onChange={(value) => {
+                      setShingleType(value);
+                      trackField('shingleType', value); // ← ADDED
+                    }}
                     options={shingleOptions}
                   />
 
@@ -498,7 +516,12 @@ const RoofingMaterialsCalculator = () => {
                   <NumberInput
                     label="Attic Floor Area (sq ft)"
                     value={atticArea}
-                    onChange={(value) => { setAtticArea(Number(value)); setTimeout(() => validate(getValues()), 100); }}
+                    onChange={(value) => { 
+                      const areaValue = Number(value);
+                      setAtticArea(areaValue); 
+                      trackField('atticArea', areaValue); // ← ADDED
+                      setTimeout(() => validate(getValues()), 100); 
+                    }}
                     unit="sq ft"
                     required={true}
                     fieldName="atticArea"
@@ -677,6 +700,7 @@ const RoofingMaterialsCalculator = () => {
                 <ResultsButtons
                   onCopy={handleCopyCalculation}
                   onPrint={() => {
+                    trackAction('print'); // ← ADDED
                     trackCalculatorInteraction.print('roofing');
                     printCalculation('Roofing Calculator');
                   }}

@@ -9,6 +9,7 @@ import { printCalculation } from '@/utils/printCalculation';
 import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
 import { FAQSection } from '@/components/FAQSection';
+import { useCalculatorTracking, useCalculatorFlow } from '@/utils/tracking-hooks'; // ← ADDED
 import { 
   NumberInput, 
   SelectInput, 
@@ -21,6 +22,10 @@ import {
 
 
 const ConcreteCalculator = () => {
+  // ← ADDED THESE 2 LINES
+  const { trackField, trackAction } = useCalculatorTracking('concrete-calculator');
+  useCalculatorFlow('concrete-calculator');
+  
   const resultsRef = useRef(null);
   // Project Type Selection
   const [projectType, setProjectType] = useState('slab');
@@ -448,6 +453,7 @@ const ConcreteCalculator = () => {
 };
 
   const handleReset = () => {
+    trackAction('reset'); // ← ADDED
     trackCalculatorInteraction.startOver('concrete');
     setSlabLength('');
     setSlabWidth('');
@@ -476,6 +482,7 @@ const ConcreteCalculator = () => {
   };
 
   const handleCopyCalculation = async () => {
+    trackAction('copy'); // ← ADDED
     if (!results) return;
 
     trackCalculatorInteraction.copyResults('concrete');
@@ -547,7 +554,10 @@ const ConcreteCalculator = () => {
                 ].map((type) => (
                   <button
                     key={type.value}
-                    onClick={() => setProjectType(type.value)}
+                    onClick={() => {
+                      setProjectType(type.value);
+                      trackField('projectType', type.value); // ← ADDED
+                    }}
                     className={`p-4 rounded-lg border-2 transition-all text-left ${
                       projectType === type.value
                         ? 'border-blue-600 bg-blue-50'
@@ -570,6 +580,7 @@ const ConcreteCalculator = () => {
                     value={slabLength}
                     onChange={(val) => { 
                       setSlabLength(val); 
+                      trackField('slabLength', val); // ← ADDED
                       setTimeout(() => validate(getValues()), 100); 
                     }}
                     unit="feet" 
@@ -581,6 +592,7 @@ const ConcreteCalculator = () => {
                     value={slabWidth}
                     onChange={(val) => { 
                       setSlabWidth(val); 
+                      trackField('slabWidth', val); // ← ADDED
                       setTimeout(() => validate(getValues()), 100); 
                     }}
                     unit="feet" 
@@ -592,6 +604,7 @@ const ConcreteCalculator = () => {
                     value={slabThickness}
                     onChange={(val) => { 
                       setSlabThickness(val); 
+                      trackField('slabThickness', val); // ← ADDED
                       setTimeout(() => validate(getValues()), 100); 
                     }}
                     options={[
@@ -614,6 +627,7 @@ const ConcreteCalculator = () => {
         value={footingLength}
         onChange={(val) => { 
           setFootingLength(val); 
+          trackField('footingLength', val); // ← ADDED
           setTimeout(() => validate(getValues()), 100); 
         }}
         unit="feet" 
@@ -691,6 +705,7 @@ const ConcreteCalculator = () => {
                     value={postCount}
                     onChange={(val) => { 
                       setPostCount(val); 
+                      trackField('postCount', val); // ← ADDED
                       setTimeout(() => validate(getValues()), 100);
                     }}
                     placeholder="Enter count"
@@ -854,7 +869,10 @@ const ConcreteCalculator = () => {
                 <SelectInput 
   label="PSI Strength Rating" 
   value={psiRating} 
-  onChange={setPsiRating}
+  onChange={(val) => {
+    setPsiRating(val);
+    trackField('psiRating', val); // ← ADDED
+  }}
   options={[
     { value: '2500', label: '2,500 PSI' },
     { value: '3000', label: '3,000 PSI' },
@@ -979,7 +997,10 @@ const ConcreteCalculator = () => {
                 {/* Action Buttons */}
                 <ResultsButtons
                   onCopy={handleCopyCalculation}
-                  onPrint={() => printCalculation('Concrete Calculator')}
+                  onPrint={() => {
+                    printCalculation('Concrete Calculator');
+                    trackAction('print'); // ← ADDED
+                  }}
                   copyButtonText={copyButtonText}
                 />
               </div>

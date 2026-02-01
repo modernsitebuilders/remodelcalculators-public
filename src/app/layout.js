@@ -4,7 +4,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import SiteSchema from '@/components/SiteSchema';
 import { SITE_CONFIG } from '@/data/siteConfig';
-import { GoogleAnalytics } from '@next/third-parties/google';
+import GoogleAnalytics from '@/components/GoogleAnalytics';
 import TrackingInitializer from '@/components/TrackingInitializer';
 
 const geistSans = Geist({
@@ -49,13 +49,13 @@ export default function RootLayout({ children }) {
         <SiteSchema />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}>
+        <GoogleAnalytics measurementId="G-KZBWPC3X69" />
         <TrackingInitializer />
         <Header />
         <main className="flex-grow">
           {children}
         </main>
         <Footer />
-        <GoogleAnalytics gaId="G-KZBWPC3X69" />
       </body>
     </html>
   );

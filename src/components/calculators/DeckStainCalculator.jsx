@@ -9,6 +9,7 @@ import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
 import { FAQSection } from '@/components/FAQSection';
 import { trackCalculatorInteraction } from '@/utils/buttonTracking';
+import { useCalculatorTracking, useCalculatorFlow } from '@/utils/tracking-hooks'; // ← ADDED
 import { 
   NumberInput, 
   SelectInput, 
@@ -28,6 +29,10 @@ const formatOptions = (optionsObj) => {
 };
 
 const DeckStainCalculator = () => {
+  // ← ADDED THESE 2 LINES
+  const { trackField, trackAction } = useCalculatorTracking('deck-stain-calculator');
+  useCalculatorFlow('deck-stain-calculator');
+  
   const [showResults, setShowResults] = useState(false);
   const [copyButtonText, setCopyButtonText] = useState('📋 Copy Calculation');
   const resultsRef = useRef(null);
@@ -64,6 +69,7 @@ const DeckStainCalculator = () => {
   });
 
   const handleReset = () => {
+    trackAction('reset'); // ← ADDED
     trackCalculatorInteraction.startOver('deck-stain');
     setInputs({
       deckLength: '',
@@ -333,6 +339,12 @@ const DeckStainCalculator = () => {
       
       return updates;
     });
+    
+    // ← ADDED TRACKING FOR KEY FIELDS
+    if (['deckLength', 'deckWidth', 'woodType', 'stainType', 'applicationMethod'].includes(field)) {
+      trackField(field, value);
+    }
+    
     setTimeout(() => validate(getValues()), 100);
   };
 
@@ -460,6 +472,7 @@ const DeckStainCalculator = () => {
   }, [inputs]);  
 
   const handleCopyCalculation = async () => {
+    trackAction('copy'); // ← ADDED
     trackCalculatorInteraction.copyResults('deck-stain');
     if (!showResults || results.totalArea === 0) return;
     
@@ -981,7 +994,10 @@ const DeckStainCalculator = () => {
                 <div className="bg-white rounded-lg shadow-lg p-6">
                   <ResultsButtons
                     onCopy={handleCopyCalculation}
-                    onPrint={() => printCalculation('Deck Stain Calculator')}
+                    onPrint={() => {
+                      printCalculation('Deck Stain Calculator');
+                      trackAction('print'); // ← ADDED
+                    }}
                     copyButtonText={copyButtonText}
                   />
                 </div>

@@ -9,6 +9,7 @@ import { printCalculation } from '@/utils/printCalculation';
 import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
 import { FAQSection } from '@/components/FAQSection';
+import { useCalculatorTracking, useCalculatorFlow } from '@/utils/tracking-hooks'; // ← ADDED
 import { 
   NumberInput,
   SelectInput,
@@ -20,6 +21,9 @@ import {
 } from '@/components/calculator';
 
 export default function PaintCalculator() {
+  const { trackField, trackAction } = useCalculatorTracking('interior-paint-calculator'); // ← ADDED
+  useCalculatorFlow('interior-paint-calculator'); // ← ADDED
+
   const [rooms, setRooms] = useState([{ 
     id: 1, 
     length: '', 
@@ -108,6 +112,7 @@ export default function PaintCalculator() {
       useCustomDoorSizes: false,
       useCustomWindowSizes: false
     }]);
+    trackField('addRoom', rooms.length + 1); // ← ADDED
   };
 
   const removeRoom = (id) => {
@@ -130,6 +135,7 @@ export default function PaintCalculator() {
       }
       return room;
     }));
+    trackField('addDoor', roomId); // ← ADDED
   };
 
   const removeDoor = (roomId, doorId) => {
@@ -163,6 +169,7 @@ export default function PaintCalculator() {
       }
       return room;
     }));
+    trackField('addWindow', roomId); // ← ADDED
   };
 
   const removeWindow = (roomId, windowId) => {
@@ -405,6 +412,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
   };
 
   const handleReset = () => {
+    trackAction('reset'); // ← ADDED
     trackCalculatorInteraction.startOver('interior-paint');
     
     // Reset all state to defaults
@@ -441,6 +449,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
   };
 
   const handleCopyCalculation = async () => {
+    trackAction('copy'); // ← ADDED
     trackCalculatorInteraction.copyResults('interior-paint');
     if (!showResults) return;
     
@@ -548,6 +557,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     value={room.length}
                     onChange={(value) => {
                       updateRoom(room.id, 'length', value);
+                      trackField('roomLength', value); // ← ADDED
                       setTimeout(() => validate(getValues()), 100);
                     }}
                     unit="feet"
@@ -561,6 +571,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     value={room.width}
                     onChange={(value) => {
                       updateRoom(room.id, 'width', value);
+                      trackField('roomWidth', value); // ← ADDED
                       setTimeout(() => validate(getValues()), 100);
                     }}
                     unit="feet"
@@ -572,7 +583,10 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                   <NumberInput
                     label="Height"
                     value={room.height}
-                    onChange={(value) => updateRoom(room.id, 'height', value)}
+                    onChange={(value) => {
+                      updateRoom(room.id, 'height', value);
+                      trackField('roomHeight', value); // ← ADDED
+                    }}
                     unit="feet"
                     required={true}
                     fieldName={`room${index}-height`}
@@ -590,7 +604,11 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                         <input
                           type="checkbox"
                           checked={room.useCustomDoorSizes}
-                          onChange={(e) => { updateRoom(room.id, 'useCustomDoorSizes', e.target.checked); setTimeout(() => validate(getValues()), 100); }}
+                          onChange={(e) => { 
+                            updateRoom(room.id, 'useCustomDoorSizes', e.target.checked); 
+                            trackField('useCustomDoorSizes', e.target.checked); // ← ADDED
+                            setTimeout(() => validate(getValues()), 100); 
+                          }}
                           className="w-3 h-3 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
                         />
                         <label className="text-xs text-gray-600 cursor-pointer">Use custom size</label>
@@ -613,7 +631,10 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                           <span className="text-xs text-gray-500 w-16">Door {doorIndex + 1}</span>
                           <SelectInput
                             value={door.size}
-                            onChange={(value) => updateDoor(room.id, door.id, value)}
+                            onChange={(value) => {
+                              updateDoor(room.id, door.id, value);
+                              trackField('doorSize', value); // ← ADDED
+                            }}
                             options={doorSizeOptions}
                             size="sm"
                           />
@@ -635,6 +656,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                         value={room.customDoorArea}
                         onChange={(value) => {
                           updateRoom(room.id, 'customDoorArea', value);
+                          trackField('customDoorArea', value); // ← ADDED
                           setTimeout(() => validate(getValues()), 100);
                         }}
                         unit="sq ft"
@@ -658,7 +680,11 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                         <input
                           type="checkbox"
                           checked={room.useCustomWindowSizes}
-                          onChange={(e) => { updateRoom(room.id, 'useCustomWindowSizes', e.target.checked); setTimeout(() => validate(getValues()), 100); }}
+                          onChange={(e) => { 
+                            updateRoom(room.id, 'useCustomWindowSizes', e.target.checked); 
+                            trackField('useCustomWindowSizes', e.target.checked); // ← ADDED
+                            setTimeout(() => validate(getValues()), 100); 
+                          }}
                           className="w-3 h-3 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
                         />
                         <label className="text-xs text-gray-600 cursor-pointer">Use custom size</label>
@@ -681,7 +707,10 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                           <span className="text-xs text-gray-500 w-16">Window {windowIndex + 1}</span>
                           <SelectInput
                             value={window.size}
-                            onChange={(value) => updateWindow(room.id, window.id, value)}
+                            onChange={(value) => {
+                              updateWindow(room.id, window.id, value);
+                              trackField('windowSize', value); // ← ADDED
+                            }}
                             options={windowSizeOptions}
                             size="sm"
                           />
@@ -703,6 +732,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                         value={room.customWindowArea}
                         onChange={(value) => {
                           updateRoom(room.id, 'customWindowArea', value);
+                          trackField('customWindowArea', value); // ← ADDED
                           setTimeout(() => validate(getValues()), 100);
                         }}
                         unit="sq ft"
@@ -737,7 +767,10 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                   <input
                     type="checkbox"
                     checked={paintWalls}
-                    onChange={(e) => setPaintWalls(e.target.checked)}
+                    onChange={(e) => {
+                      setPaintWalls(e.target.checked);
+                      trackField('paintWalls', e.target.checked); // ← ADDED
+                    }}
                     className="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
                   />
                   <label className="text-sm font-medium text-gray-700 cursor-pointer">Include walls</label>
@@ -756,31 +789,46 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     <SelectInput
                       label="Number of Coats"
                       value={wallCoats.toString()}
-                      onChange={(value) => setWallCoats(parseInt(value))}
+                      onChange={(value) => {
+                        setWallCoats(parseInt(value));
+                        trackField('wallCoats', value); // ← ADDED
+                      }}
                       options={coatOptions}
                     />
                     <SelectInput
                       label="Paint Quality"
                       value={wallPaintType}
-                      onChange={setWallPaintType}
+                      onChange={(value) => {
+                        setWallPaintType(value);
+                        trackField('wallPaintType', value); // ← ADDED
+                      }}
                       options={paintTypeOptions}
                     />
                     <SelectInput
                       label="Surface Texture"
                       value={wallSurfaceTexture}
-                      onChange={setWallSurfaceTexture}
+                      onChange={(value) => {
+                        setWallSurfaceTexture(value);
+                        trackField('wallSurfaceTexture', value); // ← ADDED
+                      }}
                       options={textureOptions}
                     />
                     <SelectInput
                       label="Surface Condition"
                       value={wallSurfaceCondition}
-                      onChange={setWallSurfaceCondition}
+                      onChange={(value) => {
+                        setWallSurfaceCondition(value);
+                        trackField('wallSurfaceCondition', value); // ← ADDED
+                      }}
                       options={conditionOptions}
                     />
                     <SelectInput
                       label="Application Method"
                       value={wallApplicationMethod}
-                      onChange={setWallApplicationMethod}
+                      onChange={(value) => {
+                        setWallApplicationMethod(value);
+                        trackField('wallApplicationMethod', value); // ← ADDED
+                      }}
                       options={applicationOptions}
                     />
                   </InputGrid>
@@ -796,7 +844,10 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                   <input
                     type="checkbox"
                     checked={paintCeiling}
-                    onChange={(e) => setPaintCeiling(e.target.checked)}
+                    onChange={(e) => {
+                      setPaintCeiling(e.target.checked);
+                      trackField('paintCeiling', e.target.checked); // ← ADDED
+                    }}
                     className="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
                   />
                   <label className="text-sm font-medium text-gray-700 cursor-pointer">Include ceilings</label>
@@ -815,25 +866,37 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     <SelectInput
                       label="Number of Coats"
                       value={ceilingCoats.toString()}
-                      onChange={(value) => setCeilingCoats(parseInt(value))}
+                      onChange={(value) => {
+                        setCeilingCoats(parseInt(value));
+                        trackField('ceilingCoats', value); // ← ADDED
+                      }}
                       options={coatOptions}
                     />
                     <SelectInput
                       label="Paint Quality"
                       value={ceilingPaintType}
-                      onChange={setCeilingPaintType}
+                      onChange={(value) => {
+                        setCeilingPaintType(value);
+                        trackField('ceilingPaintType', value); // ← ADDED
+                      }}
                       options={paintTypeOptions}
                     />
                     <SelectInput
                       label="Surface Condition"
                       value={ceilingSurfaceCondition}
-                      onChange={setCeilingSurfaceCondition}
+                      onChange={(value) => {
+                        setCeilingSurfaceCondition(value);
+                        trackField('ceilingSurfaceCondition', value); // ← ADDED
+                      }}
                       options={conditionOptions}
                     />
                     <SelectInput
                       label="Application Method"
                       value={ceilingApplicationMethod}
-                      onChange={setCeilingApplicationMethod}
+                      onChange={(value) => {
+                        setCeilingApplicationMethod(value);
+                        trackField('ceilingApplicationMethod', value); // ← ADDED
+                      }}
                       options={applicationOptions}
                     />
                   </InputGrid>
@@ -1065,7 +1128,10 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
             
             <ResultsButtons
               onCopy={handleCopyCalculation}
-              onPrint={() => printCalculation('Interior Paint Calculator')}
+              onPrint={() => {
+                printCalculation('Interior Paint Calculator');
+                trackAction('print'); // ← ADDED
+              }}
               onStartOver={handleReset}
               copyButtonText={copyButtonText}
               showStartOver={true}

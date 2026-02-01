@@ -9,6 +9,7 @@ import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { trackCalculatorInteraction } from '@/utils/buttonTracking';
 import { useValidation } from '@/hooks/useValidation';
 import { FAQSection } from '@/components/FAQSection';
+import { useCalculatorTracking, useCalculatorFlow } from '@/utils/tracking-hooks'; // ← ADDED
 import { 
   NumberInput,
   SelectInput,
@@ -20,6 +21,9 @@ import {
 } from '@/components/calculator';
 
 const MulchCalculator = () => {
+  const { trackField, trackAction } = useCalculatorTracking('mulch-calculator'); // ← ADDED
+  useCalculatorFlow('mulch-calculator'); // ← ADDED
+
   // State management
   const [shape, setShape] = useState('rectangle');
   const [length, setLength] = useState('');
@@ -229,6 +233,7 @@ const MulchCalculator = () => {
   };
 
   const handleReset = () => {
+    trackAction('reset'); // ← ADDED
     trackCalculatorInteraction.startOver('mulch');
     setLength('');
     setWidth('');
@@ -243,6 +248,7 @@ const MulchCalculator = () => {
   };
 
   const handleCopyCalculation = async () => {
+    trackAction('copy'); // ← ADDED
     if (!showResults || !hasResults) return;
     trackCalculatorInteraction.copyResults('mulch');
     
@@ -308,7 +314,10 @@ const MulchCalculator = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">Area Shape</label>
               <div className="grid grid-cols-2 gap-3">
                 <button
-                  onClick={() => setShape('rectangle')}
+                  onClick={() => {
+                    setShape('rectangle');
+                    trackField('shape', 'rectangle'); // ← ADDED
+                  }}
                   className={`p-3 rounded-lg border-2 transition-all ${
                     shape === 'rectangle'
                       ? 'border-green-600 bg-green-50 text-green-700'
@@ -318,7 +327,10 @@ const MulchCalculator = () => {
                   Rectangle/Square
                 </button>
                 <button
-                  onClick={() => setShape('circle')}
+                  onClick={() => {
+                    setShape('circle');
+                    trackField('shape', 'circle'); // ← ADDED
+                  }}
                   className={`p-3 rounded-lg border-2 transition-all ${
                     shape === 'circle'
                       ? 'border-green-600 bg-green-50 text-green-700'
@@ -338,6 +350,7 @@ const MulchCalculator = () => {
                   value={length}
                   onChange={(value) => { 
                     setLength(value); 
+                    trackField('length', value); // ← ADDED
                     setTimeout(() => validate(getValues()), 100); 
                   }}
                   unit="feet"
@@ -349,6 +362,7 @@ const MulchCalculator = () => {
                   value={width}
                   onChange={(value) => { 
                     setWidth(value); 
+                    trackField('width', value); // ← ADDED
                     setTimeout(() => validate(getValues()), 100); 
                   }}
                   unit="feet"
@@ -363,6 +377,7 @@ const MulchCalculator = () => {
                   value={diameter}
                   onChange={(value) => { 
                     setDiameter(value); 
+                    trackField('diameter', value); // ← ADDED
                     setTimeout(() => validate(getValues()), 100); 
                   }}
                   unit="feet"
@@ -379,6 +394,7 @@ const MulchCalculator = () => {
                 value={depth}
                 onChange={(value) => { 
                   setDepth(value); 
+                  trackField('depth', value); // ← ADDED
                   setTimeout(() => validate(getValues()), 100); 
                 }}
                 options={depthPresets}
@@ -389,6 +405,7 @@ const MulchCalculator = () => {
                   value={customDepth}
                   onChange={(value) => { 
                     setCustomDepth(value); 
+                    trackField('customDepth', value); // ← ADDED
                     setTimeout(() => validate(getValues()), 100); 
                   }}
                   unit="inches"
@@ -404,7 +421,10 @@ const MulchCalculator = () => {
               <SelectInput
                 label="Material Type"
                 value={materialType}
-                onChange={setMaterialType}
+                onChange={(value) => {
+                  setMaterialType(value);
+                  trackField('materialType', value); // ← ADDED
+                }}
                 options={materialOptions}
               />
             </div>
@@ -414,7 +434,10 @@ const MulchCalculator = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">Purchase Format</label>
               <div className="grid grid-cols-2 gap-3">
                 <button
-                  onClick={() => setPurchaseFormat('bulk')}
+                  onClick={() => {
+                    setPurchaseFormat('bulk');
+                    trackField('purchaseFormat', 'bulk'); // ← ADDED
+                  }}
                   className={`p-3 rounded-lg border-2 transition-all ${
                     purchaseFormat === 'bulk'
                       ? 'border-green-600 bg-green-50 text-green-700'
@@ -424,7 +447,10 @@ const MulchCalculator = () => {
                   Bulk (Cubic Yards)
                 </button>
                 <button
-                  onClick={() => setPurchaseFormat('bags')}
+                  onClick={() => {
+                    setPurchaseFormat('bags');
+                    trackField('purchaseFormat', 'bags'); // ← ADDED
+                  }}
                   className={`p-3 rounded-lg border-2 transition-all ${
                     purchaseFormat === 'bags'
                       ? 'border-green-600 bg-green-50 text-green-700'
@@ -442,7 +468,10 @@ const MulchCalculator = () => {
                 <SelectInput
                   label="Bag Size"
                   value={bagSize}
-                  onChange={setBagSize}
+                  onChange={(value) => {
+                    setBagSize(value);
+                    trackField('bagSize', value); // ← ADDED
+                  }}
                   options={bagSizeOptions}
                 />
               </div>
@@ -454,7 +483,10 @@ const MulchCalculator = () => {
                 type="checkbox"
                 id="waste"
                 checked={includeWaste}
-                onChange={(e) => setIncludeWaste(e.target.checked)}
+                onChange={(e) => {
+                  setIncludeWaste(e.target.checked);
+                  trackField('includeWaste', e.target.checked); // ← ADDED
+                }}
                 className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
               />
               <label htmlFor="waste" className="text-sm text-gray-700">
@@ -550,7 +582,10 @@ const MulchCalculator = () => {
                 <SectionCard>
                   <ResultsButtons
                     onCopy={handleCopyCalculation}
-                    onPrint={() => printCalculation('Mulch Calculator')}
+                    onPrint={() => {
+                      printCalculation('Mulch Calculator');
+                      trackAction('print'); // ← ADDED
+                    }}
                     copyButtonText={copyButtonText}
                   />
                 </SectionCard>
