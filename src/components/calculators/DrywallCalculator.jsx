@@ -198,13 +198,11 @@ export default function DrywallCalculator() {
     const gallonsPerCoat = totalArea / 280;
     const totalMudGallons = Math.ceil(gallonsPerCoat * 3);
     
-    const tapeFeetByArea = totalAreaWithWaste * 5;
-    const tapeFeetByPerimeter = sheetsNeeded * sheetPerimeter;
-    const totalTapeFeet = Math.ceil(Math.max(tapeFeetByArea, tapeFeetByPerimeter));
+    const totalTapeFeet = Math.ceil(sheetsNeeded * sheetPerimeter * 1.15);
     const tapeRolls = Math.ceil(totalTapeFeet / 500);
     
     const wallScrews = Math.ceil(wallAreaWithWaste * 1.0);
-    const ceilingScrews = Math.ceil(ceilingAreaWithWaste * 1.25);
+    const ceilingScrews = Math.ceil(ceilingAreaWithWaste * 1.5);
     const totalScrews = wallScrews + ceilingScrews;
     const screwPounds = Math.ceil(totalScrews / 300);
 
@@ -557,7 +555,7 @@ export default function DrywallCalculator() {
                   value={results.tapeRolls}
                   unit="rolls"
                   subtitle={`${results.tapeFeet} linear feet`}
-                  note="Industry standard: 500 ft per 100 sq ft drywall"
+                  note="Sheet perimeter method with 15% waste factor"
                   color="green"
                 />
 
