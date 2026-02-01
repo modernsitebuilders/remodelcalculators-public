@@ -1,10 +1,10 @@
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import SiteSchema from '@/components/SiteSchema';
 import { SITE_CONFIG } from '@/data/siteConfig';
-import GoogleAnalytics from '@/components/GoogleAnalytics';
 import TrackingInitializer from '@/components/TrackingInitializer';
 
 const geistSans = Geist({
@@ -49,7 +49,26 @@ export default function RootLayout({ children }) {
         <SiteSchema />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}>
-        <GoogleAnalytics measurementId="G-KZBWPC3X69" />
+        <Script
+          id="gtag-base"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-KZBWPC3X69', {
+                send_page_view: true,
+                debug_mode: true
+              });
+              console.log('✅ GA4 initialized');
+            `
+          }}
+        />
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-KZBWPC3X69"
+          strategy="afterInteractive"
+        />
         <TrackingInitializer />
         <Header />
         <main className="flex-grow">
