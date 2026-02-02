@@ -190,11 +190,11 @@ export default function FlooringCalculator() {
         if (installerExp === 'diy') baseFactor += 5;
         break;
       case 'vinyl':
-        if (layoutPattern === 'straight') baseFactor = 6;
-        else if (layoutPattern === 'diagonal') baseFactor = 12.5;
-        else if (layoutPattern === 'herringbone') baseFactor = 13.5;
-        if (installerExp === 'diy') baseFactor += 5;
-        break;
+  if (layoutPattern === 'straight') baseFactor = 10;
+  else if (layoutPattern === 'diagonal') baseFactor = 15;
+  else if (layoutPattern === 'herringbone') baseFactor = 20;
+  if (installerExp === 'diy') baseFactor += 5;
+  break;
       case 'tile':
   if (layoutPattern === 'straight') baseFactor = 5;
   else if (layoutPattern === 'diagonal') baseFactor = 15;
