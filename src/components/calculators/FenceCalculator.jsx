@@ -146,19 +146,27 @@ useCalculatorFlow('fence-calculator');
       },
       CommonRules.unrealistic(12, 72, 'Frost depth')
     ],
-    corners: [
-      CommonRules.unrealistic(0, 20, 'Number of corners'),
-      {
-        condition: (val, allVals) => {
-          const num = parseFloat(val);
-          const linear = parseFloat(allVals.linearFeet);
-          if (!num || !linear || num === 0 || linear === 0) return false;
-          return num > linear / 15;
-        },
-        message: 'High number of corners for fence length - please verify',
-        type: ValidationTypes.WARNING
-      }
-    ]
+   corners: [
+  CommonRules.unrealistic(0, 20, 'Number of corners'),
+  {
+    condition: (val, allVals) => {
+      const num = parseFloat(val);
+      const linear = parseFloat(allVals.linearFeet);
+      if (!num || !linear || num === 0 || linear === 0) return false;
+      return num > linear / 15;
+    },
+    message: 'High number of corners for fence length - please verify',
+    type: ValidationTypes.WARNING
+  },
+  {
+    condition: (val) => {
+      const num = parseFloat(val);
+      return num < 3 && fenceLayout === 'continuous';
+    },
+    message: 'Continuous fences need 3+ corners to form a closed loop. Consider "Open-Ended" layout.',
+    type: ValidationTypes.WARNING
+  }
+]
   };
 
   const getValues = () => ({
@@ -295,19 +303,19 @@ useCalculatorFlow('fence-calculator');
     }
     
     let rails = 0;
-    let totalRailLength = 0;
-    
-    if (['standard-privacy', 'board-on-board', 'picket'].includes(fenceType)) {
-      const railsPerSection = height <= 4 ? 2 : (height <= 7 ? 3 : 4);
-      rails = sections * railsPerSection;
-      const rails16ft = Math.floor(rails / 2);
-      const rails8ft = rails % 2;
-      totalRailLength = (rails16ft * 16) + (rails8ft * 8);
-    } else if (fenceType === 'split-rail' || fenceType === 'split-rail-chain') {
-      const railsPerSection = height <= 3 ? 2 : (height <= 4 ? 3 : 4);
-      rails = sections * railsPerSection;
-      totalRailLength = rails * railLength;
-    }
+let totalRailLength = 0;
+
+if (['standard-privacy', 'board-on-board', 'picket'].includes(fenceType)) {
+  const railsPerHeight = height <= 4 ? 2 : (height <= 7 ? 3 : 4);
+  totalRailLength = linearFt * railsPerHeight;
+  const rails16ft = Math.floor(totalRailLength / 16);
+  const rails8ft = Math.ceil((totalRailLength - (rails16ft * 16)) / 8);
+  rails = rails16ft + rails8ft;
+} else if (fenceType === 'split-rail' || fenceType === 'split-rail-chain') {
+  const railsPerSection = height <= 3 ? 2 : (height <= 4 ? 3 : 4);
+  rails = sections * railsPerSection;
+  totalRailLength = rails * railLength;
+}
     
     const railFasteners = rails * 4;
     const picketFasteners = pickets * (fenceType === 'horizontal-slat' ? 2 : (height <= 4 ? 2 : 3)) * 2;

@@ -196,10 +196,10 @@ export default function FlooringCalculator() {
         if (installerExp === 'diy') baseFactor += 5;
         break;
       case 'tile':
-        if (layoutPattern === 'straight') baseFactor = 7.5;
-        else if (layoutPattern === 'diagonal') baseFactor = 12.5;
-        else if (layoutPattern === 'herringbone') baseFactor = 15;
-        break;
+  if (layoutPattern === 'straight') baseFactor = 5;
+  else if (layoutPattern === 'diagonal') baseFactor = 15;
+  else if (layoutPattern === 'herringbone') baseFactor = 20;
+  break;
       case 'carpet':
         baseFactor = 10;
         if (patternMatch) baseFactor = 20;
@@ -264,13 +264,17 @@ export default function FlooringCalculator() {
       );
     }
 
-    if (selectedFlooringType === 'tile') {
-      additionalMaterials.unshift(
-        { name: 'Thin-set mortar', qty: Math.ceil(totalMaterialNeeded / 65), note: '50 lb bags' },
-        { name: 'Grout', qty: Math.ceil(totalMaterialNeeded / 130), note: '25 lb bags' },
-        { name: 'Backer board', qty: Math.ceil(areaSquareFeet / 15), note: "3'×5' sheets" }
-      );
-    }
+   if (selectedFlooringType === 'tile') {
+  // Grout coverage: ~0.05 lbs per sq ft for standard 12x12 with 3/16" grout
+  const groutLbsNeeded = Math.ceil(totalMaterialNeeded * 0.05);
+  const groutBagsNeeded = Math.ceil(groutLbsNeeded / 25);
+  
+  additionalMaterials.unshift(
+    { name: 'Thin-set mortar', qty: Math.ceil(totalMaterialNeeded / 60), note: '50 lb bags' },
+    { name: 'Grout', qty: groutBagsNeeded, note: `25 lb bags (~${groutLbsNeeded} lbs needed)` },
+    { name: 'Backer board', qty: Math.ceil(areaSquareFeet / 15), note: "3'×5' sheets" }
+  );
+}
 
     const recommendations = [];
     switch (selectedFlooringType) {
