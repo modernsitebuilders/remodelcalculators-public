@@ -18,7 +18,8 @@ import { printCalculation } from '@/utils/printCalculation';
 import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
 import { FAQSection } from '@/components/FAQSection';
-import { useCalculatorTracking, useCalculatorFlow } from '@/utils/tracking-hooks'; // ← ADDED
+import { useCalculatorTracking, useCalculatorFlow } from '@/utils/tracking-hooks';
+import FlagModal from '@/components/FlagModal'; // ← ADDED IMPORT
 
 const SidingCalculator = () => {
     console.log("SIDING CALCULATOR LOADED - FILE IS CORRECT");  // ADD THIS LINE
@@ -67,6 +68,24 @@ const SidingCalculator = () => {
   const [results, setResults] = useState(null);
   const [copyButtonText, setCopyButtonText] = useState('📋 Copy Calculation');
   const resultsRef = useRef(null);
+
+  // Capture current calculator state for flag report ← ADDED FUNCTION
+  const captureInputs = () => ({
+    // Project data
+    ...projectData,
+    
+    // Current step
+    step,
+    
+    // Calculated results (if available)
+    ...(results && {
+      areas: results.areas,
+      siding: results.siding,
+      accessories: results.accessories,
+      fasteners: results.fasteners,
+      underlayment: results.underlayment
+    })
+  });
 
   // Siding specifications database
   const sidingSpecs = {
@@ -1399,6 +1418,14 @@ const SidingCalculator = () => {
               Next →
             </button>
           )}
+        </div>
+        
+        {/* Flag Modal Component */}
+        <div className="mt-8 text-center">
+          <FlagModal 
+            calculatorName="Siding Calculator"
+            captureInputs={captureInputs}
+          />
         </div>
       </div>
       <FAQSection calculatorId="siding-calculator" />

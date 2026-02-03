@@ -19,6 +19,7 @@ import {
   SectionCard,
   InputGrid
 } from '@/components/calculator';
+import FlagModal from '@/components/FlagModal'; // ← ADDED IMPORT
 
 
 const ConcreteCalculator = () => {
@@ -480,6 +481,46 @@ const ConcreteCalculator = () => {
     setCustomWasteFactor('');
     setResults(null);
   };
+
+  // Capture current calculator state for flag report ← ADDED FUNCTION
+  const captureInputs = () => ({
+    projectType,
+    ...(projectType === 'slab' && {
+      slabLength,
+      slabWidth,
+      slabThickness
+    }),
+    ...(projectType === 'footing' && {
+      footingLength,
+      footingWidth,
+      footingDepth
+    }),
+    ...(projectType === 'posthole' && {
+      postDiameter,
+      postDepth,
+      postCount
+    }),
+    ...(projectType === 'stairs' && {
+      stairWidth,
+      riserHeight,
+      treadDepth,
+      numberOfSteps
+    }),
+    ...(projectType === 'wall' && {
+      wallLength,
+      wallHeight,
+      wallThickness
+    }),
+    ...(projectType === 'column' && {
+      columnDiameter,
+      columnHeight,
+      columnCount
+    }),
+    psiRating,
+    region,
+    customWasteFactor,
+    results
+  });
 
   const handleCopyCalculation = async () => {
     trackAction('copy'); // ← ADDED
@@ -1093,6 +1134,11 @@ const ConcreteCalculator = () => {
               and installation methods.
             </p>
           </div>
+          {/* Flag Button - Replaced with FlagModal component */}
+          <FlagModal 
+            calculatorName="Concrete Calculator"
+            captureInputs={captureInputs}
+          />
         </div>
       </div>
       <FAQSection calculatorId="concrete-calculator" />

@@ -8,7 +8,8 @@ import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
 import { FAQSection } from '@/components/FAQSection';
 import { trackCalculatorInteraction } from '@/utils/buttonTracking';
-import { useCalculatorTracking, useCalculatorFlow } from '@/utils/tracking-hooks'; // ← ADDED
+import { useCalculatorTracking, useCalculatorFlow } from '@/utils/tracking-hooks';
+import FlagModal from '@/components/FlagModal'; // ← ADDED IMPORT
 import { 
   NumberInput,
   SelectInput,
@@ -20,8 +21,8 @@ import {
 } from '@/components/calculator';
 
 export default function FlooringCalculator() {
-  const { trackField, trackAction } = useCalculatorTracking('flooring-calculator'); // ← ADDED
-  useCalculatorFlow('flooring-calculator'); // ← ADDED
+  const { trackField, trackAction } = useCalculatorTracking('flooring-calculator');
+  useCalculatorFlow('flooring-calculator');
 
   const [selectedFlooringType, setSelectedFlooringType] = useState('');
   const [roomLength, setRoomLength] = useState('');
@@ -43,7 +44,7 @@ export default function FlooringCalculator() {
 
   const handleFlooringTypeSelect = (type) => {
     setSelectedFlooringType(type);
-    trackField('flooringType', type); // ← ADDED
+    trackField('flooringType', type);
     setShowResults(false);
   };
 
@@ -340,7 +341,7 @@ export default function FlooringCalculator() {
   };
 
   const handleReset = () => {
-    trackAction('reset'); // ← ADDED
+    trackAction('reset');
     trackCalculatorInteraction.startOver('flooring');
     setSelectedFlooringType('');
     setRoomLength('');
@@ -360,7 +361,7 @@ export default function FlooringCalculator() {
   };  
 
   const handleCopyCalculation = async () => {
-    trackAction('copy'); // ← ADDED
+    trackAction('copy');
     trackCalculatorInteraction.copyResults('flooring');
     if (!showResults || !results) return;
     
@@ -403,6 +404,24 @@ export default function FlooringCalculator() {
       alert('Unable to copy. Please copy results manually.');
     }
   };
+
+  // Capture current calculator state for flag report
+  const captureInputs = () => ({
+    selectedFlooringType,
+    roomLength,
+    roomWidth,
+    layoutPattern,
+    roomComplexity,
+    installerExp,
+    plankWidth,
+    customPlankWidth,
+    tileWidth,
+    tileLength,
+    groutWidth,
+    carpetWidth,
+    patternMatch,
+    results
+  });
 
   return (  
     <>
@@ -716,7 +735,7 @@ export default function FlooringCalculator() {
                   value={roomLength}
                   onChange={(value) => {
                     setRoomLength(value);
-                    trackField('roomLength', value); // ← ADDED
+                    trackField('roomLength', value);
                     setTimeout(() => validate(getValues()), 100);
                   }}
                   unit="feet"
@@ -728,7 +747,7 @@ export default function FlooringCalculator() {
                   value={roomWidth}
                   onChange={(value) => {
                     setRoomWidth(value);
-                    trackField('roomWidth', value); // ← ADDED
+                    trackField('roomWidth', value);
                     setTimeout(() => validate(getValues()), 100);
                   }}
                   unit="feet"
@@ -747,7 +766,7 @@ export default function FlooringCalculator() {
                     value={layoutPattern}
                     onChange={(value) => {
                       setLayoutPattern(value);
-                      trackField('layoutPattern', value); // ← ADDED
+                      trackField('layoutPattern', value);
                     }}
                     options={layoutPatternOptions}
                   />
@@ -758,7 +777,7 @@ export default function FlooringCalculator() {
                   value={roomComplexity}
                   onChange={(value) => {
                     setRoomComplexity(value);
-                    trackField('roomComplexity', value); // ← ADDED
+                    trackField('roomComplexity', value);
                   }}
                   options={roomComplexityOptions}
                 />
@@ -768,7 +787,7 @@ export default function FlooringCalculator() {
                   value={installerExp}
                   onChange={(value) => {
                     setInstallerExp(value);
-                    trackField('installerExperience', value); // ← ADDED
+                    trackField('installerExperience', value);
                   }}
                   options={installerExpOptions}
                 />
@@ -782,7 +801,7 @@ export default function FlooringCalculator() {
                     value={plankWidth}
                     onChange={(value) => {
                       setPlankWidth(value);
-                      trackField('plankWidth', value); // ← ADDED
+                      trackField('plankWidth', value);
                       setTimeout(() => validate(getValues()), 100);
                     }}
                     options={plankWidthOptions}
@@ -794,7 +813,7 @@ export default function FlooringCalculator() {
                         value={customPlankWidth}
                         onChange={(value) => {
                           setCustomPlankWidth(value);
-                          trackField('customPlankWidth', value); // ← ADDED
+                          trackField('customPlankWidth', value);
                           setTimeout(() => validate(getValues()), 100);
                         }}
                         unit="inches"
@@ -819,7 +838,7 @@ export default function FlooringCalculator() {
                       value={tileWidth}
                       onChange={(value) => {
                         setTileWidth(value);
-                        trackField('tileWidth', value); // ← ADDED
+                        trackField('tileWidth', value);
                         setTimeout(() => validate(getValues()), 100);
                       }}
                       options={tileSizeOptions}
@@ -829,7 +848,7 @@ export default function FlooringCalculator() {
                       value={tileLength}
                       onChange={(value) => {
                         setTileLength(value);
-                        trackField('tileLength', value); // ← ADDED
+                        trackField('tileLength', value);
                         setTimeout(() => validate(getValues()), 100);
                       }}
                       options={tileSizeOptions}
@@ -852,7 +871,7 @@ export default function FlooringCalculator() {
                       value={carpetWidth}
                       onChange={(value) => {
                         setCarpetWidth(value);
-                        trackField('carpetWidth', value); // ← ADDED
+                        trackField('carpetWidth', value);
                       }}
                       options={carpetWidthOptions}
                     />
@@ -945,7 +964,7 @@ export default function FlooringCalculator() {
                   onCopy={handleCopyCalculation}
                   onPrint={() => {
                     printCalculation('Flooring Calculator');
-                    trackAction('print'); // ← ADDED
+                    trackAction('print');
                   }}
                   copyButtonText={copyButtonText}
                 />
@@ -957,6 +976,13 @@ export default function FlooringCalculator() {
         <div className="footer">
           <p className="footer-text">Based on NWFA, NTCA, TCNA, CRI, and RFCI industry standards</p>
         </div>
+        
+        {/* Add FlagModal component */}
+        <FlagModal 
+          calculatorName="Flooring Calculator"
+          captureInputs={captureInputs}
+        />
+        
         <FAQSection calculatorId="flooring-calculator" />
       </div>
     </>

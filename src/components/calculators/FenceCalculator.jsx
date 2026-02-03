@@ -9,6 +9,7 @@ import { useValidation } from '@/hooks/useValidation';
 import { FAQSection } from '@/components/FAQSection';
 import { trackCalculatorInteraction } from '@/utils/buttonTracking';
 import { useCalculatorTracking, useCalculatorFlow } from '@/utils/tracking-hooks';
+import FlagModal from '@/components/FlagModal';
 import { 
   NumberInput,
   SelectInput,
@@ -499,6 +500,28 @@ const handleCopyCalculation = async () => {
     setHasCalculated(false);
   };
 
+  // Capture current calculator state for flag report
+  const captureInputs = () => ({
+    linearFeet,
+    fenceType,
+    height,
+    boardWidth,
+    boardSpacing,
+    railLength,
+    vinylStyle,
+    terrain,
+    slopeMethod,
+    frostDepth,
+    gates3ft,
+    gates4ft,
+    gates6ft,
+    gates10ft,
+    gates12ft,
+    corners,
+    fenceLayout,
+    materials
+  });
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
@@ -833,6 +856,10 @@ const handleCopyCalculation = async () => {
             )}
           </div>
         </div>
+        <FlagModal 
+          calculatorName="Fence Calculator"
+          captureInputs={captureInputs}
+        />
       </div>
       <FAQSection calculatorId="fence-calculator" />
     </div>

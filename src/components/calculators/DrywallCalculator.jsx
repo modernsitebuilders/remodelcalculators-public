@@ -19,6 +19,7 @@ import {
   CalculateButtons,
   ResultsButtons
 } from '@/components/calculator';
+import FlagModal from '@/components/FlagModal'; // ← ADDED IMPORT
 
 // Industry standards based on USG specifications and ASTM C840
 const SHEET_SIZES = {
@@ -74,6 +75,14 @@ export default function DrywallCalculator() {
   
   const resultsRef = useRef(null);
   const [copyButtonText, setCopyButtonText] = useState('📋 Copy Calculation');
+
+  // Capture current calculator state for flag report ← ADDED FUNCTION
+  const captureInputs = () => ({
+    rooms,
+    sheetSize,
+    thickness,
+    results
+  });
 
   const validationRules = {
     'room0-length': [
@@ -617,6 +626,15 @@ export default function DrywallCalculator() {
           </div>
         )}
       </div>
+      
+      {/* Flag Modal Component */}
+      <div className="mt-8 p-6 border-t border-gray-200">
+        <FlagModal 
+          calculatorName="Drywall Calculator"
+          captureInputs={captureInputs}
+        />
+      </div>
+      
       <FAQSection calculatorId="drywall-calculator" />
     </div>
   );

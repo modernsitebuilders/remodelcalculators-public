@@ -9,7 +9,8 @@ import { printCalculation } from '@/utils/printCalculation';
 import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
 import { FAQSection } from '@/components/FAQSection';
-import { useCalculatorTracking, useCalculatorFlow } from '@/utils/tracking-hooks'; // ← ADDED
+import { useCalculatorTracking, useCalculatorFlow } from '@/utils/tracking-hooks';
+import FlagModal from '@/components/FlagModal'; // ← ADDED IMPORT
 import { 
   NumberInput,
   SelectInput,
@@ -21,8 +22,8 @@ import {
 } from '@/components/calculator';
 
 export default function PaintCalculator() {
-  const { trackField, trackAction } = useCalculatorTracking('interior-paint-calculator'); // ← ADDED
-  useCalculatorFlow('interior-paint-calculator'); // ← ADDED
+  const { trackField, trackAction } = useCalculatorTracking('interior-paint-calculator');
+  useCalculatorFlow('interior-paint-calculator');
 
   const [rooms, setRooms] = useState([{ 
     id: 1, 
@@ -112,7 +113,7 @@ export default function PaintCalculator() {
       useCustomDoorSizes: false,
       useCustomWindowSizes: false
     }]);
-    trackField('addRoom', rooms.length + 1); // ← ADDED
+    trackField('addRoom', rooms.length + 1);
   };
 
   const removeRoom = (id) => {
@@ -135,7 +136,7 @@ export default function PaintCalculator() {
       }
       return room;
     }));
-    trackField('addDoor', roomId); // ← ADDED
+    trackField('addDoor', roomId);
   };
 
   const removeDoor = (roomId, doorId) => {
@@ -169,7 +170,7 @@ export default function PaintCalculator() {
       }
       return room;
     }));
-    trackField('addWindow', roomId); // ← ADDED
+    trackField('addWindow', roomId);
   };
 
   const removeWindow = (roomId, windowId) => {
@@ -412,7 +413,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
   };
 
   const handleReset = () => {
-    trackAction('reset'); // ← ADDED
+    trackAction('reset');
     trackCalculatorInteraction.startOver('interior-paint');
     
     // Reset all state to defaults
@@ -449,7 +450,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
   };
 
   const handleCopyCalculation = async () => {
-    trackAction('copy'); // ← ADDED
+    trackAction('copy');
     trackCalculatorInteraction.copyResults('interior-paint');
     if (!showResults) return;
     
@@ -518,6 +519,23 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
     }
   };
 
+  // Capture current calculator state for flag report
+  const captureInputs = () => ({
+    rooms,
+    paintWalls,
+    wallCoats,
+    wallSurfaceTexture,
+    wallSurfaceCondition,
+    wallApplicationMethod,
+    wallPaintType,
+    paintCeiling,
+    ceilingCoats,
+    ceilingSurfaceCondition,
+    ceilingApplicationMethod,
+    ceilingPaintType,
+    results: showResults ? calculatePaint() : null
+  });
+
   const results = showResults ? calculatePaint() : null; 
 
   return (
@@ -557,7 +575,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     value={room.length}
                     onChange={(value) => {
                       updateRoom(room.id, 'length', value);
-                      trackField('roomLength', value); // ← ADDED
+                      trackField('roomLength', value);
                       setTimeout(() => validate(getValues()), 100);
                     }}
                     unit="feet"
@@ -571,7 +589,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     value={room.width}
                     onChange={(value) => {
                       updateRoom(room.id, 'width', value);
-                      trackField('roomWidth', value); // ← ADDED
+                      trackField('roomWidth', value);
                       setTimeout(() => validate(getValues()), 100);
                     }}
                     unit="feet"
@@ -585,7 +603,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     value={room.height}
                     onChange={(value) => {
                       updateRoom(room.id, 'height', value);
-                      trackField('roomHeight', value); // ← ADDED
+                      trackField('roomHeight', value);
                     }}
                     unit="feet"
                     required={true}
@@ -606,7 +624,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                           checked={room.useCustomDoorSizes}
                           onChange={(e) => { 
                             updateRoom(room.id, 'useCustomDoorSizes', e.target.checked); 
-                            trackField('useCustomDoorSizes', e.target.checked); // ← ADDED
+                            trackField('useCustomDoorSizes', e.target.checked);
                             setTimeout(() => validate(getValues()), 100); 
                           }}
                           className="w-3 h-3 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
@@ -633,7 +651,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                             value={door.size}
                             onChange={(value) => {
                               updateDoor(room.id, door.id, value);
-                              trackField('doorSize', value); // ← ADDED
+                              trackField('doorSize', value);
                             }}
                             options={doorSizeOptions}
                             size="sm"
@@ -656,7 +674,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                         value={room.customDoorArea}
                         onChange={(value) => {
                           updateRoom(room.id, 'customDoorArea', value);
-                          trackField('customDoorArea', value); // ← ADDED
+                          trackField('customDoorArea', value);
                           setTimeout(() => validate(getValues()), 100);
                         }}
                         unit="sq ft"
@@ -682,7 +700,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                           checked={room.useCustomWindowSizes}
                           onChange={(e) => { 
                             updateRoom(room.id, 'useCustomWindowSizes', e.target.checked); 
-                            trackField('useCustomWindowSizes', e.target.checked); // ← ADDED
+                            trackField('useCustomWindowSizes', e.target.checked);
                             setTimeout(() => validate(getValues()), 100); 
                           }}
                           className="w-3 h-3 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
@@ -709,7 +727,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                             value={window.size}
                             onChange={(value) => {
                               updateWindow(room.id, window.id, value);
-                              trackField('windowSize', value); // ← ADDED
+                              trackField('windowSize', value);
                             }}
                             options={windowSizeOptions}
                             size="sm"
@@ -732,7 +750,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                         value={room.customWindowArea}
                         onChange={(value) => {
                           updateRoom(room.id, 'customWindowArea', value);
-                          trackField('customWindowArea', value); // ← ADDED
+                          trackField('customWindowArea', value);
                           setTimeout(() => validate(getValues()), 100);
                         }}
                         unit="sq ft"
@@ -769,7 +787,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     checked={paintWalls}
                     onChange={(e) => {
                       setPaintWalls(e.target.checked);
-                      trackField('paintWalls', e.target.checked); // ← ADDED
+                      trackField('paintWalls', e.target.checked);
                     }}
                     className="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
                   />
@@ -791,7 +809,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       value={wallCoats.toString()}
                       onChange={(value) => {
                         setWallCoats(parseInt(value));
-                        trackField('wallCoats', value); // ← ADDED
+                        trackField('wallCoats', value);
                       }}
                       options={coatOptions}
                     />
@@ -800,7 +818,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       value={wallPaintType}
                       onChange={(value) => {
                         setWallPaintType(value);
-                        trackField('wallPaintType', value); // ← ADDED
+                        trackField('wallPaintType', value);
                       }}
                       options={paintTypeOptions}
                     />
@@ -809,7 +827,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       value={wallSurfaceTexture}
                       onChange={(value) => {
                         setWallSurfaceTexture(value);
-                        trackField('wallSurfaceTexture', value); // ← ADDED
+                        trackField('wallSurfaceTexture', value);
                       }}
                       options={textureOptions}
                     />
@@ -818,7 +836,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       value={wallSurfaceCondition}
                       onChange={(value) => {
                         setWallSurfaceCondition(value);
-                        trackField('wallSurfaceCondition', value); // ← ADDED
+                        trackField('wallSurfaceCondition', value);
                       }}
                       options={conditionOptions}
                     />
@@ -827,7 +845,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       value={wallApplicationMethod}
                       onChange={(value) => {
                         setWallApplicationMethod(value);
-                        trackField('wallApplicationMethod', value); // ← ADDED
+                        trackField('wallApplicationMethod', value);
                       }}
                       options={applicationOptions}
                     />
@@ -846,7 +864,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                     checked={paintCeiling}
                     onChange={(e) => {
                       setPaintCeiling(e.target.checked);
-                      trackField('paintCeiling', e.target.checked); // ← ADDED
+                      trackField('paintCeiling', e.target.checked);
                     }}
                     className="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
                   />
@@ -868,7 +886,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       value={ceilingCoats.toString()}
                       onChange={(value) => {
                         setCeilingCoats(parseInt(value));
-                        trackField('ceilingCoats', value); // ← ADDED
+                        trackField('ceilingCoats', value);
                       }}
                       options={coatOptions}
                     />
@@ -877,7 +895,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       value={ceilingPaintType}
                       onChange={(value) => {
                         setCeilingPaintType(value);
-                        trackField('ceilingPaintType', value); // ← ADDED
+                        trackField('ceilingPaintType', value);
                       }}
                       options={paintTypeOptions}
                     />
@@ -886,7 +904,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       value={ceilingSurfaceCondition}
                       onChange={(value) => {
                         setCeilingSurfaceCondition(value);
-                        trackField('ceilingSurfaceCondition', value); // ← ADDED
+                        trackField('ceilingSurfaceCondition', value);
                       }}
                       options={conditionOptions}
                     />
@@ -895,7 +913,7 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
                       value={ceilingApplicationMethod}
                       onChange={(value) => {
                         setCeilingApplicationMethod(value);
-                        trackField('ceilingApplicationMethod', value); // ← ADDED
+                        trackField('ceilingApplicationMethod', value);
                       }}
                       options={applicationOptions}
                     />
@@ -1130,13 +1148,19 @@ const { validate, ValidationDisplay } = useValidation(validationRules);
               onCopy={handleCopyCalculation}
               onPrint={() => {
                 printCalculation('Interior Paint Calculator');
-                trackAction('print'); // ← ADDED
+                trackAction('print');
               }}
               onStartOver={handleReset}
               copyButtonText={copyButtonText}
               showStartOver={true}
             />
           </div>
+
+          {/* Add FlagModal component */}
+          <FlagModal 
+            calculatorName="Interior Paint Calculator"
+            captureInputs={captureInputs}
+          />
         </div>
       </div>
       <FAQSection calculatorId="interior-paint-calculator" />

@@ -17,7 +17,8 @@ import { printCalculation } from '@/utils/printCalculation';
 import { CommonRules, ValidationTypes } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
 import { FAQSection } from '@/components/FAQSection';
-import { useCalculatorTracking, useCalculatorFlow } from '@/utils/tracking-hooks'; // ← ADDED
+import { useCalculatorTracking, useCalculatorFlow } from '@/utils/tracking-hooks';
+import FlagModal from '@/components/FlagModal'; // ← ADDED IMPORT
 
 const RoofingMaterialsCalculator = () => {
   // ← ADDED THESE 2 LINES
@@ -58,6 +59,44 @@ const RoofingMaterialsCalculator = () => {
     complex: 0.15,
     highly_complex: 0.20
   };
+
+  // Capture current calculator state for flag report ← ADDED FUNCTION
+  const captureInputs = () => ({
+    // Input values
+    roofLength,
+    roofWidth,
+    roofPitch,
+    roofComplexity,
+    shingleType,
+    underlaymentType,
+    windZone,
+    coldClimate,
+    atticArea,
+    ridgeLength,
+    hipLength,
+    valleyLength,
+    includeRakeStarter,
+    
+    // Calculated results
+    footprint,
+    actualRoofArea,
+    totalWithWaste,
+    squares,
+    wasteFactor: wasteFactor * 100,
+    pitchMultiplier,
+    totalBundles,
+    bundlesPerSquare,
+    underlaymentRolls,
+    starterBundles,
+    ridgeCapBundles,
+    iceWaterRolls,
+    dripEdgePieces,
+    nailBoxes,
+    totalShingleNails,
+    totalCapNails,
+    adjustedRidgeVent,
+    requiredNFA
+  });
 
   // Format options helper
   const formatOptions = (optionsObj) => {
@@ -208,7 +247,7 @@ const RoofingMaterialsCalculator = () => {
   };
 
   const handleStartOver = () => {
-    trackAction('reset'); // ← ADDED
+    trackAction('reset');
     trackCalculatorInteraction.startOver('roofing');
     setRoofLength(40);
     setRoofWidth(30);
@@ -227,7 +266,7 @@ const RoofingMaterialsCalculator = () => {
   };  
 
   const handleCopyCalculation = async () => {
-    trackAction('copy'); // ← ADDED
+    trackAction('copy');
     trackCalculatorInteraction.copyResults('roofing');
     if (!showResults) return;
     
@@ -390,7 +429,7 @@ const RoofingMaterialsCalculator = () => {
                     onChange={(value) => {
                       const newLength = Number(value);
                       setRoofLength(newLength);
-                      trackField('roofLength', newLength); // ← ADDED
+                      trackField('roofLength', newLength);
                       setTimeout(() => validate(getValues()), 100);
                       // Auto-update ridge length for convenience (user can override)
                       if (ridgeLength === 0 || ridgeLength === roofLength) {
@@ -413,7 +452,7 @@ const RoofingMaterialsCalculator = () => {
                     onChange={(value) => {
                       const newWidth = Number(value);
                       setRoofWidth(newWidth);
-                      trackField('roofWidth', newWidth); // ← ADDED
+                      trackField('roofWidth', newWidth);
                       setTimeout(() => validate(getValues()), 100);
                       // Auto-update attic area to match footprint (user can override)
                       const newFootprint = roofLength * newWidth;
@@ -432,7 +471,7 @@ const RoofingMaterialsCalculator = () => {
                     onChange={(value) => { 
                       const pitchValue = Number(value);
                       setRoofPitch(pitchValue); 
-                      trackField('roofPitch', pitchValue); // ← ADDED
+                      trackField('roofPitch', pitchValue);
                       setTimeout(() => validate(getValues()), 100); 
                     }}
                     options={pitchOptions}
@@ -444,7 +483,7 @@ const RoofingMaterialsCalculator = () => {
                     onChange={(value) => {
                       const newComplexity = value;
                       setRoofComplexity(newComplexity);
-                      trackField('roofComplexity', newComplexity); // ← ADDED
+                      trackField('roofComplexity', newComplexity);
                       // Reset hip length if switching to a roof type without hips
                       if (newComplexity === 'simple' || newComplexity === 'gable') {
                         setHipLength(0);
@@ -466,7 +505,7 @@ const RoofingMaterialsCalculator = () => {
                     value={shingleType}
                     onChange={(value) => {
                       setShingleType(value);
-                      trackField('shingleType', value); // ← ADDED
+                      trackField('shingleType', value);
                     }}
                     options={shingleOptions}
                   />
@@ -519,7 +558,7 @@ const RoofingMaterialsCalculator = () => {
                     onChange={(value) => { 
                       const areaValue = Number(value);
                       setAtticArea(areaValue); 
-                      trackField('atticArea', areaValue); // ← ADDED
+                      trackField('atticArea', areaValue);
                       setTimeout(() => validate(getValues()), 100); 
                     }}
                     unit="sq ft"
@@ -700,7 +739,7 @@ const RoofingMaterialsCalculator = () => {
                 <ResultsButtons
                   onCopy={handleCopyCalculation}
                   onPrint={() => {
-                    trackAction('print'); // ← ADDED
+                    trackAction('print');
                     trackCalculatorInteraction.print('roofing');
                     printCalculation('Roofing Calculator');
                   }}
@@ -724,6 +763,12 @@ const RoofingMaterialsCalculator = () => {
         {/* Footer */}
         <div className="text-center mt-6 text-slate-400 text-sm">
           <p>Based on NRCA standards, IRC/IBC codes, and manufacturer specifications from GAF, CertainTeed, Owens Corning, and IKO</p>
+          <div className="mt-4 flex justify-center">
+            <FlagModal 
+              calculatorName="Roofing Materials Calculator"
+              captureInputs={captureInputs}
+            />
+          </div>
         </div>
       </div>
       <FAQSection calculatorId="roofing-calculator" />

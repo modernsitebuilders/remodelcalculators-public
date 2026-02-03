@@ -19,6 +19,7 @@ import {
   CalculateButtons, 
   ResultsButtons 
 } from '@/components/calculator';
+import FlagModal from '@/components/FlagModal'; // ← ADDED IMPORT
 
 // Convert option objects to array format for SelectInput
 const formatOptions = (optionsObj) => {
@@ -103,6 +104,12 @@ const DeckStainCalculator = () => {
     });
     setShowResults(false);
   };
+
+  // Capture current calculator state for flag report ← ADDED FUNCTION
+  const captureInputs = () => ({
+    ...inputs,
+    results: showResults ? results : null
+  });
 
   const woodTypes = {
     pressure_treated: {
@@ -1096,6 +1103,13 @@ const DeckStainCalculator = () => {
           <p className="text-sm text-yellow-900">
             <strong>Important:</strong> This calculator uses conservative estimates based on industry research showing field coverage is typically 20-40% lower than manufacturer specifications. Coverage rates account for wood absorption, surface texture, condition, and application method waste.
           </p>
+        </div>
+        {/* Flag Button - Replaced with FlagModal component */}
+        <div className="mt-6 pt-6 border-t border-gray-300">
+          <FlagModal 
+            calculatorName="Deck Stain Calculator"
+            captureInputs={captureInputs}
+          />
         </div>
       </div>
       <FAQSection calculatorId="deck-stain-calculator" />

@@ -19,6 +19,7 @@ import {
   CalculateButtons,
   ResultsButtons
 } from '@/components/calculator';
+import FlagModal from '@/components/FlagModal'; // ← ADDED IMPORT
 
 const ExteriorPaintCalculator = () => {
   // ← ADDED THESE 2 LINES
@@ -47,6 +48,12 @@ const ExteriorPaintCalculator = () => {
   const roundUpToWholeGallon = (value) => {
     return Math.ceil(value);
   };
+
+  // Capture current calculator state for flag report ← ADDED FUNCTION
+  const captureInputs = () => ({
+    ...inputs,
+    calculations: showResults ? calculations : null
+  });
 
   // Surface type characteristics
   const surfaceTypes = {
@@ -575,6 +582,13 @@ const ExteriorPaintCalculator = () => {
             <strong>Based on professional industry standards</strong> from PCA (Painting Contractors Association) 
             and MPI (Master Painters Institute). Calculations account for surface porosity, texture, and application method.
           </p>
+          {/* Flag Modal Component */}
+          <div className="mt-6">
+            <FlagModal 
+              calculatorName="Exterior Paint Calculator"
+              captureInputs={captureInputs}
+            />
+          </div>
         </div>
       </div>
       <FAQSection calculatorId="exterior-paint-calculator" />
