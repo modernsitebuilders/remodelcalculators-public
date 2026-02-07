@@ -187,21 +187,25 @@ export default function DrywallCalculator() {
     const sheetPerimeter = SHEET_SIZES[sheetSize].perimeter;
     const wallThicknessSpec = THICKNESS_SPECS[thickness];
     
-    // Calculate wall sheets
-    const wallSheets = Math.ceil(wallAreaWithWaste / sheetArea);
-    const wallWeight = wallSheets * wallThicknessSpec.weight;
-    
-    // Calculate ceiling sheets separately
-    let ceilingSheets = 0;
-    let ceilingWeight = 0;
-    let ceilingThicknessSpec = null;
-    if (totalCeilingArea > 0 && firstCeilingThickness) {
-      ceilingThicknessSpec = THICKNESS_SPECS[firstCeilingThickness];
-      ceilingSheets = Math.ceil(ceilingAreaWithWaste / sheetArea);
-      ceilingWeight = ceilingSheets * ceilingThicknessSpec.weight;
-    }
-    
-    const sheetsNeeded = wallSheets + ceilingSheets;
+    // Calculate total area with waste (already computed above)
+// totalAreaWithWaste = wallAreaWithWaste + ceilingAreaWithWaste - totalDeductions
+
+// INDUSTRY STANDARD: Single rounding operation prevents over-estimation
+const sheetsNeeded = Math.ceil(totalAreaWithWaste / sheetArea);
+
+// For display purposes - estimate the split between walls and ceiling
+const wallSheets = Math.round(wallAreaWithWaste / sheetArea);
+const ceilingSheets = sheetsNeeded - wallSheets;
+
+// Calculate weights
+const wallWeight = wallSheets * wallThicknessSpec.weight;
+
+let ceilingWeight = 0;
+let ceilingThicknessSpec = null;
+if (totalCeilingArea > 0 && firstCeilingThickness) {
+  ceilingThicknessSpec = THICKNESS_SPECS[firstCeilingThickness];
+  ceilingWeight = ceilingSheets * ceilingThicknessSpec.weight;
+}
     const totalWeight = wallWeight + ceilingWeight;
     
     const gallonsPerCoat = totalArea / 280;
