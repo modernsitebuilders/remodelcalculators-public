@@ -190,7 +190,11 @@ export default function Footer() {
               Professional construction material calculators. Results are estimates - always verify with industry professionals.
             </p>
           </div>
-        </div>
+         {/* Affiliate Disclosure */}
+  <p className="text-xs text-gray-600 text-center mt-4">
+    As an Amazon Associate, we earn from qualifying purchases at no cost to you.
+  </p>
+</div>
       </div>
     </footer>
   );
